@@ -1,4 +1,4 @@
-package com.kulenina.questix;
+package com.kulenina.questix.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.kulenina.questix.R;
 import com.kulenina.questix.service.AuthService;
 
 import androidx.appcompat.app.AppCompatActivity;

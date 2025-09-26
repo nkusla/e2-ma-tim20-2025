@@ -1,4 +1,4 @@
-package com.kulenina.questix;
+package com.kulenina.questix.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseUser;
+import com.kulenina.questix.R;
 import com.kulenina.questix.service.AuthService;
 
 public class MainActivity extends AppCompatActivity {

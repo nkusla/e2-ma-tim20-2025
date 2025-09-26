@@ -1,4 +1,4 @@
-package com.kulenina.questix;
+package com.kulenina.questix.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
+import com.kulenina.questix.R;
 import com.kulenina.questix.service.AuthService;
 
 public class RegistrationActivity extends AppCompatActivity {

@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Questix">
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan|stateHidden">
             <intent-filter>
@@ -24,11 +24,11 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="false" />
 
         <activity
-            android:name=".RegistrationActivity"
+            android:name=".activity.RegistrationActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden" />
     </application>
