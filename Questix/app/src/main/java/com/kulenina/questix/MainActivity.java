@@ -17,11 +17,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseUser;
+import com.kulenina.questix.service.AuthService;
 
 public class MainActivity extends AppCompatActivity {
 	private AuthService authHelper;
 	private TextView textViewWelcome;
-	private Button buttonAddTestData;
 	private Button buttonLogout;
 
 	@Override
@@ -43,17 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
 		// Initialize views
 		textViewWelcome = findViewById(R.id.textViewWelcome);
-		buttonAddTestData = findViewById(R.id.buttonAddTestData);
 		buttonLogout = findViewById(R.id.buttonLogout);
 
-		// Set up test data button (before login check)
-		buttonAddTestData.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				authHelper.addTestData();
-				Toast.makeText(MainActivity.this, "Test data added to Firestore!", Toast.LENGTH_SHORT).show();
-			}
-		});
 
 		// Set up logout button
 		buttonLogout.setOnClickListener(new View.OnClickListener() {

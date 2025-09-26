@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fillViewport="true"
+	android:scrollbars="vertical"
+	android:fadeScrollbars="false">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:padding="16dp"
+		android:gravity="center">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Create your account"
+			android:textSize="16sp"
+			android:layout_marginBottom="24dp"
+			android:textColor="@color/black" />
+
+		<!-- Avatar Selection -->
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Choose your avatar"
+			android:textSize="16sp"
+			android:textStyle="bold"
+			android:layout_marginBottom="16dp"
+			android:textColor="@color/black" />
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:gravity="center"
+			android:layout_marginBottom="16dp">
+
+			<ImageView
+				android:id="@+id/avatar1"
+				android:layout_width="80dp"
+				android:layout_height="80dp"
+				android:layout_margin="8dp"
+				android:padding="6dp"
+				android:src="@drawable/avatar_1"
+				android:background="@drawable/avatar_border_unselected"
+				android:clickable="true"
+				android:focusable="true"
+				android:contentDescription="Avatar 1" />
+
+			<ImageView
+				android:id="@+id/avatar2"
+				android:layout_width="80dp"
+				android:layout_height="80dp"
+				android:layout_margin="8dp"
+				android:padding="6dp"
+				android:src="@drawable/avatar_2"
+				android:background="@drawable/avatar_border_unselected"
+				android:clickable="true"
+				android:focusable="true"
+				android:contentDescription="Avatar 2" />
+
+			<ImageView
+				android:id="@+id/avatar3"
+				android:layout_width="80dp"
+				android:layout_height="80dp"
+				android:layout_margin="8dp"
+				android:padding="6dp"
+				android:src="@drawable/avatar_3"
+				android:background="@drawable/avatar_border_unselected"
+				android:clickable="true"
+				android:focusable="true"
+				android:contentDescription="Avatar 3" />
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:gravity="center"
+			android:layout_marginBottom="16dp">
+
+			<ImageView
+				android:id="@+id/avatar4"
+				android:layout_width="80dp"
+				android:layout_height="80dp"
+				android:layout_margin="8dp"
+				android:padding="6dp"
+				android:src="@drawable/avatar_4"
+				android:background="@drawable/avatar_border_unselected"
+				android:clickable="true"
+				android:focusable="true"
+				android:contentDescription="Avatar 4" />
+
+			<ImageView
+				android:id="@+id/avatar5"
+				android:layout_width="80dp"
+				android:layout_height="80dp"
+				android:layout_margin="8dp"
+				android:padding="6dp"
+				android:src="@drawable/avatar_5"
+				android:background="@drawable/avatar_border_unselected"
+				android:clickable="true"
+				android:focusable="true"
+				android:contentDescription="Avatar 5" />
+
+		</LinearLayout>
+
+		<!-- Email Field -->
+		<com.google.android.material.textfield.TextInputLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="12dp"
+			android:hint="Email"
+			app:startIconDrawable="@android:drawable/ic_dialog_email">
+
+			<com.google.android.material.textfield.TextInputEditText
+				android:id="@+id/editTextEmail"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:inputType="textEmailAddress"
+				android:autofillHints="email" />
+
+		</com.google.android.material.textfield.TextInputLayout>
+
+		<!-- Username Field -->
+		<com.google.android.material.textfield.TextInputLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="12dp"
+			android:hint="Username"
+			app:startIconDrawable="@android:drawable/ic_menu_edit">
+
+			<com.google.android.material.textfield.TextInputEditText
+				android:id="@+id/editTextUsername"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:inputType="text"
+				android:autofillHints="username" />
+
+		</com.google.android.material.textfield.TextInputLayout>
+
+		<!-- Password Field -->
+		<com.google.android.material.textfield.TextInputLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="12dp"
+			android:hint="Password"
+			app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
+			app:endIconMode="password_toggle">
+
+			<com.google.android.material.textfield.TextInputEditText
+				android:id="@+id/editTextPassword"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:inputType="textPassword"
+				android:autofillHints="password" />
+
+		</com.google.android.material.textfield.TextInputLayout>
+
+		<!-- Confirm Password Field -->
+		<com.google.android.material.textfield.TextInputLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="16dp"
+			android:hint="Confirm Password"
+			app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
+			app:endIconMode="password_toggle">
+
+			<com.google.android.material.textfield.TextInputEditText
+				android:id="@+id/editTextConfirmPassword"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:inputType="textPassword"
+				android:autofillHints="password" />
+
+		</com.google.android.material.textfield.TextInputLayout>
+
+		<!-- Register Button -->
+		<Button
+			android:id="@+id/buttonRegister"
+			android:layout_width="match_parent"
+			android:layout_height="56dp"
+			android:layout_marginBottom="16dp"
+			android:text="Create Account"
+			android:textSize="16sp"
+			android:textStyle="bold"
+			android:backgroundTint="@color/purple_500"
+			android:onClick="onRegisterClick" />
+
+		<!-- Login Link -->
+		<TextView
+			android:id="@+id/textViewLogin"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Already have an account? Sign In"
+			android:textSize="14sp"
+			android:textColor="@color/purple_500"
+			android:clickable="true"
+			android:focusable="true"
+			android:padding="8dp"
+			android:onClick="onLoginClick" />
+
+		<ProgressBar
+			android:id="@+id/progressBar"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:visibility="gone" />
+
+	</LinearLayout>
+
+</ScrollView>

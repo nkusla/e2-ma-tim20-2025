@@ -36,8 +36,13 @@ public class Repository<T extends IIdentifiable> {
       return db.collection(collectionName).document(object.getId()).set(data);
     }
 
-    public Task<DocumentSnapshot> read(T object) {
-      return db.collection(collectionName).document(object.getId()).get();
+    public Task<T> read(String id) {
+      return db.collection(collectionName)
+        .document(id)
+        .get()
+        .continueWith(task ->
+          toObject(task.getResult())
+        );
     }
 
     public Task<QuerySnapshot> readAll() {
@@ -51,5 +56,15 @@ public class Repository<T extends IIdentifiable> {
 
     public Task<Void> delete(T object) {
       return db.collection(collectionName).document(object.getId()).delete();
+    }
+
+    private T toObject(DocumentSnapshot document) {
+      if (document == null || !document.exists()) {
+        return null;
+      }
+
+      String documentId = document.getId();
+      Map<String, Object> data = document.getData();
+      return mapper.fromMap(data, documentId);
     }
 }
