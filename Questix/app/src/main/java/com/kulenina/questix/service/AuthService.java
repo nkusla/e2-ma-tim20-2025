@@ -4,16 +4,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.kulenina.questix.repository.Repository;
+import com.kulenina.questix.repository.UserRepository;
 import com.kulenina.questix.model.User;
 
 public class AuthService {
-	private FirebaseAuth mAuth;
-	private Repository<User> userRepository;
+	private final FirebaseAuth mAuth;
+	private final UserRepository userRepository;
 
 	public AuthService() {
 		mAuth = FirebaseAuth.getInstance();
-		userRepository = new Repository<User>("users", User.class);
+		userRepository = new UserRepository();
 	}
 
 	public FirebaseUser getCurrentUser() {

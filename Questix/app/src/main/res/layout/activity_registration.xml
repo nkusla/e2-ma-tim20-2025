@@ -133,7 +133,7 @@
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="12dp"
 			android:hint="Username"
-			app:startIconDrawable="@android:drawable/ic_menu_edit">
+			app:startIconDrawable="@drawable/ic_person">
 
 			<com.google.android.material.textfield.TextInputEditText
 				android:id="@+id/editTextUsername"
