@@ -29,7 +29,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.kulenina.questix.R;
 import com.kulenina.questix.databinding.ActivityMainBinding;
 import com.kulenina.questix.fragment.UserProfileFragment;
-import com.kulenina.questix.fragment.QuestsFragment;
 import com.kulenina.questix.fragment.AllianceListFragment;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.fragment.UserSearchFragment;
@@ -100,16 +99,10 @@ public class MainActivity extends AppCompatActivity {
 		int itemId = item.getItemId();
 		if (itemId == R.id.nav_profile) {
 			showUserProfile();
-		} else if (itemId == R.id.nav_quests) {
-			showQuests();
 		} else if (itemId == R.id.nav_alliances) {
 			showAlliances();
 		} else if (itemId == R.id.nav_search_users) {
 			showUserSearch();
-		} else if (itemId == R.id.nav_achievements) {
-			Toast.makeText(this, "Achievements coming soon!", Toast.LENGTH_SHORT).show();
-		} else if (itemId == R.id.nav_settings) {
-			Toast.makeText(this, "Settings coming soon!", Toast.LENGTH_SHORT).show();
 		} else if (itemId == R.id.nav_logout) {
 			logout();
 		}
@@ -123,11 +116,6 @@ public class MainActivity extends AppCompatActivity {
 			UserProfileFragment fragment = UserProfileFragment.newInstance(currentUser.getUid());
 			replaceFragment(fragment);
 		}
-	}
-
-	private void showQuests() {
-		QuestsFragment fragment = new QuestsFragment();
-		replaceFragment(fragment);
 	}
 
 	private void showUserSearch() {

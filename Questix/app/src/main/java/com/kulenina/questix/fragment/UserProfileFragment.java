@@ -41,6 +41,9 @@ public class UserProfileFragment extends Fragment {
         authService = new AuthService();
         binding.setViewModel(userViewModel);
 
+        // Initialize UI state - show loading by default
+        showLoadingState();
+
         if (getArguments() != null) {
             String userId = getArguments().getString("userId");
             if (userId != null) {
@@ -48,6 +51,11 @@ public class UserProfileFragment extends Fragment {
                 setupFriendButton(userId);
             }
         }
+    }
+
+    private void showLoadingState() {
+        userViewModel.setIsLoading(true);
+        userViewModel.setErrorMessage(null);
     }
 
     private void fetchUserById(String userId) {
@@ -71,6 +79,8 @@ public class UserProfileFragment extends Fragment {
 
     public void setUser(User user) {
         if (userViewModel != null) {
+            userViewModel.setIsLoading(false);
+            userViewModel.setErrorMessage(null);
             userViewModel.setUser(user);
         }
     }
