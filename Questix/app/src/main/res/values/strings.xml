@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Questix</string>
+    <string name="not_set">Not set</string>
 </resources>

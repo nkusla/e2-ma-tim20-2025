@@ -84,7 +84,15 @@ public class AuthService {
 			return mAuth.signInWithEmailAndPassword(email, password);
 		}
 
-		public void logout() {
-			mAuth.signOut();
+	public void logout() {
+		mAuth.signOut();
+	}
+
+	public Task<User> getCurrentUserProfile() {
+		FirebaseUser firebaseUser = getCurrentUser();
+		if (firebaseUser == null) {
+			throw new RuntimeException("No user logged in");
 		}
+		return userRepository.read(firebaseUser.getUid());
+	}
 }
