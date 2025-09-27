@@ -15,6 +15,10 @@
 			android:icon="@android:drawable/ic_menu_agenda"
 			android:title="Quests" />
 		<item
+			android:id="@+id/nav_alliances"
+			android:icon="@drawable/ic_group"
+			android:title="Alliances" />
+		<item
 			android:id="@+id/nav_achievements"
 			android:icon="@android:drawable/ic_menu_gallery"
 			android:title="Achievements" />

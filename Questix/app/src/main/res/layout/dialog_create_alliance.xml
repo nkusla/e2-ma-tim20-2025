@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:padding="24dp">
+
+	<!-- Alliance Name -->
+	<com.google.android.material.textfield.TextInputLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="16dp"
+		android:hint="Alliance Name">
+
+		<com.google.android.material.textfield.TextInputEditText
+			android:id="@+id/editTextAllianceName"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:maxLength="30"
+			android:inputType="textCapWords" />
+
+	</com.google.android.material.textfield.TextInputLayout>
+
+	<!-- Alliance Description -->
+	<com.google.android.material.textfield.TextInputLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="16dp"
+		android:hint="Description (Optional)">
+
+		<com.google.android.material.textfield.TextInputEditText
+			android:id="@+id/editTextAllianceDescription"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:maxLength="100"
+			android:inputType="textCapSentences|textMultiLine"
+			android:lines="2" />
+
+	</com.google.android.material.textfield.TextInputLayout>
+
+	<!-- Friends Section -->
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Invite Friends"
+		android:textSize="18sp"
+		android:textStyle="bold"
+		android:layout_marginBottom="8dp" />
+
+	<TextView
+		android:id="@+id/textViewSelectedCount"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="No friends selected"
+		android:textSize="14sp"
+		android:textColor="@android:color/darker_gray"
+		android:layout_marginBottom="12dp" />
+
+	<!-- Progress Bar -->
+	<ProgressBar
+		android:id="@+id/progressBar"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_marginBottom="16dp"
+		android:visibility="gone" />
+
+	<!-- No Friends Message -->
+	<TextView
+		android:id="@+id/textViewNoFriends"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Loading friends..."
+		android:textSize="14sp"
+		android:textColor="@android:color/darker_gray"
+		android:layout_gravity="center"
+		android:layout_marginBottom="16dp"
+		android:visibility="gone" />
+
+	<!-- Friends RecyclerView -->
+	<androidx.recyclerview.widget.RecyclerView
+		android:id="@+id/recyclerViewFriends"
+		android:layout_width="match_parent"
+		android:layout_height="200dp"
+		android:layout_marginBottom="16dp"
+		android:visibility="gone" />
+
+	<!-- Buttons -->
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:gravity="end">
+
+		<Button
+			android:id="@+id/buttonCancel"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Cancel"
+			android:layout_marginEnd="8dp"
+			style="@style/Widget.Material3.Button.TextButton" />
+
+		<Button
+			android:id="@+id/buttonCreate"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Create Alliance"
+			android:enabled="true" />
+
+	</LinearLayout>
+
+</LinearLayout>

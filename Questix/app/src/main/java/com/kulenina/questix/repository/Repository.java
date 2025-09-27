@@ -76,6 +76,10 @@ public class Repository<T extends IIdentifiable> {
       return db.collection(collectionName).document(object.getId()).delete();
     }
 
+    public Task<Void> delete(String id) {
+      return db.collection(collectionName).document(id).delete();
+    }
+
     private T toObject(DocumentSnapshot document) {
       if (document == null || !document.exists()) {
         return null;

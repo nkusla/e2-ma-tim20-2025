@@ -13,7 +13,9 @@ public class User implements IIdentifiable, Serializable {
 	public Integer powerPoints;
 	public Integer xp;
 	public Integer coins;
-	public List<String> friends; // List of friend user IDs
+	public List<String> friends;
+	public String currentAllianceId;
+	public List<String> allianceInvitations;
 
 	public User() {
 		this.level = 1;
@@ -21,6 +23,7 @@ public class User implements IIdentifiable, Serializable {
 		this.xp = 0;
 		this.coins = 0;
 		this.friends = new ArrayList<>();
+		this.allianceInvitations = new ArrayList<>();
 	}
 
 	public User(String id, String avatar, String username, String email, Integer level, Integer powerPoints, Integer xp, Integer coins) {
@@ -33,6 +36,7 @@ public class User implements IIdentifiable, Serializable {
 		this.xp = xp;
 		this.coins = coins;
 		this.friends = new ArrayList<>();
+		this.allianceInvitations = new ArrayList<>();
 	}
 
 	@Override
@@ -57,5 +61,40 @@ public class User implements IIdentifiable, Serializable {
 
 	public boolean isFriend(String friendId) {
 		return friends != null && friends.contains(friendId);
+	}
+
+	public void setCurrentAlliance(String allianceId) {
+		this.currentAllianceId = allianceId;
+	}
+
+	public void leaveAlliance() {
+		this.currentAllianceId = null;
+	}
+
+	public boolean isInAlliance() {
+		return currentAllianceId != null && !currentAllianceId.isEmpty();
+	}
+
+	public void addAllianceInvitation(String invitationId) {
+		if (allianceInvitations == null) {
+			allianceInvitations = new ArrayList<>();
+		}
+		if (!allianceInvitations.contains(invitationId)) {
+			allianceInvitations.add(invitationId);
+		}
+	}
+
+	public void removeAllianceInvitation(String invitationId) {
+		if (allianceInvitations != null) {
+			allianceInvitations.remove(invitationId);
+		}
+	}
+
+	public boolean hasPendingInvitations() {
+		return allianceInvitations != null && !allianceInvitations.isEmpty();
+	}
+
+	public int getPendingInvitationCount() {
+		return allianceInvitations != null ? allianceInvitations.size() : 0;
 	}
 }
