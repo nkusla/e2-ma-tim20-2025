@@ -3,8 +3,6 @@ package com.kulenina.questix.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -31,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.kulenina.questix.R;
 import com.kulenina.questix.databinding.ActivityMainBinding;
 import com.kulenina.questix.fragment.UserProfileFragment;
+import com.kulenina.questix.fragment.QuestsFragment;
 import com.kulenina.questix.model.User;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.viewmodel.UserViewModel;
@@ -102,10 +101,12 @@ public class MainActivity extends AppCompatActivity {
 				} else {
 					populateWithFirebaseUserData(firebaseUser);
 				}
+				showUserProfile();
 			})
 			.addOnFailureListener(e -> {
 				populateWithFirebaseUserData(firebaseUser);
 				userViewModel.setErrorMessage("Could not load profile data");
+				showUserProfile();
 			});
 		}
 	}
@@ -125,8 +126,7 @@ public class MainActivity extends AppCompatActivity {
 			if (itemId == R.id.nav_profile) {
 				showUserProfile();
 			} else if (itemId == R.id.nav_quests) {
-				// TODO: Implement quests functionality
-				Toast.makeText(this, "Quests coming soon!", Toast.LENGTH_SHORT).show();
+				showQuests();
 			} else if (itemId == R.id.nav_achievements) {
 				// TODO: Implement achievements functionality
 				Toast.makeText(this, "Achievements coming soon!", Toast.LENGTH_SHORT).show();
@@ -146,8 +146,23 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void showUserProfile() {
-		// For now, just show a toast. In a real app, you might navigate to a profile fragment
-		Toast.makeText(this, "User Profile - " + userViewModel.getUsername(), Toast.LENGTH_SHORT).show();
+		UserProfileFragment fragment = new UserProfileFragment();
+		Bundle args = new Bundle();
+		args.putSerializable("user", userViewModel.getUser());
+		fragment.setArguments(args);
+		replaceFragment(fragment);
+	}
+
+	private void showQuests() {
+		QuestsFragment fragment = new QuestsFragment();
+		replaceFragment(fragment);
+	}
+
+	private void replaceFragment(Fragment fragment) {
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		transaction.replace(R.id.fragment_container, fragment);
+		transaction.commit();
 	}
 
 	private void updateNavigationHeader(User user) {
@@ -163,23 +178,6 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main_menu, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.action_logout) {
-			authService.logout();
-			Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-			startActivity(new Intent(this, LoginActivity.class));
-			finish();
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 
 	private void populateWithFirebaseUserData(FirebaseUser firebaseUser) {
 		User fallbackUser = new User();
