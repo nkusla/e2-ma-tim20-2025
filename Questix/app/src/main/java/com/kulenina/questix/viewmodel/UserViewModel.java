@@ -67,6 +67,11 @@ public class UserViewModel extends BaseObservable {
         return user != null && user.powerPoints != null ? user.powerPoints.toString() : "0";
     }
 
+    @Bindable
+    public String getAvatar() {
+        return user != null && user.avatar != null ? user.avatar : "avatar_1";
+    }
+
     public void setUser(User user) {
         this.user = user;
         // Notify all user-related properties changed
@@ -76,6 +81,7 @@ public class UserViewModel extends BaseObservable {
         notifyPropertyChanged(com.kulenina.questix.BR.xp);
         notifyPropertyChanged(com.kulenina.questix.BR.coins);
         notifyPropertyChanged(com.kulenina.questix.BR.powerPoints);
+        notifyPropertyChanged(com.kulenina.questix.BR.avatar);
     }
 
     public User getUser() {
