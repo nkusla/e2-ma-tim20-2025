@@ -12,8 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.FirebaseApp;
 import com.kulenina.questix.R;
 import com.kulenina.questix.service.AuthService;
 
@@ -32,19 +30,12 @@ public class RegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
-        // Initialize Firebase
-        FirebaseApp.initializeApp(this);
-
-        // Initialize Firebase Auth Helper
         authService = new AuthService();
 
-        // Initialize views
         initializeViews();
 
-        // Set click listeners for avatars (still programmatic since they need dynamic behavior)
         setAvatarClickListeners();
 
-        // Set default avatar selection
         avatars[selectedAvatarIndex].setBackgroundResource(R.drawable.avatar_border_selected);
     }
 
@@ -57,7 +48,6 @@ public class RegistrationActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         textViewLogin = findViewById(R.id.textViewLogin);
 
-        // Initialize avatar array
         avatars = new ImageView[5];
         avatars[0] = findViewById(R.id.avatar1);
         avatars[1] = findViewById(R.id.avatar2);
@@ -66,7 +56,6 @@ public class RegistrationActivity extends AppCompatActivity {
         avatars[4] = findViewById(R.id.avatar5);
     }
 
-    // Public methods for XML onClick handlers
     public void onRegisterClick(View view) {
         registerUser();
     }
@@ -77,7 +66,6 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void setAvatarClickListeners() {
-        // Avatar selection listeners
         for (int i = 0; i < avatars.length; i++) {
             final int avatarIndex = i;
             avatars[i].setOnClickListener(v -> selectAvatar(avatarIndex));
@@ -85,14 +73,12 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void selectAvatar(int avatarIndex) {
-        // Reset all avatars to unselected state
         for (ImageView avatar : avatars) {
             avatar.setBackgroundResource(R.drawable.avatar_border_unselected);
         }
 
-        // Set selected avatar
         selectedAvatarIndex = avatarIndex;
-        selectedAvatar = "avatar_" + (avatarIndex + 1); // Convert 0-based index to 1-based avatar name
+        selectedAvatar = "avatar_" + (avatarIndex + 1);
         avatars[avatarIndex].setBackgroundResource(R.drawable.avatar_border_selected);
     }
 
@@ -102,7 +88,6 @@ public class RegistrationActivity extends AppCompatActivity {
         String password = editTextPassword.getText().toString().trim();
         String confirmPassword = editTextConfirmPassword.getText().toString().trim();
 
-        // Validation
         if (TextUtils.isEmpty(email)) {
             editTextEmail.setError("Email is required");
             editTextEmail.requestFocus();

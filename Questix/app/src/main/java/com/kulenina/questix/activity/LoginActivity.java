@@ -14,8 +14,6 @@ import com.kulenina.questix.service.AuthService;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.FirebaseApp;
-
 public class LoginActivity extends AppCompatActivity {
   private EditText editTextEmail, editTextPassword;
   private Button buttonLogin;
@@ -28,34 +26,13 @@ public class LoginActivity extends AppCompatActivity {
 	  super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_login);
 
-    // Initialize Firebase
-    FirebaseApp.initializeApp(this);
-
-    // Initialize Firebase Auth Helper
     authService = new AuthService();
 
-    // Initialize views
     editTextEmail = findViewById(R.id.editTextEmail);
     editTextPassword = findViewById(R.id.editTextPassword);
     buttonLogin = findViewById(R.id.buttonLogin);
     progressBar = findViewById(R.id.progressBar);
     textViewRegister = findViewById(R.id.textViewRegister);
-
-    // Set click listeners
-    buttonLogin.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        loginUser();
-      }
-    });
-
-    textViewRegister.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
-        finish();
-      }
-    });
 
     if (authService.isUserLoggedIn()) {
       startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -103,5 +80,14 @@ public class LoginActivity extends AppCompatActivity {
   private void showProgressBar(boolean show) {
     progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
     buttonLogin.setEnabled(!show);
+  }
+
+  public void onLoginClick(View view) {
+    loginUser();
+  }
+
+  public void onRegisterClick(View view) {
+    startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
+    finish();
   }
 }

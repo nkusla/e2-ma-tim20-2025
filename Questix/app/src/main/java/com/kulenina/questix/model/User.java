@@ -1,6 +1,8 @@
 package com.kulenina.questix.model;
 
-public class User implements IIdentifiable {
+import java.io.Serializable;
+
+public class User implements IIdentifiable, Serializable {
 	public String id;
 	public String avatar;
 	public String username;

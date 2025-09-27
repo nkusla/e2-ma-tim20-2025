@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Questix</string>
     <string name="not_set">Not set</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation header</string>
 </resources>

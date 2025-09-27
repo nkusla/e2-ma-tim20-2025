@@ -72,7 +72,8 @@
         android:text="Sign In"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:backgroundTint="@color/purple_500" />
+        android:backgroundTint="@color/purple_500"
+        android:onClick="onLoginClick" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -89,6 +90,7 @@
         android:textColor="@color/purple_500"
         android:clickable="true"
         android:focusable="true"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:onClick="onRegisterClick" />
 
 </LinearLayout>

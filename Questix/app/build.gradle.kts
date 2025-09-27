@@ -41,6 +41,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
 
     // Firebase BOM - manages all Firebase library versions
     implementation(platform(libs.firebase.bom))
