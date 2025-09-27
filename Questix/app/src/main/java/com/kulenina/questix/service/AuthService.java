@@ -35,28 +35,6 @@ public class AuthService {
 			});
 	}
 
-	private Task<AuthResult> createUserProfile(Task<AuthResult> authTask) {
-		FirebaseUser user = mAuth.getCurrentUser();
-		if (user == null) {
-			throw new RuntimeException("User creation failed");
-		}
-
-		User userObj = new User();
-		userObj.id = user.getUid();
-		userObj.email = user.getEmail();
-		userObj.username = user.getEmail();
-
-		return userRepository.createWithId(userObj)
-			.continueWithTask(repoTask -> {
-				if (repoTask.isSuccessful()) {
-					return authTask;
-				} else {
-					user.delete();
-					throw repoTask.getException();
-				}
-			});
-	}
-
 	private Task<AuthResult> createUserProfile(Task<AuthResult> authTask, String username, String avatar) {
 		FirebaseUser user = mAuth.getCurrentUser();
 		if (user == null) {
@@ -96,7 +74,7 @@ public class AuthService {
 		return userRepository.read(firebaseUser.getUid());
 	}
 
-	public Task<User> getUserById(String userId) {
+	public Task<User> getUser(String userId) {
 		return userRepository.read(userId);
 	}
 }

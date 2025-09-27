@@ -21,16 +21,14 @@ public class RegistrationActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView textViewLogin;
     private ImageView[] avatars;
-    private AuthService authService;
-    private String selectedAvatar = "avatar_1"; // Default avatar
-    private int selectedAvatarIndex = 0; // Track selected avatar index
+    private AuthService authService = new AuthService();
+    private String selectedAvatar = "avatar_1";
+    private int selectedAvatarIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
-
-        authService = new AuthService();
 
         initializeViews();
 
@@ -56,10 +54,6 @@ public class RegistrationActivity extends AppCompatActivity {
         avatars[4] = findViewById(R.id.avatar5);
     }
 
-    public void onRegisterClick(View view) {
-        registerUser();
-    }
-
     public void onLoginClick(View view) {
         startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));
         finish();
@@ -82,59 +76,14 @@ public class RegistrationActivity extends AppCompatActivity {
         avatars[avatarIndex].setBackgroundResource(R.drawable.avatar_border_selected);
     }
 
-    private void registerUser() {
+    public void onRegisterClick(View view) {
+        if (!validateForm()) {
+            return;
+        }
+
         String email = editTextEmail.getText().toString().trim();
         String username = editTextUsername.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
-        String confirmPassword = editTextConfirmPassword.getText().toString().trim();
-
-        if (TextUtils.isEmpty(email)) {
-            editTextEmail.setError("Email is required");
-            editTextEmail.requestFocus();
-            return;
-        }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            editTextEmail.setError("Please enter a valid email address");
-            editTextEmail.requestFocus();
-            return;
-        }
-
-        if (TextUtils.isEmpty(username)) {
-            editTextUsername.setError("Username is required");
-            editTextUsername.requestFocus();
-            return;
-        }
-
-        if (username.length() < 3) {
-            editTextUsername.setError("Username must be at least 3 characters");
-            editTextUsername.requestFocus();
-            return;
-        }
-
-        if (TextUtils.isEmpty(password)) {
-            editTextPassword.setError("Password is required");
-            editTextPassword.requestFocus();
-            return;
-        }
-
-        if (password.length() < 6) {
-            editTextPassword.setError("Password must be at least 6 characters");
-            editTextPassword.requestFocus();
-            return;
-        }
-
-        if (TextUtils.isEmpty(confirmPassword)) {
-            editTextConfirmPassword.setError("Please confirm your password");
-            editTextConfirmPassword.requestFocus();
-            return;
-        }
-
-        if (!password.equals(confirmPassword)) {
-            editTextConfirmPassword.setError("Passwords do not match");
-            editTextConfirmPassword.requestFocus();
-            return;
-        }
 
         showProgressBar(true);
 
@@ -147,9 +96,66 @@ public class RegistrationActivity extends AppCompatActivity {
             })
             .addOnFailureListener(e -> {
                 showProgressBar(false);
-                String errorMessage = "Registration failed";
+                String errorMessage = "Registration failed!";
                 Toast.makeText(RegistrationActivity.this, errorMessage, Toast.LENGTH_LONG).show();
             });
+    }
+
+    private boolean validateForm() {
+        String email = editTextEmail.getText().toString().trim();
+        String username = editTextUsername.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
+        String confirmPassword = editTextConfirmPassword.getText().toString().trim();
+
+        if (TextUtils.isEmpty(email)) {
+            editTextEmail.setError("Email is required");
+            editTextEmail.requestFocus();
+            return false;
+        }
+
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            editTextEmail.setError("Please enter a valid email address");
+            editTextEmail.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(username)) {
+            editTextUsername.setError("Username is required");
+            editTextUsername.requestFocus();
+            return false;
+        }
+
+        if (username.length() < 3) {
+            editTextUsername.setError("Username must be at least 3 characters");
+            editTextUsername.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(password)) {
+            editTextPassword.setError("Password is required");
+            editTextPassword.requestFocus();
+            return false;
+        }
+
+        if (password.length() < 6) {
+            editTextPassword.setError("Password must be at least 6 characters");
+            editTextPassword.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(confirmPassword)) {
+            editTextConfirmPassword.setError("Please confirm your password");
+            editTextConfirmPassword.requestFocus();
+            return false;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            editTextConfirmPassword.setError("Passwords do not match");
+            editTextConfirmPassword.requestFocus();
+            return false;
+        }
+
+        return true;
     }
 
     private void showProgressBar(boolean show) {

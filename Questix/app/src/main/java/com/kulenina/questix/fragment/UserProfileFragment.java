@@ -54,7 +54,7 @@ public class UserProfileFragment extends Fragment {
         userViewModel.setIsLoading(true);
         userViewModel.setErrorMessage(null);
 
-        authService.getUserById(userId)
+        authService.getUser(userId)
             .addOnSuccessListener(user -> {
                 userViewModel.setIsLoading(false);
                 if (user != null) {

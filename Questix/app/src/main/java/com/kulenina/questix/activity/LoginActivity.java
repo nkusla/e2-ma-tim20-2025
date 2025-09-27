@@ -40,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     }
   }
 
-  private void loginUser() {
+  public void onLoginClick(View view) {
     String email = editTextEmail.getText().toString().trim();
     String password = editTextPassword.getText().toString().trim();
 
@@ -67,7 +67,6 @@ public class LoginActivity extends AppCompatActivity {
     authService.loginUser(email, password)
       .addOnSuccessListener(authResult -> {
         showProgressBar(false);
-        Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
         finish();
       })
@@ -80,10 +79,6 @@ public class LoginActivity extends AppCompatActivity {
   private void showProgressBar(boolean show) {
     progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
     buttonLogin.setEnabled(!show);
-  }
-
-  public void onLoginClick(View view) {
-    loginUser();
   }
 
   public void onRegisterClick(View view) {
