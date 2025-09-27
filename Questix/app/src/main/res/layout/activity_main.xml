@@ -5,9 +5,6 @@
 
     <data>
         <variable
-            name="viewModel"
-            type="com.kulenina.questix.viewmodel.UserViewModel" />
-        <variable
             name="activity"
             type="com.kulenina.questix.activity.MainActivity" />
     </data>

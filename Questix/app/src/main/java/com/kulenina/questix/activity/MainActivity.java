@@ -31,15 +31,13 @@ import com.kulenina.questix.databinding.ActivityMainBinding;
 import com.kulenina.questix.fragment.UserProfileFragment;
 import com.kulenina.questix.fragment.QuestsFragment;
 import com.kulenina.questix.fragment.AllianceListFragment;
-import com.kulenina.questix.model.User;
 import com.kulenina.questix.service.AuthService;
-import com.kulenina.questix.viewmodel.UserViewModel;
 import com.kulenina.questix.fragment.UserSearchFragment;
 
 public class MainActivity extends AppCompatActivity {
-	private AuthService authService;
+	private AuthService authService = new AuthService();
+
 	private ActivityMainBinding binding;
-	private UserViewModel userViewModel;
 	private DrawerLayout drawerLayout;
 	private ActionBarDrawerToggle drawerToggle;
 	private NavigationView navigationView;
@@ -49,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		EdgeToEdge.enable(this);
 
-		// Configure system UI for proper status bar appearance
 		getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			getWindow().getDecorView().setSystemUiVisibility(
@@ -59,32 +56,22 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-		// Handle system window insets for the main content area
 		ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
 			Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-			// Apply top padding to main content to account for status bar
 			v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
 			return insets;
 		});
 
-		// Handle system window insets for navigation drawer
 		ViewCompat.setOnApplyWindowInsetsListener(binding.navView, (v, insets) -> {
 			Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-			// Apply top padding to navigation view to account for status bar
 			v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
 			return insets;
 		});
 
-		authService = new AuthService();
-
-		userViewModel = new UserViewModel();
-		binding.setViewModel(userViewModel);
 		binding.setActivity(this);
 
-		// Set up toolbar
 		setSupportActionBar(binding.toolbar);
 
-		// Set up navigation drawer
 		setupNavigationDrawer();
 
 		if (!authService.isUserLoggedIn()) {
@@ -93,23 +80,7 @@ public class MainActivity extends AppCompatActivity {
 			return;
 		}
 
-		FirebaseUser firebaseUser = authService.getCurrentUser();
-		if (firebaseUser != null) {
-		authService.getCurrentUserProfile()
-			.addOnSuccessListener(user -> {
-				if (user != null) {
-					userViewModel.setUser(user);
-				} else {
-					populateWithFirebaseUserData(firebaseUser);
-				}
-				showUserProfile();
-			})
-			.addOnFailureListener(e -> {
-				populateWithFirebaseUserData(firebaseUser);
-				userViewModel.setErrorMessage("Could not load profile data");
-				showUserProfile();
-			});
-		}
+		showUserProfile();
 	}
 
 	private void setupNavigationDrawer() {
@@ -122,42 +93,34 @@ public class MainActivity extends AppCompatActivity {
 		drawerLayout.addDrawerListener(drawerToggle);
 		drawerToggle.syncState();
 
-		navigationView.setNavigationItemSelectedListener(item -> {
-			int itemId = item.getItemId();
-			if (itemId == R.id.nav_profile) {
-				showUserProfile();
-			} else if (itemId == R.id.nav_quests) {
-				showQuests();
-			} else if (itemId == R.id.nav_alliances) {
-				showAlliances();
-			} else if (itemId == R.id.nav_search_users) {
-				showUserSearch();
-			} else if (itemId == R.id.nav_achievements) {
-				// TODO: Implement achievements functionality
-				Toast.makeText(this, "Achievements coming soon!", Toast.LENGTH_SHORT).show();
-			} else if (itemId == R.id.nav_settings) {
-				// TODO: Implement settings functionality
-				Toast.makeText(this, "Settings coming soon!", Toast.LENGTH_SHORT).show();
-			} else if (itemId == R.id.nav_logout) {
-				authService.logout();
-				Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-				startActivity(new Intent(this, LoginActivity.class));
-				finish();
-				return true;
-			}
-			drawerLayout.closeDrawer(navigationView);
-			return true;
-		});
+		navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+	}
+
+	private boolean onNavigationItemSelected(android.view.MenuItem item) {
+		int itemId = item.getItemId();
+		if (itemId == R.id.nav_profile) {
+			showUserProfile();
+		} else if (itemId == R.id.nav_quests) {
+			showQuests();
+		} else if (itemId == R.id.nav_alliances) {
+			showAlliances();
+		} else if (itemId == R.id.nav_search_users) {
+			showUserSearch();
+		} else if (itemId == R.id.nav_achievements) {
+			Toast.makeText(this, "Achievements coming soon!", Toast.LENGTH_SHORT).show();
+		} else if (itemId == R.id.nav_settings) {
+			Toast.makeText(this, "Settings coming soon!", Toast.LENGTH_SHORT).show();
+		} else if (itemId == R.id.nav_logout) {
+			logout();
+		}
+		drawerLayout.closeDrawer(navigationView);
+		return true;
 	}
 
 	private void showUserProfile() {
-		User currentUser = userViewModel.getUser();
-		if (currentUser != null && currentUser.id != null) {
-			UserProfileFragment fragment = UserProfileFragment.newInstance(currentUser.id);
-			replaceFragment(fragment);
-		} else {
-			// Fallback: show current user data if available
-			UserProfileFragment fragment = new UserProfileFragment();
+		FirebaseUser currentUser = authService.getCurrentUser();
+		if (currentUser != null) {
+			UserProfileFragment fragment = UserProfileFragment.newInstance(currentUser.getUid());
 			replaceFragment(fragment);
 		}
 	}
@@ -184,19 +147,8 @@ public class MainActivity extends AppCompatActivity {
 		transaction.commit();
 	}
 
-	private void populateWithFirebaseUserData(FirebaseUser firebaseUser) {
-		User fallbackUser = new User();
-		fallbackUser.email = firebaseUser.getEmail();
-		fallbackUser.username = firebaseUser.getDisplayName() != null ? firebaseUser.getDisplayName() : "Not set";
-		fallbackUser.level = 1;
-		fallbackUser.xp = 0;
-		fallbackUser.coins = 0;
-		fallbackUser.powerPoints = 0;
 
-		userViewModel.setUser(fallbackUser);
-	}
-
-	public void onLogoutClick(View view) {
+	public void logout() {
 		authService.logout();
 		Toast.makeText(MainActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
 		startActivity(new Intent(MainActivity.this, LoginActivity.class));
