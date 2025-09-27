@@ -60,6 +60,17 @@
 						android:textSize="24sp"
 						android:textStyle="bold"
 						android:textColor="@android:color/black"
+						android:layout_marginBottom="4dp" />
+
+					<!-- Title -->
+					<TextView
+						android:id="@+id/textViewTitle"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@{viewModel.title}"
+						android:textSize="16sp"
+						android:textStyle="italic"
+						android:textColor="@android:color/holo_blue_dark"
 						android:layout_marginBottom="8dp" />
 
 					<!-- Level Badge -->
@@ -232,6 +243,22 @@
 			</LinearLayout>
 
 		</androidx.cardview.widget.CardView>
+
+		<!-- Friend Button (only shown for other users) -->
+		<Button
+			android:id="@+id/buttonAddFriend"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_margin="16dp"
+			android:text="Add Friend"
+			android:visibility="gone"
+			android:background="@drawable/button_primary_selector"
+			android:textColor="@android:color/white"
+			android:textSize="16sp"
+			android:textStyle="bold"
+			app:layout_constraintTop_toBottomOf="@id/statsCard"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintEnd_toEndOf="parent" />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

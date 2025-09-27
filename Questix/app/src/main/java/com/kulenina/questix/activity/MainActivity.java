@@ -33,6 +33,7 @@ import com.kulenina.questix.fragment.QuestsFragment;
 import com.kulenina.questix.model.User;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.viewmodel.UserViewModel;
+import com.kulenina.questix.fragment.UserSearchFragment;
 
 public class MainActivity extends AppCompatActivity {
 	private AuthService authService;
@@ -97,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
 			.addOnSuccessListener(user -> {
 				if (user != null) {
 					userViewModel.setUser(user);
-					updateNavigationHeader(user);
 				} else {
 					populateWithFirebaseUserData(firebaseUser);
 				}
@@ -127,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
 				showUserProfile();
 			} else if (itemId == R.id.nav_quests) {
 				showQuests();
+			} else if (itemId == R.id.nav_search_users) {
+				showUserSearch();
 			} else if (itemId == R.id.nav_achievements) {
 				// TODO: Implement achievements functionality
 				Toast.makeText(this, "Achievements coming soon!", Toast.LENGTH_SHORT).show();
@@ -146,15 +148,24 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void showUserProfile() {
-		UserProfileFragment fragment = new UserProfileFragment();
-		Bundle args = new Bundle();
-		args.putSerializable("user", userViewModel.getUser());
-		fragment.setArguments(args);
-		replaceFragment(fragment);
+		User currentUser = userViewModel.getUser();
+		if (currentUser != null && currentUser.id != null) {
+			UserProfileFragment fragment = UserProfileFragment.newInstance(currentUser.id);
+			replaceFragment(fragment);
+		} else {
+			// Fallback: show current user data if available
+			UserProfileFragment fragment = new UserProfileFragment();
+			replaceFragment(fragment);
+		}
 	}
 
 	private void showQuests() {
 		QuestsFragment fragment = new QuestsFragment();
+		replaceFragment(fragment);
+	}
+
+	private void showUserSearch() {
+		UserSearchFragment fragment = new UserSearchFragment();
 		replaceFragment(fragment);
 	}
 
@@ -164,20 +175,6 @@ public class MainActivity extends AppCompatActivity {
 		transaction.replace(R.id.fragment_container, fragment);
 		transaction.commit();
 	}
-
-	private void updateNavigationHeader(User user) {
-		View headerView = navigationView.getHeaderView(0);
-		TextView usernameText = headerView.findViewById(R.id.textViewUsername);
-		TextView emailText = headerView.findViewById(R.id.textViewEmail);
-
-		if (usernameText != null) {
-			usernameText.setText(user.username);
-		}
-		if (emailText != null) {
-			emailText.setText(user.email);
-		}
-	}
-
 
 	private void populateWithFirebaseUserData(FirebaseUser firebaseUser) {
 		User fallbackUser = new User();
@@ -189,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
 		fallbackUser.powerPoints = 0;
 
 		userViewModel.setUser(fallbackUser);
-		updateNavigationHeader(fallbackUser);
 	}
 
 	public void onLogoutClick(View view) {

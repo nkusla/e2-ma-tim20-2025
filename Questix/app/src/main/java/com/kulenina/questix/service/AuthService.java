@@ -95,4 +95,8 @@ public class AuthService {
 		}
 		return userRepository.read(firebaseUser.getUid());
 	}
+
+	public Task<User> getUserById(String userId) {
+		return userRepository.read(userId);
+	}
 }

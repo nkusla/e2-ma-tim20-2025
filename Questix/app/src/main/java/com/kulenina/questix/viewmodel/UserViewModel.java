@@ -72,6 +72,30 @@ public class UserViewModel extends BaseObservable {
         return user != null && user.avatar != null ? user.avatar : "avatar_1";
     }
 
+    @Bindable
+    public String getTitle() {
+        if (user != null && user.level != null) {
+            return getTitleForLevel(user.level);
+        }
+        return getTitleForLevel(1);
+    }
+
+    private String getTitleForLevel(int level) {
+        switch (level) {
+            case 1: return "Novice";
+            case 2: return "Apprentice";
+            case 3: return "Explorer";
+            case 4: return "Adventurer";
+            case 5: return "Seeker";
+            case 6: return "Hunter";
+            case 7: return "Scout";
+            case 8: return "Guardian";
+            case 9: return "Warrior";
+            case 10: return "Knight";
+            default: return "Beyond Legend";
+        }
+    }
+
     public void setUser(User user) {
         this.user = user;
         // Notify all user-related properties changed
@@ -82,6 +106,7 @@ public class UserViewModel extends BaseObservable {
         notifyPropertyChanged(com.kulenina.questix.BR.coins);
         notifyPropertyChanged(com.kulenina.questix.BR.powerPoints);
         notifyPropertyChanged(com.kulenina.questix.BR.avatar);
+        notifyPropertyChanged(com.kulenina.questix.BR.title);
     }
 
     public User getUser() {

@@ -45,8 +45,26 @@ public class Repository<T extends IIdentifiable> {
         );
     }
 
-    public Task<QuerySnapshot> readAll() {
-      return db.collection(collectionName).get();
+    public Task<T> read(T object) {
+      return read(object.getId());
+    }
+
+    public Task<List<T>> readAll() {
+      return db.collection(collectionName)
+        .get()
+        .continueWith(task -> {
+          QuerySnapshot querySnapshot = task.getResult();
+          List<T> objects = new ArrayList<>();
+          if (querySnapshot != null) {
+            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+              T object = toObject(document);
+              if (object != null) {
+                objects.add(object);
+              }
+            }
+          }
+          return objects;
+        });
     }
 
     public Task<Void> update(T object) {
@@ -66,5 +84,13 @@ public class Repository<T extends IIdentifiable> {
       String documentId = document.getId();
       Map<String, Object> data = document.getData();
       return mapper.fromMap(data, documentId);
+    }
+
+    public DocumentReference getDocumentReference(String id) {
+      return db.collection(collectionName).document(id);
+    }
+
+    public DocumentReference getDocumentReference(T object) {
+      return getDocumentReference(object.getId());
     }
 }
