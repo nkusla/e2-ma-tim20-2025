@@ -19,6 +19,28 @@
 			android:layout_height="wrap_content"
 			android:orientation="vertical">
 
+			<!-- Loading State -->
+			<LinearLayout
+				android:id="@+id/layout_loading"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				android:gravity="center"
+				android:padding="32dp">
+
+				<ProgressBar
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="16dp" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Loading alliance data..."
+					android:textSize="16sp" />
+
+			</LinearLayout>
+
 			<!-- No Alliance State -->
 			<LinearLayout
 				android:id="@+id/layout_no_alliance"
@@ -60,7 +82,8 @@
 				android:orientation="vertical"
 				android:background="@drawable/card_background"
 				android:padding="16dp"
-				android:layout_marginBottom="16dp">
+				android:layout_marginBottom="16dp"
+				android:visibility="gone">
 
 				<TextView
 					android:layout_width="wrap_content"
@@ -79,13 +102,6 @@
 					android:textStyle="bold"
 					android:layout_marginBottom="4dp" />
 
-				<TextView
-					android:id="@+id/text_view_alliance_description"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="Alliance Description"
-					android:textSize="14sp"
-					android:layout_marginBottom="8dp" />
 
 				<TextView
 					android:id="@+id/text_view_member_count"
@@ -115,7 +131,8 @@
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
 						android:text="Invite Friends"
-						android:layout_marginEnd="8dp" />
+						android:layout_marginEnd="8dp"
+						android:visibility="gone" />
 
 					<Button
 						android:id="@+id/button_leave_alliance"
@@ -123,7 +140,8 @@
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
 						android:text="Leave Alliance"
-						android:layout_marginStart="8dp" />
+						android:layout_marginStart="8dp"
+						android:visibility="gone" />
 
 				</LinearLayout>
 
@@ -133,7 +151,8 @@
 					android:layout_height="wrap_content"
 					android:text="Disband Alliance"
 					android:layout_marginTop="8dp"
-					android:backgroundTint="@android:color/holo_red_dark" />
+					android:backgroundTint="@android:color/holo_red_dark"
+					android:visibility="gone" />
 
 			</LinearLayout>
 
@@ -145,7 +164,8 @@
 				android:orientation="vertical"
 				android:background="@drawable/card_background"
 				android:padding="16dp"
-				android:layout_marginBottom="16dp">
+				android:layout_marginBottom="16dp"
+				android:visibility="gone">
 
 				<TextView
 					android:layout_width="wrap_content"
@@ -163,12 +183,19 @@
 					android:textSize="14sp"
 					android:layout_marginBottom="8dp" />
 
+				<androidx.recyclerview.widget.RecyclerView
+					android:id="@+id/recycler_view_invitations"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:nestedScrollingEnabled="false" />
+
 				<TextView
-					android:id="@+id/text_view_invitation_list"
+					android:id="@+id/text_view_no_invitations"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="No pending invitations"
-					android:textSize="14sp" />
+					android:textSize="14sp"
+					android:visibility="gone" />
 
 			</LinearLayout>
 

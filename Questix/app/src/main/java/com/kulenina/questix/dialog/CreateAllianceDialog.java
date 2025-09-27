@@ -35,7 +35,6 @@ import java.util.Set;
 
 public class CreateAllianceDialog extends DialogFragment implements FriendSelectionAdapter.OnFriendSelectionChangeListener {
     private EditText editTextAllianceName;
-    private EditText editTextAllianceDescription;
     private RecyclerView recyclerViewFriends;
     private Button buttonCreate;
     private Button buttonCancel;
@@ -97,7 +96,6 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
 
     private void initViews(View view) {
         editTextAllianceName = view.findViewById(R.id.editTextAllianceName);
-        editTextAllianceDescription = view.findViewById(R.id.editTextAllianceDescription);
         recyclerViewFriends = view.findViewById(R.id.recyclerViewFriends);
         buttonCreate = view.findViewById(R.id.buttonCreate);
         buttonCancel = view.findViewById(R.id.buttonCancel);
@@ -150,7 +148,6 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
 
     private void createAlliance() {
         String allianceName = editTextAllianceName.getText().toString().trim();
-        String allianceDescription = editTextAllianceDescription.getText().toString().trim();
 
         if (TextUtils.isEmpty(allianceName)) {
             editTextAllianceName.setError("Alliance name is required");
@@ -174,7 +171,7 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
         progressBar.setVisibility(View.VISIBLE);
 
         // Create alliance
-        allianceService.createAlliance(allianceName, allianceDescription, currentUserId)
+        allianceService.createAlliance(allianceName, currentUserId)
             .addOnSuccessListener(allianceId -> {
                 // Send invitations to selected friends
                 if (!selectedFriendIds.isEmpty()) {

@@ -21,22 +21,6 @@
 
 	</com.google.android.material.textfield.TextInputLayout>
 
-	<!-- Alliance Description -->
-	<com.google.android.material.textfield.TextInputLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginBottom="16dp"
-		android:hint="Description (Optional)">
-
-		<com.google.android.material.textfield.TextInputEditText
-			android:id="@+id/editTextAllianceDescription"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:maxLength="100"
-			android:inputType="textCapSentences|textMultiLine"
-			android:lines="2" />
-
-	</com.google.android.material.textfield.TextInputLayout>
 
 	<!-- Friends Section -->
 	<TextView

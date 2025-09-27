@@ -24,7 +24,7 @@ public class AllianceService {
         this.userRepository = new UserRepository();
     }
 
-    public Task<String> createAlliance(String name, String description, String leaderId) {
+    public Task<String> createAlliance(String name, String leaderId) {
         return userRepository.read(leaderId)
             .continueWithTask(task -> {
                 User leader = task.getResult();
@@ -38,7 +38,7 @@ public class AllianceService {
 
                 // Create alliance
                 String allianceId = UUID.randomUUID().toString();
-                Alliance alliance = new Alliance(allianceId, name, description, leaderId);
+                Alliance alliance = new Alliance(allianceId, name, leaderId);
 
                 // Update user's current alliance
                 leader.setCurrentAlliance(allianceId);

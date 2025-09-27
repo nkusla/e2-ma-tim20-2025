@@ -80,9 +80,9 @@ public class AuthService {
 			});
 	}
 
-		public Task<AuthResult> loginUser(String email, String password) {
-			return mAuth.signInWithEmailAndPassword(email, password);
-		}
+	public Task<AuthResult> loginUser(String email, String password) {
+		return mAuth.signInWithEmailAndPassword(email, password);
+	}
 
 	public void logout() {
 		mAuth.signOut();

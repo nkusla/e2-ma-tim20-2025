@@ -7,7 +7,6 @@ import java.util.List;
 public class Alliance implements IIdentifiable, Serializable {
     public String id;
     public String name;
-    public String description;
     public String leaderId; // Creator's user ID
     public List<String> memberIds; // All member user IDs (including leader)
     public boolean isMissionActive; // Whether a mission is currently running
@@ -21,11 +20,10 @@ public class Alliance implements IIdentifiable, Serializable {
         this.updatedAt = System.currentTimeMillis();
     }
 
-    public Alliance(String id, String name, String description, String leaderId) {
+    public Alliance(String id, String name, String leaderId) {
         this();
         this.id = id;
         this.name = name;
-        this.description = description;
         this.leaderId = leaderId;
         // Leader is automatically added as first member
         this.memberIds.add(leaderId);

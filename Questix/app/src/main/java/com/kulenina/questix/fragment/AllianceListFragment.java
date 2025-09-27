@@ -12,9 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.kulenina.questix.R;
+import com.kulenina.questix.adapter.AllianceInvitationAdapter;
 import com.kulenina.questix.databinding.FragmentAllianceListBinding;
 import com.kulenina.questix.model.Alliance;
 import com.kulenina.questix.model.AllianceInvitation;
@@ -26,7 +28,7 @@ import com.kulenina.questix.dialog.CreateAllianceDialog;
 
 import java.util.List;
 
-public class AllianceListFragment extends Fragment implements CreateAllianceDialog.OnAllianceCreatedListener {
+public class AllianceListFragment extends Fragment implements CreateAllianceDialog.OnAllianceCreatedListener, AllianceInvitationAdapter.OnInvitationActionListener {
     private FragmentAllianceListBinding binding;
     private AllianceService allianceService;
     private AllianceInvitationService invitationService;
@@ -34,6 +36,7 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
     private String currentUserId;
     private Alliance currentAlliance;
     private List<AllianceInvitation> pendingInvitations;
+    private AllianceInvitationAdapter invitationAdapter;
 
     @Nullable
     @Override
@@ -61,6 +64,14 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         binding.buttonInviteFriends.setOnClickListener(v -> showInviteFriendsDialog());
         binding.buttonLeaveAlliance.setOnClickListener(v -> leaveAlliance());
         binding.buttonDisbandAlliance.setOnClickListener(v -> disbandAlliance());
+
+        // Setup invitation RecyclerView
+        invitationAdapter = new AllianceInvitationAdapter(this);
+        binding.recyclerViewInvitations.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recyclerViewInvitations.setAdapter(invitationAdapter);
+
+        // Initialize UI state - show loading by default
+        showLoadingState();
     }
 
     private void loadUserAlliance() {
@@ -71,6 +82,7 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
             })
             .addOnFailureListener(e -> {
                 Toast.makeText(getContext(), "Error loading alliance: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                currentAlliance = null;
                 updateAllianceUI();
             });
     }
@@ -83,19 +95,29 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
             })
             .addOnFailureListener(e -> {
                 Toast.makeText(getContext(), "Error loading invitations: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                pendingInvitations = null;
                 updateInvitationsUI();
             });
     }
 
+    private void showLoadingState() {
+        binding.layoutLoading.setVisibility(View.VISIBLE);
+        binding.layoutNoAlliance.setVisibility(View.GONE);
+        binding.layoutAllianceInfo.setVisibility(View.GONE);
+        binding.layoutInvitations.setVisibility(View.GONE);
+    }
+
     private void updateAllianceUI() {
+        // Hide loading state
+        binding.layoutLoading.setVisibility(View.GONE);
+
         if (currentAlliance != null) {
             binding.textViewAllianceName.setText(currentAlliance.name);
-            binding.textViewAllianceDescription.setText(currentAlliance.description);
             binding.textViewMemberCount.setText("Members: " + currentAlliance.getMemberCount());
             binding.textViewMissionStatus.setText(currentAlliance.isMissionActive ? "Mission Active" : "No Active Mission");
 
             // Show/hide buttons based on user role and alliance status
-            binding.buttonInviteFriends.setVisibility(View.VISIBLE);
+            binding.buttonInviteFriends.setVisibility(currentAlliance.isLeader(currentUserId) ? View.VISIBLE : View.GONE);
             binding.buttonLeaveAlliance.setVisibility(currentAlliance.canLeave(currentUserId) ? View.VISIBLE : View.GONE);
             binding.buttonDisbandAlliance.setVisibility(currentAlliance.canDisband(currentUserId) ? View.VISIBLE : View.GONE);
 
@@ -108,14 +130,19 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
     }
 
     private void updateInvitationsUI() {
-        if (pendingInvitations != null && !pendingInvitations.isEmpty()) {
-            binding.textViewInvitationCount.setText("Pending Invitations: " + pendingInvitations.size());
-            binding.layoutInvitations.setVisibility(View.VISIBLE);
+        // Only update invitations if we're not in loading state
+        if (binding.layoutLoading.getVisibility() != View.VISIBLE) {
+            if (pendingInvitations != null && !pendingInvitations.isEmpty()) {
+                binding.textViewInvitationCount.setText("Pending Invitations: " + pendingInvitations.size());
+                binding.layoutInvitations.setVisibility(View.VISIBLE);
+                binding.recyclerViewInvitations.setVisibility(View.VISIBLE);
+                binding.textViewNoInvitations.setVisibility(View.GONE);
 
-            // For now, just show the count. In a real implementation, you'd show a list
-            binding.textViewInvitationList.setText("You have " + pendingInvitations.size() + " pending alliance invitations");
-        } else {
-            binding.layoutInvitations.setVisibility(View.GONE);
+                // Update the adapter with the invitation list
+                invitationAdapter.updateInvitations(pendingInvitations);
+            } else {
+                binding.layoutInvitations.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -162,5 +189,37 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         // Refresh the alliance data
         loadUserAlliance();
         Toast.makeText(getContext(), "Alliance created successfully!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAcceptInvitation(AllianceInvitation invitation) {
+        invitationService.acceptInvitation(invitation.id, currentUserId)
+            .addOnSuccessListener(aVoid -> {
+                Toast.makeText(getContext(), "Invitation accepted! You joined " + invitation.allianceName, Toast.LENGTH_SHORT).show();
+                // Remove the invitation from the list
+                invitationAdapter.removeInvitation(invitation);
+                // Refresh alliance data
+                loadUserAlliance();
+                // Reload invitations to update the count
+                loadPendingInvitations();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Error accepting invitation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+    }
+
+    @Override
+    public void onDeclineInvitation(AllianceInvitation invitation) {
+        invitationService.declineInvitation(invitation.id, currentUserId)
+            .addOnSuccessListener(aVoid -> {
+                Toast.makeText(getContext(), "Invitation declined", Toast.LENGTH_SHORT).show();
+                // Remove the invitation from the list
+                invitationAdapter.removeInvitation(invitation);
+                // Reload invitations to update the count
+                loadPendingInvitations();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Error declining invitation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
     }
 }
