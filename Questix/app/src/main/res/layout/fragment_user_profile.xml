@@ -95,15 +95,24 @@
 					android:gravity="center_vertical">
 
 					<!-- Avatar -->
-					<ImageView
-						android:id="@+id/imageViewAvatar"
-						android:layout_width="80dp"
-						android:layout_height="80dp"
-						android:layout_marginEnd="20dp"
-						android:src="@drawable/avatar_1"
-						android:scaleType="centerCrop"
-						android:background="@drawable/avatar_border_unselected"
-						app:avatarResource="@{viewModel.avatar}" />
+					<com.google.android.material.card.MaterialCardView
+						android:layout_width="120dp"
+						android:layout_height="120dp"
+						android:layout_marginEnd="30dp"
+						app:cardCornerRadius="12dp"
+						app:cardElevation="0dp"
+						app:strokeWidth="4dp"
+						app:strokeColor="@android:color/darker_gray">
+
+						<ImageView
+							android:id="@+id/imageViewAvatar"
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:src="@drawable/avatar_1"
+							android:scaleType="centerCrop"
+							app:avatarResource="@{viewModel.avatar}" />
+
+					</com.google.android.material.card.MaterialCardView>
 
 					<!-- User Info -->
 					<LinearLayout
@@ -201,7 +210,10 @@
 				android:id="@+id/statsCard"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_margin="16dp"
+				android:layout_marginTop="8dp"
+				android:layout_marginStart="16dp"
+				android:layout_marginEnd="16dp"
+				android:layout_marginBottom="16dp"
 				android:elevation="4dp"
 				app:cardCornerRadius="12dp"
 				app:cardElevation="4dp">

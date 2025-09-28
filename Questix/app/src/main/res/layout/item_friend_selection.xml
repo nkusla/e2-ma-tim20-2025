@@ -31,14 +31,23 @@
 			android:gravity="center_vertical">
 
 			<!-- Avatar -->
-			<ImageView
-				android:id="@+id/imageViewAvatar"
+			<com.google.android.material.card.MaterialCardView
 				android:layout_width="60dp"
 				android:layout_height="60dp"
 				android:layout_marginEnd="16dp"
-				android:scaleType="centerCrop"
-				android:background="@drawable/avatar_border_selected"
-				app:avatarResource="@{userViewModel.avatar}" />
+				app:cardCornerRadius="8dp"
+				app:cardElevation="0dp"
+				app:strokeWidth="3dp"
+				app:strokeColor="@android:color/darker_gray">
+
+				<ImageView
+					android:id="@+id/imageViewAvatar"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:scaleType="centerCrop"
+					app:avatarResource="@{userViewModel.avatar}" />
+
+			</com.google.android.material.card.MaterialCardView>
 
 			<!-- User Info -->
 			<LinearLayout
