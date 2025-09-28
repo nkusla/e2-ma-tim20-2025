@@ -77,4 +77,27 @@ public class AuthService {
 	public Task<User> getUser(String userId) {
 		return userRepository.read(userId);
 	}
+
+	public Task<Void> changePassword(String currentPassword, String newPassword) {
+		FirebaseUser user = getCurrentUser();
+		if (user == null) {
+			throw new RuntimeException("No user logged in");
+		}
+
+		// First re-authenticate with current password
+		String email = user.getEmail();
+		if (email == null) {
+			throw new RuntimeException("User email not available");
+		}
+
+		return mAuth.signInWithEmailAndPassword(email, currentPassword)
+			.continueWithTask(authTask -> {
+				if (authTask.isSuccessful()) {
+					// Re-authentication successful, now update password
+					return user.updatePassword(newPassword);
+				} else {
+					throw authTask.getException();
+				}
+			});
+	}
 }

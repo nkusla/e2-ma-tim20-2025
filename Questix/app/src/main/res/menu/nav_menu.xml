@@ -27,6 +27,10 @@
 	<item android:title="">
 		<menu>
 			<item
+				android:id="@+id/nav_change_password"
+				android:icon="@drawable/ic_lock"
+				android:title="Change Password" />
+			<item
 				android:id="@+id/nav_logout"
 				android:icon="@drawable/ic_logout"
 				android:title="Logout" />

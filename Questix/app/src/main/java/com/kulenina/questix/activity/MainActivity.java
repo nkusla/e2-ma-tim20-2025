@@ -34,6 +34,7 @@ import com.kulenina.questix.fragment.AllianceInvitationFragment;
 import com.kulenina.questix.fragment.QRScannerFragment;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.fragment.UserSearchFragment;
+import com.kulenina.questix.fragment.ChangePasswordFragment;
 
 public class MainActivity extends AppCompatActivity {
 	private AuthService authService = new AuthService();
@@ -109,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
 			showQRScanner();
 		} else if (itemId == R.id.nav_invites) {
 			showInvites();
+		} else if (itemId == R.id.nav_change_password) {
+			showChangePassword();
 		} else if (itemId == R.id.nav_logout) {
 			logout();
 		}
@@ -141,6 +144,11 @@ public class MainActivity extends AppCompatActivity {
 
 	private void showInvites() {
 		AllianceInvitationFragment fragment = new AllianceInvitationFragment();
+		replaceFragment(fragment);
+	}
+
+	private void showChangePassword() {
+		ChangePasswordFragment fragment = new ChangePasswordFragment();
 		replaceFragment(fragment);
 	}
 
