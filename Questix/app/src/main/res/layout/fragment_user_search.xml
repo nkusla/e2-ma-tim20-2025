@@ -23,18 +23,87 @@
 			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="horizontal"
-				android:padding="16dp"
-				android:gravity="center_vertical">
+				android:orientation="vertical"
+				android:padding="16dp">
 
+				<!-- Title -->
 				<TextView
-					android:layout_width="0dp"
+					android:id="@+id/textViewTitle"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:text="Find Friends"
+					android:text="My Friends"
 					android:textSize="18sp"
-					android:textStyle="bold" />
+					android:textStyle="bold"
+					android:layout_marginBottom="12dp" />
 
+				<!-- Toggle Buttons -->
+				<com.google.android.material.button.MaterialButtonToggleGroup
+					android:id="@+id/toggleGroup"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="12dp"
+					app:singleSelection="true"
+					app:selectionRequired="true">
+
+					<com.google.android.material.button.MaterialButton
+						android:id="@+id/buttonFriends"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:text="Friends"
+						android:textSize="14sp"
+						style="@style/Widget.Material3.Button.OutlinedButton" />
+
+					<com.google.android.material.button.MaterialButton
+						android:id="@+id/buttonSearch"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:text="Search Users"
+						android:textSize="14sp"
+						style="@style/Widget.Material3.Button.OutlinedButton" />
+
+				</com.google.android.material.button.MaterialButtonToggleGroup>
+
+				<!-- Search Layout (initially hidden) -->
+				<LinearLayout
+					android:id="@+id/layoutSearch"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal"
+					android:visibility="gone"
+					android:gravity="center_vertical">
+
+					<com.google.android.material.textfield.TextInputLayout
+						android:id="@+id/textInputLayoutSearch"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:layout_marginEnd="8dp"
+						style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+						app:boxCornerRadiusTopStart="8dp"
+						app:boxCornerRadiusTopEnd="8dp"
+						app:boxCornerRadiusBottomStart="8dp"
+						app:boxCornerRadiusBottomEnd="8dp">
+
+						<com.google.android.material.textfield.TextInputEditText
+							android:id="@+id/editTextSearch"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:hint="Search users..."
+							android:inputType="text"
+							android:imeOptions="actionSearch" />
+
+					</com.google.android.material.textfield.TextInputLayout>
+
+					<com.google.android.material.button.MaterialButton
+						android:id="@+id/buttonDoSearch"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Search"
+						android:textSize="14sp" />
+
+				</LinearLayout>
 
 			</LinearLayout>
 

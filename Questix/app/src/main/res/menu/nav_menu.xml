@@ -9,7 +9,7 @@
 		<item
 			android:id="@+id/nav_search_users"
 			android:icon="@drawable/ic_person_search"
-			android:title="Search Users" />
+			android:title="Friends &amp; Search" />
 		<item
 			android:id="@+id/nav_qr_scanner"
 			android:icon="@drawable/ic_qr_code_scanner"

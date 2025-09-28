@@ -49,6 +49,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         return userViewModels.size();
     }
 
+    public void updateUserList(List<UserViewModel> newUserViewModels) {
+        this.userViewModels = newUserViewModels;
+        notifyDataSetChanged();
+    }
+
+    public List<UserViewModel> getUserList() {
+        return userViewModels;
+    }
+
     static class UserViewHolder extends RecyclerView.ViewHolder {
         private ItemUserBinding binding;
 
