@@ -22,6 +22,7 @@ import com.journeyapps.barcodescanner.CompoundBarcodeView;
 import com.journeyapps.barcodescanner.DefaultDecoderFactory;
 import com.kulenina.questix.R;
 import com.kulenina.questix.databinding.FragmentQrScannerBinding;
+import com.kulenina.questix.fragment.UserProfileFragment;
 import com.kulenina.questix.service.FriendshipService;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.utils.QRCodeHelper;
@@ -164,7 +165,7 @@ public class QRScannerFragment extends Fragment {
             .addOnSuccessListener(aVoid -> {
                 viewModel.setIsLoading(false);
                 Toast.makeText(getContext(), "Added " + friendUsername + " as friend!", Toast.LENGTH_LONG).show();
-                closeScanner(); // Close after successful friend addition
+                navigateToProfile(); // Navigate to profile after successful friend addition
             })
             .addOnFailureListener(e -> {
                 viewModel.setIsLoading(false);
@@ -198,8 +199,22 @@ public class QRScannerFragment extends Fragment {
     }
 
     private void closeScanner() {
+        navigateToProfile();
+    }
+
+    private void navigateToProfile() {
         if (getActivity() != null) {
-            getActivity().onBackPressed(); // Go back to previous fragment
+            // Get current user ID
+            String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+            // Create new profile fragment
+            UserProfileFragment profileFragment = UserProfileFragment.newInstance(currentUserId);
+
+            // Replace current fragment with profile fragment
+            getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, profileFragment)
+                .commit();
         }
     }
 
