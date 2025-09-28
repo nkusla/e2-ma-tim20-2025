@@ -72,7 +72,7 @@
         android:text="Sign In"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:backgroundTint="@color/purple_500"
+        android:backgroundTint="?attr/colorPrimary"
         android:onClick="onLoginClick" />
 
     <ProgressBar
@@ -87,7 +87,7 @@
         android:layout_height="wrap_content"
         android:text="Don't have an account? Sign Up"
         android:textSize="14sp"
-        android:textColor="@color/purple_500"
+        android:textColor="?attr/colorPrimary"
         android:clickable="true"
         android:focusable="true"
         android:padding="8dp"
