@@ -5,8 +5,10 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 import com.kulenina.questix.model.Alliance;
+import com.kulenina.questix.model.AllianceMessage;
 import com.kulenina.questix.model.User;
 import com.kulenina.questix.repository.AllianceRepository;
+import com.kulenina.questix.repository.AllianceMessageRepository;
 import com.kulenina.questix.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -16,11 +18,13 @@ import java.util.UUID;
 public class AllianceService {
     private final FirebaseFirestore db;
     private final AllianceRepository allianceRepository;
+    private final AllianceMessageRepository messageRepository;
     private final UserRepository userRepository;
 
     public AllianceService() {
         this.db = FirebaseFirestore.getInstance();
         this.allianceRepository = new AllianceRepository();
+        this.messageRepository = new AllianceMessageRepository();
         this.userRepository = new UserRepository();
     }
 
@@ -238,6 +242,47 @@ public class AllianceService {
 
                 alliance.setMissionActive(active);
                 return allianceRepository.update(alliance);
+            });
+    }
+
+    public Task<String> sendMessage(String allianceId, String senderId, String messageText) {
+        return Tasks.whenAllSuccess(
+            allianceRepository.read(allianceId),
+            userRepository.read(senderId)
+        ).continueWithTask(task -> {
+            List<Object> results = task.getResult();
+            Alliance alliance = (Alliance) results.get(0);
+            User sender = (User) results.get(1);
+
+            if (alliance == null) {
+                throw new RuntimeException("Alliance not found");
+            }
+            if (sender == null) {
+                throw new RuntimeException("User not found");
+            }
+            if (!alliance.isMember(senderId)) {
+                throw new RuntimeException("User is not a member of this alliance");
+            }
+
+            // Create message
+            String messageId = UUID.randomUUID().toString();
+            AllianceMessage message = new AllianceMessage(messageId, allianceId, senderId,
+                sender.username, messageText);
+
+            return messageRepository.createWithId(message)
+                .continueWith(createTask -> messageId);
+        });
+    }
+
+    public Task<List<AllianceMessage>> getAllianceMessages(String allianceId) {
+        return allianceRepository.read(allianceId)
+            .continueWithTask(task -> {
+                Alliance alliance = task.getResult();
+                if (alliance == null) {
+                    throw new RuntimeException("Alliance not found");
+                }
+
+                return messageRepository.getMessagesByAllianceId(allianceId);
             });
     }
 }

@@ -1,10 +1,12 @@
 package com.kulenina.questix.fragment;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,14 +15,19 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.kulenina.questix.R;
 import com.kulenina.questix.databinding.FragmentAllianceListBinding;
+import com.kulenina.questix.adapter.AllianceMessageAdapter;
 import com.kulenina.questix.model.Alliance;
+import com.kulenina.questix.model.AllianceMessage;
 import com.kulenina.questix.service.AllianceService;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.dialog.CreateAllianceDialog;
+
+import java.util.List;
 
 public class AllianceListFragment extends Fragment implements CreateAllianceDialog.OnAllianceCreatedListener, AllianceInvitationFragment.OnInvitationUpdateListener {
     private FragmentAllianceListBinding binding;
@@ -29,6 +36,11 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
     private String currentUserId;
     private Alliance currentAlliance;
     private AllianceInvitationFragment invitationFragment;
+
+    // Messaging components
+    private AllianceMessageAdapter messageAdapter;
+    private RecyclerView messagesRecyclerView;
+    private EditText messageEditText;
 
     @Nullable
     @Override
@@ -46,6 +58,7 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         setupUI();
+        setupMessaging();
         loadUserAlliance();
         setupInvitationFragment();
     }
@@ -57,6 +70,19 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
 
         // Initialize UI state - show loading by default
         showLoadingState();
+    }
+
+    private void setupMessaging() {
+        messageAdapter = new AllianceMessageAdapter(currentUserId);
+        messagesRecyclerView = binding.recyclerViewMessages;
+        messageEditText = binding.editTextMessage;
+
+        // Setup RecyclerView
+        messagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        messagesRecyclerView.setAdapter(messageAdapter);
+
+        // Setup send button
+        binding.buttonSendMessage.setOnClickListener(v -> sendMessage());
     }
 
     private void setupInvitationFragment() {
@@ -86,6 +112,7 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         binding.layoutLoading.setVisibility(View.VISIBLE);
         binding.layoutNoAlliance.setVisibility(View.GONE);
         binding.layoutAllianceInfo.setVisibility(View.GONE);
+        binding.layoutAllianceChat.setVisibility(View.GONE);
         binding.fragmentContainerInvitations.setVisibility(View.GONE);
     }
 
@@ -103,9 +130,14 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
             binding.buttonDisbandAlliance.setVisibility(currentAlliance.canDisband(currentUserId) ? View.VISIBLE : View.GONE);
 
             binding.layoutAllianceInfo.setVisibility(View.VISIBLE);
+            binding.layoutAllianceChat.setVisibility(View.VISIBLE);
             binding.layoutNoAlliance.setVisibility(View.GONE);
+
+            // Load alliance messages
+            loadAllianceMessages();
         } else {
             binding.layoutAllianceInfo.setVisibility(View.GONE);
+            binding.layoutAllianceChat.setVisibility(View.GONE);
             binding.layoutNoAlliance.setVisibility(View.VISIBLE);
         }
 
@@ -176,5 +208,46 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
     public void onInvitationDeclined() {
         // Update invitations UI when invitation is declined
         updateInvitationsUI();
+    }
+
+    private void loadAllianceMessages() {
+        if (currentAlliance != null) {
+            allianceService.getAllianceMessages(currentAlliance.id)
+                .addOnSuccessListener(messages -> {
+                    messageAdapter.updateMessages(messages);
+                    if (!messages.isEmpty()) {
+                        // Scroll to bottom to show latest messages
+                        messagesRecyclerView.scrollToPosition(messages.size() - 1);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error loading messages: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+        }
+    }
+
+    private void sendMessage() {
+        if (currentAlliance == null) {
+            return;
+        }
+
+        String messageText = messageEditText.getText().toString().trim();
+        if (TextUtils.isEmpty(messageText)) {
+            return;
+        }
+
+        // Clear the input immediately
+        messageEditText.setText("");
+
+        allianceService.sendMessage(currentAlliance.id, currentUserId, messageText)
+            .addOnSuccessListener(messageId -> {
+                // Reload messages to show the new message
+                loadAllianceMessages();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Error sending message: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                // Restore the message text if sending failed
+                messageEditText.setText(messageText);
+            });
     }
 }
