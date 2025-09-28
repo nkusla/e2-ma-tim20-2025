@@ -156,48 +156,12 @@
 
 			</LinearLayout>
 
-			<!-- Pending Invitations -->
-			<LinearLayout
-				android:id="@+id/layout_invitations"
+			<!-- Pending Invitations Fragment Container -->
+			<FrameLayout
+				android:id="@+id/fragment_container_invitations"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="vertical"
-				android:background="@drawable/card_background"
-				android:padding="16dp"
-				android:layout_marginBottom="16dp"
-				android:visibility="gone">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="Pending Invitations"
-					android:textSize="16sp"
-					android:textStyle="bold"
-					android:layout_marginBottom="8dp" />
-
-				<TextView
-					android:id="@+id/text_view_invitation_count"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="Pending Invitations: 0"
-					android:textSize="14sp"
-					android:layout_marginBottom="8dp" />
-
-				<androidx.recyclerview.widget.RecyclerView
-					android:id="@+id/recycler_view_invitations"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:nestedScrollingEnabled="false" />
-
-				<TextView
-					android:id="@+id/text_view_no_invitations"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="No pending invitations"
-					android:textSize="14sp"
-					android:visibility="gone" />
-
-			</LinearLayout>
+				android:layout_marginBottom="16dp" />
 
 		</LinearLayout>
 

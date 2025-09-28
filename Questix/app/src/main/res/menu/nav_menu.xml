@@ -14,6 +14,10 @@
 			android:id="@+id/nav_alliances"
 			android:icon="@drawable/ic_group"
 			android:title="Alliances" />
+		<item
+			android:id="@+id/nav_invites"
+			android:icon="@drawable/ic_mail"
+			android:title="Alliance Invites" />
 	</group>
 
 	<item android:title="">

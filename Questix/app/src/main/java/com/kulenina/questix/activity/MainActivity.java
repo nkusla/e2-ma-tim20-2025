@@ -30,6 +30,7 @@ import com.kulenina.questix.R;
 import com.kulenina.questix.databinding.ActivityMainBinding;
 import com.kulenina.questix.fragment.UserProfileFragment;
 import com.kulenina.questix.fragment.AllianceListFragment;
+import com.kulenina.questix.fragment.AllianceInvitationFragment;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.fragment.UserSearchFragment;
 
@@ -103,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
 			showAlliances();
 		} else if (itemId == R.id.nav_search_users) {
 			showUserSearch();
+		} else if (itemId == R.id.nav_invites) {
+			showInvites();
 		} else if (itemId == R.id.nav_logout) {
 			logout();
 		}
@@ -125,6 +128,11 @@ public class MainActivity extends AppCompatActivity {
 
 	private void showAlliances() {
 		AllianceListFragment fragment = new AllianceListFragment();
+		replaceFragment(fragment);
+	}
+
+	private void showInvites() {
+		AllianceInvitationFragment fragment = new AllianceInvitationFragment();
 		replaceFragment(fragment);
 	}
 
