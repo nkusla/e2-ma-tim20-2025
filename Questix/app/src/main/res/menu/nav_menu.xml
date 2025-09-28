@@ -22,19 +22,16 @@
 			android:id="@+id/nav_invites"
 			android:icon="@drawable/ic_mail"
 			android:title="Alliance Invites" />
+		<item
+			android:title=""
+			android:enabled="false" />
+		<item
+			android:id="@+id/nav_change_password"
+			android:icon="@drawable/ic_lock"
+			android:title="Change Password" />
+		<item
+			android:id="@+id/nav_logout"
+			android:icon="@drawable/ic_logout"
+			android:title="Logout" />
 	</group>
-
-	<item android:title="">
-		<menu>
-			<item
-				android:id="@+id/nav_change_password"
-				android:icon="@drawable/ic_lock"
-				android:title="Change Password" />
-			<item
-				android:id="@+id/nav_logout"
-				android:icon="@drawable/ic_logout"
-				android:title="Logout" />
-		</menu>
-	</item>
-
 </menu>
