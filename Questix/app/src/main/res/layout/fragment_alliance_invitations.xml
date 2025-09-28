@@ -16,6 +16,32 @@
 		android:padding="16dp"
 		android:layout_marginBottom="16dp">
 
+		<!-- Header -->
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:gravity="center_vertical"
+			android:layout_marginBottom="16dp">
+
+			<ImageView
+				android:layout_width="28dp"
+				android:layout_height="28dp"
+				android:src="@drawable/ic_mail"
+				android:layout_marginEnd="8dp"
+				app:tint="?attr/colorPrimary" />
+
+			<TextView
+				android:id="@+id/text_view_header"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Alliance Invitations"
+				android:textSize="24sp"
+				android:textStyle="bold"
+				android:textColor="?attr/colorOnSurface" />
+
+		</LinearLayout>
+
 		<androidx.recyclerview.widget.RecyclerView
 			android:id="@+id/recycler_view_invitations"
 			android:layout_width="match_parent"
@@ -27,7 +53,6 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="No pending alliance invitations..."
-			android:textSize="18sp"
 			android:textStyle="italic"
 			android:layout_gravity="center"
 			android:layout_marginTop="16dp"

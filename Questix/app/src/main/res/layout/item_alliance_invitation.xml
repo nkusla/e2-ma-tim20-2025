@@ -17,7 +17,9 @@
         android:orientation="vertical"
         android:background="@drawable/card_background"
         android:padding="12dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        android:elevation="4dp"
+        android:layout_marginHorizontal="4dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -41,28 +43,33 @@
             android:orientation="horizontal"
             android:gravity="end">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_decline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Decline"
                 android:textSize="12sp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:backgroundTint="@android:color/holo_red_dark"
                 android:layout_marginEnd="8dp"
-                android:onClick="@{() -> listener.onDeclineInvitation(invitation)}" />
+                android:onClick="@{() -> listener.onDeclineInvitation(invitation)}"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                app:strokeColor="@android:color/holo_red_dark"
+                app:cornerRadius="8dp"
+                android:textColor="@android:color/holo_red_dark"
+                app:icon="@drawable/ic_close"
+                app:iconTint="@android:color/holo_red_dark" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_accept"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Accept"
                 android:textSize="12sp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:backgroundTint="@android:color/holo_green_dark"
-                android:onClick="@{() -> listener.onAcceptInvitation(invitation)}" />
+                android:onClick="@{() -> listener.onAcceptInvitation(invitation)}"
+                app:backgroundTint="@android:color/holo_green_dark"
+                app:cornerRadius="8dp"
+                android:textColor="@android:color/white"
+                app:icon="@drawable/ic_check"
+                app:iconTint="@android:color/white" />
 
         </LinearLayout>
 

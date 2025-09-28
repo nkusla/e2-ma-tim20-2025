@@ -75,10 +75,8 @@ public class AllianceService {
                 throw new RuntimeException("Only alliance members can send invitations");
             }
 
-            // Check if invitee is already in an alliance
-            if (invitee.isInAlliance()) {
-                throw new RuntimeException("User is already in an alliance");
-            }
+            // Allow inviting users who are already in alliances
+            // They can switch alliances by accepting the invitation
 
             // Check if invitee is already invited
             if (invitee.allianceInvitations != null && invitee.allianceInvitations.contains(allianceId)) {

@@ -52,7 +52,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
 
     private void setupUI() {
         binding.buttonCreateAlliance.setOnClickListener(v -> showCreateAllianceDialog());
-        binding.buttonInviteFriends.setOnClickListener(v -> showInviteFriendsDialog());
         binding.buttonLeaveAlliance.setOnClickListener(v -> leaveAlliance());
         binding.buttonDisbandAlliance.setOnClickListener(v -> disbandAlliance());
 
@@ -100,7 +99,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
             binding.textViewMissionStatus.setText(currentAlliance.isMissionActive ? "Mission Active" : "No Active Mission");
 
             // Show/hide buttons based on user role and alliance status
-            binding.buttonInviteFriends.setVisibility(currentAlliance.isLeader(currentUserId) ? View.VISIBLE : View.GONE);
             binding.buttonLeaveAlliance.setVisibility(currentAlliance.canLeave(currentUserId) ? View.VISIBLE : View.GONE);
             binding.buttonDisbandAlliance.setVisibility(currentAlliance.canDisband(currentUserId) ? View.VISIBLE : View.GONE);
 
@@ -131,10 +129,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         dialog.show(getParentFragmentManager(), "CreateAllianceDialog");
     }
 
-    private void showInviteFriendsDialog() {
-        // For now, just show a toast. In a real implementation, you'd show a dialog
-        Toast.makeText(getContext(), "Invite Friends dialog would open here", Toast.LENGTH_SHORT).show();
-    }
 
     private void leaveAlliance() {
         if (currentAlliance != null) {

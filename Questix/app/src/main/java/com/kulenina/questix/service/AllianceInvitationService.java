@@ -51,10 +51,8 @@ public class AllianceInvitationService {
                 throw new RuntimeException("Only alliance members can send invitations");
             }
 
-            // Check if invitee is already in an alliance
-            if (invitee.isInAlliance()) {
-                throw new RuntimeException("User is already in an alliance");
-            }
+            // Allow users to receive invitations even if they're in an alliance
+            // They can switch alliances by accepting the invitation
 
             // Check if there's already a pending invitation
             if (hasPendingInvitation(allianceId, inviteeId)) {
@@ -105,37 +103,57 @@ public class AllianceInvitationService {
                 throw new RuntimeException("This invitation is not for this user");
             }
 
-            // Check if user is already in an alliance
-            if (user.isInAlliance()) {
-                throw new RuntimeException("User is already in an alliance");
-            }
-
-            // Get alliance and check if it still exists
+            // Get the new alliance and check if it still exists
             return allianceRepository.read(invitation.allianceId)
                 .continueWithTask(allianceTask -> {
-                    Alliance alliance = allianceTask.getResult();
-                    if (alliance == null) {
+                    Alliance newAlliance = allianceTask.getResult();
+                    if (newAlliance == null) {
                         throw new RuntimeException("Alliance no longer exists");
                     }
 
-                    // Accept invitation
-                    invitation.accept();
-                    user.setCurrentAlliance(alliance.id);
-                    user.removeAllianceInvitation(invitationId);
-                    alliance.addMember(userId);
+                    // If user is already in an alliance, we need to handle leaving the old one
+                    Task<Alliance> oldAllianceTask = null;
+                    if (user.isInAlliance()) {
+                        oldAllianceTask = allianceRepository.read(user.currentAllianceId);
+                    } else {
+                        oldAllianceTask = Tasks.forResult(null);
+                    }
 
-                    // Batch operations
-                    WriteBatch batch = db.batch();
-                    batch.update(invitationRepository.getDocumentReference(invitationId),
-                               "status", invitation.status);
-                    batch.update(userRepository.getDocumentReference(userId),
-                               "currentAllianceId", alliance.id);
-                    batch.update(userRepository.getDocumentReference(userId),
-                               "allianceInvitations", user.allianceInvitations);
-                    batch.update(allianceRepository.getDocumentReference(alliance.id),
-                               "memberIds", alliance.memberIds);
+                    return oldAllianceTask.continueWithTask(oldAllianceTaskResult -> {
+                        Alliance oldAlliance = oldAllianceTaskResult.getResult();
 
-                    return batch.commit();
+                        // Accept invitation
+                        invitation.accept();
+                        user.removeAllianceInvitation(invitationId);
+
+                        // Remove from old alliance if exists
+                        if (oldAlliance != null) {
+                            oldAlliance.removeMember(userId);
+                        }
+
+                        // Add to new alliance
+                        user.setCurrentAlliance(newAlliance.id);
+                        newAlliance.addMember(userId);
+
+                        // Batch operations
+                        WriteBatch batch = db.batch();
+                        batch.update(invitationRepository.getDocumentReference(invitationId),
+                                   "status", invitation.status);
+                        batch.update(userRepository.getDocumentReference(userId),
+                                   "currentAllianceId", newAlliance.id);
+                        batch.update(userRepository.getDocumentReference(userId),
+                                   "allianceInvitations", user.allianceInvitations);
+                        batch.update(allianceRepository.getDocumentReference(newAlliance.id),
+                                   "memberIds", newAlliance.memberIds);
+
+                        // Update old alliance if it existed
+                        if (oldAlliance != null) {
+                            batch.update(allianceRepository.getDocumentReference(oldAlliance.id),
+                                       "memberIds", oldAlliance.memberIds);
+                        }
+
+                        return batch.commit();
+                    });
                 });
         });
     }
