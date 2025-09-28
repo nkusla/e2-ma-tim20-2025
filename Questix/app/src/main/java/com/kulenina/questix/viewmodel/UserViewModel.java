@@ -10,10 +10,12 @@ public class UserViewModel extends BaseObservable {
     private User user;
     private boolean isLoading;
     private String errorMessage;
+    private boolean isOwnProfile;
 
     public UserViewModel() {
         this.isLoading = false;
         this.errorMessage = null;
+        this.isOwnProfile = false;
     }
 
     @Bindable
@@ -117,5 +119,15 @@ public class UserViewModel extends BaseObservable {
 
     public User getUser() {
         return user;
+    }
+
+    @Bindable
+    public boolean getIsOwnProfile() {
+        return isOwnProfile;
+    }
+
+    public void setIsOwnProfile(boolean isOwnProfile) {
+        this.isOwnProfile = isOwnProfile;
+        notifyPropertyChanged(com.kulenina.questix.BR.isOwnProfile);
     }
 }

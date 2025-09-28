@@ -47,6 +47,10 @@ public class UserProfileFragment extends Fragment {
         if (getArguments() != null) {
             String userId = getArguments().getString("userId");
             if (userId != null) {
+                // Check if this is the current user's own profile
+                String currentUserId = authService.getCurrentUser().getUid();
+                userViewModel.setIsOwnProfile(currentUserId.equals(userId));
+
                 fetchUserById(userId);
                 setupFriendButton(userId);
             }
