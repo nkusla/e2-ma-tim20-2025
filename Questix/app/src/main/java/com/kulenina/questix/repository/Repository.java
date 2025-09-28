@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Repository<T extends IIdentifiable> {
-    private final FirebaseFirestore db;
+    protected final FirebaseFirestore db;
     private final String collectionName;
-    private final Mapper<T> mapper;
+    protected final Mapper<T> mapper;
 
     public Repository(String collectionName, Class<T> clazz) {
 			this.db = FirebaseFirestore.getInstance();
@@ -52,19 +52,7 @@ public class Repository<T extends IIdentifiable> {
     public Task<List<T>> readAll() {
       return db.collection(collectionName)
         .get()
-        .continueWith(task -> {
-          QuerySnapshot querySnapshot = task.getResult();
-          List<T> objects = new ArrayList<>();
-          if (querySnapshot != null) {
-            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-              T object = toObject(document);
-              if (object != null) {
-                objects.add(object);
-              }
-            }
-          }
-          return objects;
-        });
+        .continueWith(task -> toList(task.getResult()));
     }
 
     public Task<Void> update(T object) {
@@ -80,7 +68,7 @@ public class Repository<T extends IIdentifiable> {
       return db.collection(collectionName).document(id).delete();
     }
 
-    private T toObject(DocumentSnapshot document) {
+    protected T toObject(DocumentSnapshot document) {
       if (document == null || !document.exists()) {
         return null;
       }
@@ -96,5 +84,22 @@ public class Repository<T extends IIdentifiable> {
 
     public DocumentReference getDocumentReference(T object) {
       return getDocumentReference(object.getId());
+    }
+
+    protected CollectionReference getCollectionReference() {
+      return db.collection(collectionName);
+    }
+
+    protected List<T> toList(QuerySnapshot querySnapshot) {
+      List<T> objects = new ArrayList<>();
+      if (querySnapshot != null) {
+        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+          T object = toObject(document);
+          if (object != null) {
+            objects.add(object);
+          }
+        }
+      }
+      return objects;
     }
 }

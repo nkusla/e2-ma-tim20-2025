@@ -221,7 +221,19 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error loading messages: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    String errorMessage = "Error loading messages";
+                    if (e.getMessage() != null) {
+                        if (e.getMessage().contains("FAILED_PRECONDITION")) {
+                            errorMessage = "Database configuration issue. Please try again later.";
+                        } else if (e.getMessage().contains("PERMISSION_DENIED")) {
+                            errorMessage = "You don't have permission to view these messages.";
+                        } else if (e.getMessage().contains("UNAVAILABLE")) {
+                            errorMessage = "Server is temporarily unavailable. Please try again.";
+                        } else {
+                            errorMessage = "Error loading messages: " + e.getMessage();
+                        }
+                    }
+                    Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
                 });
         }
     }
