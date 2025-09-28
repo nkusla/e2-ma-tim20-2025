@@ -49,6 +49,10 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
 
+    // ZXing QR Code generation
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("com.google.zxing:core:3.5.2")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

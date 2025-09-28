@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
+
+	<data>
+		<variable
+			name="viewModel"
+			type="com.kulenina.questix.viewmodel.QRScannerViewModel" />
+	</data>
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@android:color/black"
+		tools:context=".fragment.QRScannerFragment">
+
+		<!-- Camera Preview Container -->
+		<FrameLayout
+			android:id="@+id/cameraPreviewContainer"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
+			app:layout_constraintTop_toTopOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintBottom_toTopOf="@+id/bottomControlsContainer">
+
+			<!-- ZXing BarcodeView will be added programmatically here -->
+
+		</FrameLayout>
+
+		<!-- Scanning Instructions -->
+		<androidx.cardview.widget.CardView
+			android:id="@+id/instructionsCard"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="32dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginTop="64dp"
+			app:cardCornerRadius="12dp"
+			app:cardElevation="8dp"
+			app:cardBackgroundColor="@android:color/white"
+			app:layout_constraintTop_toTopOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintEnd_toEndOf="parent">
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				android:padding="16dp"
+				android:gravity="center">
+
+				<ImageView
+					android:layout_width="48dp"
+					android:layout_height="48dp"
+					android:src="@drawable/ic_qr_code_scanner"
+					android:tint="?attr/colorPrimary"
+					android:layout_marginBottom="8dp" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Scan QR Code to Add Friend"
+					android:textSize="16sp"
+					android:textStyle="bold"
+					android:textColor="@android:color/black"
+					android:layout_marginBottom="4dp" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Point your camera at a Questix user's QR code"
+					android:textSize="14sp"
+					android:textColor="@android:color/darker_gray"
+					android:gravity="center" />
+
+			</LinearLayout>
+
+		</androidx.cardview.widget.CardView>
+
+		<!-- Bottom Controls Container -->
+		<LinearLayout
+			android:id="@+id/bottomControlsContainer"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:background="@android:color/black"
+			android:padding="16dp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintEnd_toEndOf="parent">
+
+			<!-- Status Text -->
+			<TextView
+				android:id="@+id/statusText"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@{viewModel.statusMessage}"
+				android:textSize="16sp"
+				android:textColor="@android:color/white"
+				android:gravity="center"
+				android:layout_marginBottom="16dp"
+				android:visibility="@{viewModel.statusMessage != null ? android.view.View.VISIBLE : android.view.View.GONE}" />
+
+			<!-- Control Buttons -->
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:gravity="center">
+
+				<!-- Flash Toggle Button -->
+				<com.google.android.material.button.MaterialButton
+					android:id="@+id/buttonToggleFlash"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="16dp"
+					android:text="Flash"
+					android:textColor="@android:color/white"
+					app:icon="@drawable/ic_lightning"
+					app:iconTint="@android:color/white"
+					style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+					app:strokeColor="@android:color/white"
+					app:cornerRadius="8dp" />
+
+				<!-- Close Button -->
+				<com.google.android.material.button.MaterialButton
+					android:id="@+id/buttonClose"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Close"
+					android:textColor="@android:color/white"
+					app:icon="@drawable/ic_close"
+					app:iconTint="@android:color/white"
+					style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+					app:strokeColor="@android:color/white"
+					app:cornerRadius="8dp" />
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<!-- Semi-transparent background -->
+	<item>
+		<shape android:shape="rectangle">
+			<solid android:color="#80000000" />
+		</shape>
+	</item>
+
+	<!-- Transparent center square for scanning -->
+	<item
+		android:left="80dp"
+		android:top="120dp"
+		android:right="80dp"
+		android:bottom="200dp">
+		<shape android:shape="rectangle">
+			<solid android:color="#00000000" />
+			<stroke
+				android:width="2dp"
+				android:color="@android:color/white"
+				android:dashWidth="10dp"
+				android:dashGap="5dp" />
+		</shape>
+	</item>
+
+	<!-- Corner indicators -->
+	<!-- Top-left corner -->
+	<item
+		android:left="75dp"
+		android:top="115dp">
+		<vector
+			android:width="30dp"
+			android:height="30dp"
+			android:viewportWidth="30"
+			android:viewportHeight="30">
+			<path
+				android:fillColor="@android:color/holo_blue_bright"
+				android:pathData="M0,0 L0,10 L5,10 L5,5 L10,5 L10,0 Z" />
+		</vector>
+	</item>
+
+	<!-- Top-right corner -->
+	<item
+		android:right="75dp"
+		android:top="115dp">
+		<vector
+			android:width="30dp"
+			android:height="30dp"
+			android:viewportWidth="30"
+			android:viewportHeight="30">
+			<path
+				android:fillColor="@android:color/holo_blue_bright"
+				android:pathData="M20,0 L20,5 L25,5 L25,10 L30,10 L30,0 Z" />
+		</vector>
+	</item>
+
+	<!-- Bottom-left corner -->
+	<item
+		android:left="75dp"
+		android:bottom="195dp">
+		<vector
+			android:width="30dp"
+			android:height="30dp"
+			android:viewportWidth="30"
+			android:viewportHeight="30">
+			<path
+				android:fillColor="@android:color/holo_blue_bright"
+				android:pathData="M0,20 L0,30 L10,30 L10,25 L5,25 L5,20 Z" />
+		</vector>
+	</item>
+
+	<!-- Bottom-right corner -->
+	<item
+		android:right="75dp"
+		android:bottom="195dp">
+		<vector
+			android:width="30dp"
+			android:height="30dp"
+			android:viewportWidth="30"
+			android:viewportHeight="30">
+			<path
+				android:fillColor="@android:color/holo_blue_bright"
+				android:pathData="M25,20 L25,25 L20,25 L20,30 L30,30 L30,20 Z" />
+		</vector>
+	</item>
+
+</layer-list>

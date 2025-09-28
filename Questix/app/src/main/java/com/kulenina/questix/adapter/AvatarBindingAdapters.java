@@ -1,9 +1,9 @@
-package com.kulenina.questix.utils;
+package com.kulenina.questix.adapter;
 
 import android.widget.ImageView;
 import androidx.databinding.BindingAdapter;
 
-public class BindingAdapters {
+public class AvatarBindingAdapters {
 
     @BindingAdapter("avatarResource")
     public static void setAvatarResource(ImageView imageView, String avatarName) {

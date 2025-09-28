@@ -11,6 +11,10 @@
 			android:icon="@drawable/ic_person_search"
 			android:title="Search Users" />
 		<item
+			android:id="@+id/nav_qr_scanner"
+			android:icon="@drawable/ic_qr_code_scanner"
+			android:title="Scan QR Code" />
+		<item
 			android:id="@+id/nav_alliances"
 			android:icon="@drawable/ic_group"
 			android:title="Alliances" />
