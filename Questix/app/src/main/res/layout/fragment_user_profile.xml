@@ -202,6 +202,54 @@
 
 						</LinearLayout>
 
+						<!-- XP Progression Bar (only shown for own profile) -->
+						<LinearLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="vertical"
+							android:layout_marginTop="8dp"
+							android:layout_marginBottom="8dp"
+							android:visibility="@{viewModel.isOwnProfile ? android.view.View.VISIBLE : android.view.View.GONE}">
+
+							<!-- Progress Bar -->
+							<LinearLayout
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:orientation="horizontal"
+								android:gravity="center_vertical"
+								android:layout_marginBottom="4dp">
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Level XP Progress:"
+									android:textSize="12sp"
+									android:textColor="@android:color/darker_gray"
+									android:layout_marginEnd="8dp" />
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="@{viewModel.xp + ` / ` + viewModel.totalXpForNextLevel}"
+									android:textSize="12sp"
+									android:textStyle="bold"
+									android:textColor="@android:color/black" />
+
+							</LinearLayout>
+
+							<!-- Progress Bar -->
+							<ProgressBar
+								android:layout_width="match_parent"
+								android:layout_height="8dp"
+								style="?android:attr/progressBarStyleHorizontal"
+								android:max="100"
+								android:progress="@{viewModel.xpProgressPercentage}"
+								android:progressTint="?attr/colorPrimary"
+								android:backgroundTint="@android:color/darker_gray" />
+
+
+						</LinearLayout>
+
 					</LinearLayout>
 
 				</LinearLayout>

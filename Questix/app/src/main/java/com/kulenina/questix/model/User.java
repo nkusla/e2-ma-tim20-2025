@@ -18,7 +18,7 @@ public class User implements IIdentifiable, Serializable {
 	public List<String> allianceInvitations;
 
 	public User() {
-		this.level = 1;
+		this.level = 0;
 		this.powerPoints = 0;
 		this.xp = 0;
 		this.coins = 0;

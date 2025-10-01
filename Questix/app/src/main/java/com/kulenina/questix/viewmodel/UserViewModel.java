@@ -5,17 +5,20 @@ import androidx.databinding.Bindable;
 import androidx.lifecycle.ViewModel;
 
 import com.kulenina.questix.model.User;
+import com.kulenina.questix.service.LevelProgressionService;
 
 public class UserViewModel extends BaseObservable {
     private User user;
     private boolean isLoading;
     private String errorMessage;
     private boolean isOwnProfile;
+    private LevelProgressionService levelProgressionService;
 
     public UserViewModel() {
         this.isLoading = false;
         this.errorMessage = null;
         this.isOwnProfile = false;
+        this.levelProgressionService = new LevelProgressionService();
     }
 
     @Bindable
@@ -84,6 +87,7 @@ public class UserViewModel extends BaseObservable {
 
     private String getTitleForLevel(int level) {
         switch (level) {
+            case 0: return "Beginner";
             case 1: return "Novice";
             case 2: return "Apprentice";
             case 3: return "Explorer";
@@ -103,6 +107,27 @@ public class UserViewModel extends BaseObservable {
         return user != null && user.id != null ? user.id : "";
     }
 
+    @Bindable
+    public String getTotalXpForNextLevel() {
+        if (user == null || user.level == null) return "200";
+
+        int currentLevel = user.level;
+        // Get total cumulative XP needed to reach next level
+        return String.valueOf(levelProgressionService.getXpRequiredForLevel(currentLevel + 1));
+    }
+
+    @Bindable
+    public int getXpProgressPercentage() {
+        if (user == null || user.level == null || user.xp == null) return 0;
+
+        int currentXp = user.xp;
+        int totalXpForNextLevel = levelProgressionService.getXpRequiredForLevel(user.level + 1);
+
+        if (totalXpForNextLevel <= 0) return 100;
+
+        return Math.min(100, (currentXp * 100) / totalXpForNextLevel);
+    }
+
     public void setUser(User user) {
         this.user = user;
         // Notify all user-related properties changed
@@ -115,6 +140,8 @@ public class UserViewModel extends BaseObservable {
         notifyPropertyChanged(com.kulenina.questix.BR.avatar);
         notifyPropertyChanged(com.kulenina.questix.BR.title);
         notifyPropertyChanged(com.kulenina.questix.BR.userId);
+        notifyPropertyChanged(com.kulenina.questix.BR.totalXpForNextLevel);
+        notifyPropertyChanged(com.kulenina.questix.BR.xpProgressPercentage);
     }
 
     public User getUser() {

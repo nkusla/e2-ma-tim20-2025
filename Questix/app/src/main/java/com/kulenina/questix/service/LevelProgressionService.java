@@ -39,21 +39,6 @@ public class LevelProgressionService {
         return ((nextLevelXp + 99) / 100) * 100;
     }
 
-    public int getTotalXpForLevel(int level) {
-        int totalXp = 0;
-        for (int i = 1; i <= level; i++) {
-            totalXp += getXpRequiredForLevel(i);
-        }
-        return totalXp;
-    }
-
-    public int getXpNeededForNextLevel(User user) {
-        int currentLevel = user.level != null ? user.level : 1;
-        int currentXp = user.xp != null ? user.xp : 0;
-        int totalXpForNextLevel = getTotalXpForLevel(currentLevel + 1);
-        return Math.max(0, totalXpForNextLevel - currentXp);
-    }
-
     public int calculateDynamicXpReward(int userLevel, String importance, String difficulty) {
         int baseImportanceXp = getBaseImportanceXp(importance);
         int baseDifficultyXp = getBaseDifficultyXp(difficulty);
@@ -67,7 +52,7 @@ public class LevelProgressionService {
     }
 
     private boolean canLevelUp(User user) {
-        int totalXpForNextLevel = getTotalXpForLevel(user.level + 1);
+        int totalXpForNextLevel = getXpRequiredForLevel(user.level + 1);
         return user.xp >= totalXpForNextLevel;
     }
 
