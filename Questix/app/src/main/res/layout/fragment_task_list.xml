@@ -60,17 +60,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:listitem="@layout/task_list_item" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add_task"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:contentDescription="Dodaj Zadatak"
-            app:srcCompat="@android:drawable/ic_input_add"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:tint="@android:color/white"
-            app:backgroundTint="@color/colorPrimary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

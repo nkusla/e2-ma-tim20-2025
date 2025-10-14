@@ -118,10 +118,12 @@ public class MainActivity extends AppCompatActivity {
 			showChangePassword();
 		} else if (itemId == R.id.nav_category_management) {
 			showCategoryManagement();
-		} else if (itemId == R.id.nav_task_list) {     
+		} else if (itemId == R.id.nav_task_list) {
 			showTaskList();
 		} else if (itemId == R.id.nav_calendar) {
 			showCalendar();
+		} else if (itemId == R.id.nav_create_task) {
+			showCreateTask();
 		}
 		else if (itemId == R.id.nav_logout) {
 			logout();
@@ -196,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
 
 	public void showCreateTask() {
 		CreateTaskFragment fragment = new CreateTaskFragment();
-		// Obično se kreiranje stavlja u Back Stack da bi se dugme Nazad vratilo na Listu
 		replaceFragment(fragment);
 	}
 }

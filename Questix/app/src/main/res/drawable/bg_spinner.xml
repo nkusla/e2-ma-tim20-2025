@@ -8,6 +8,12 @@
         </shape>
     </item>
     <item android:gravity="center_vertical|end" android:right="8dp">
-        <bitmap android:src="@drawable/baseline_arrow_drop_down_24" />
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+            android:height="24dp"
+            android:width="24dp"
+            android:viewportHeight="24"
+            android:viewportWidth="24">
+            <path android:fillColor="@color/colorTextSecondary" android:pathData="M7,10l5,5 5,-5z"/>
+        </vector>
     </item>
 </layer-list>

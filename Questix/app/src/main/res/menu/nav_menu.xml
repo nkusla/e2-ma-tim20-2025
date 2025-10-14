@@ -34,6 +34,10 @@
 			android:icon="@drawable/ic_calendar"
 			android:title="Calendar" />
 		<item
+			android:id="@+id/nav_create_task"
+			android:icon="@android:drawable/ic_input_add"
+			android:title="Create Task" />
+		<item
 			android:title=""
 			android:enabled="false" />
 		<item

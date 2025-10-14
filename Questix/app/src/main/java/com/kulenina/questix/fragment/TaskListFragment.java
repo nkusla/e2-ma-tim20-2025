@@ -8,8 +8,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 //import androidx.navigation.NavController;
 //import androidx.navigation.Navigation;
@@ -18,7 +16,6 @@ import com.kulenina.questix.databinding.FragmentTaskListBinding;
 import com.kulenina.questix.model.AppTask;
 import com.kulenina.questix.viewmodel.AppTaskViewModel;
 import com.kulenina.questix.adapter.TaskListAdapter;
-import com.kulenina.questix.viewmodel.AppTaskViewModel;
 
 public class TaskListFragment extends Fragment implements TaskListAdapter.TaskActionListener {
 
@@ -43,7 +40,6 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
 
         setupRecyclerView();
         setupObservers();
-        setupFab();
 
         // Početno učitavanje zadataka
         appTaskViewModel.loadTasksForList();
@@ -81,16 +77,6 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
         });
     }
 
-    private void setupFab() {
-        binding.fabAddTask.setOnClickListener(v -> {
-            CreateTaskFragment fragment = new CreateTaskFragment();
-            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.fragment_container, fragment);
-            transaction.addToBackStack(null); // omogućava povratak na prethodni fragment
-            transaction.commit();
-        });
-    }
 
 
     // --- TaskActionListener Implementacija ---
