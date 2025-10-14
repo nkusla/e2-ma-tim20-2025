@@ -54,7 +54,6 @@ public class TaskDetailFragment extends Fragment {
             return;
         }
 
-        String taskId = getArguments() != null ? getArguments().getString("taskId") : null;
 
         appTaskViewModel = new ViewModelProvider(requireActivity()).get(AppTaskViewModel.class);
         categoryViewModel = new ViewModelProvider(requireActivity()).get(CategoryViewModel.class);
@@ -83,11 +82,7 @@ public class TaskDetailFragment extends Fragment {
         });
 
         // Observator za kategoriju (Potrebno za prikaz imena kategorije)
-        categoryViewModel.getCategoryById(currentTask.categoryId).observe(getViewLifecycleOwner(), category -> {
-            if (category != null) {
-                binding.tvCategoryName.setText(category.getName());
-            }
-        });
+        // Moved to populateUI method to avoid null pointer exception
 
         // Observator za greške
         appTaskViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), error -> {
@@ -110,6 +105,15 @@ public class TaskDetailFragment extends Fragment {
         // Postavljanje spinera na trenutne vrednosti
         setSpinnerSelection(binding.spinnerDifficulty, R.array.task_difficulties, task.difficulty);
         setSpinnerSelection(binding.spinnerImportance, R.array.task_importance, task.importance);
+
+        // Observator za kategoriju (moved here to avoid null pointer)
+        if (task.categoryId != null) {
+            categoryViewModel.getCategoryById(task.categoryId).observe(getViewLifecycleOwner(), category -> {
+                if (category != null) {
+                    binding.tvCategoryName.setText(category.getName());
+                }
+            });
+        }
 
         // Ažuriranje dugmeta Pauza/Nastavak
         if (task.isFinished()) {

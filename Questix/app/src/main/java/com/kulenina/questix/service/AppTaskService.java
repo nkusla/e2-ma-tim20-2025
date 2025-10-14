@@ -456,16 +456,67 @@ public class AppTaskService {
     public Task<AppTask> getTaskById(String taskId) {
         String userId = getCurrentUserId();
 
-        return taskRepository.read(taskId)
+        // Handle generated recurring task IDs (format: "originalId_timestamp")
+        String tempOriginalTaskId = taskId;
+        long tempRequestedExecutionTime = 0;
+
+        if (taskId.contains("_")) {
+            String[] parts = taskId.split("_");
+            if (parts.length == 2) {
+                try {
+                    tempOriginalTaskId = parts[0];
+                    tempRequestedExecutionTime = Long.parseLong(parts[1]);
+                } catch (NumberFormatException e) {
+                    // If parsing fails, use the original taskId
+                    tempOriginalTaskId = taskId;
+                    tempRequestedExecutionTime = 0;
+                }
+            }
+        }
+
+        final String originalTaskId = tempOriginalTaskId;
+        final long requestedExecutionTime = tempRequestedExecutionTime;
+
+        return taskRepository.read(originalTaskId)
                 .continueWith(task -> {
                     AppTask appTask = task.getResult();
 
-                    if (appTask == null || !userId.equals(appTask.getUserId())) {
-                        // Ako zadatak nije pronađen ili pripada drugom korisniku
+                    if (appTask == null) {
                         throw new RuntimeException("Task not found or access denied.");
                     }
+
+                    if (!userId.equals(appTask.getUserId())) {
+                        throw new RuntimeException("Task not found or access denied.");
+                    }
+
+                    // If this is a generated recurring instance, update the execution time
+                    if (requestedExecutionTime > 0 && appTask.isRecurring) {
+                        AppTask instanceTask = cloneTaskForDisplay(appTask, requestedExecutionTime, taskId);
+                        return instanceTask;
+                    }
+
                     return appTask;
                 });
+    }
+
+    /**
+     * Creates a display copy of a recurring task with specific execution time
+     */
+    private AppTask cloneTaskForDisplay(AppTask originalTask, long executionTime, String displayId) {
+        AppTask instance = new AppTask(
+                originalTask.userId, originalTask.categoryId, originalTask.colorHex,
+                originalTask.name, originalTask.description, executionTime,
+                originalTask.isRecurring, originalTask.repetitionInterval, originalTask.repetitionUnit,
+                originalTask.startDate, originalTask.endDate,
+                originalTask.difficulty, originalTask.difficultyXp, originalTask.importance, originalTask.importanceXp
+        );
+
+        // Set the display ID and status
+        instance.id = displayId;
+        instance.status = (executionTime == originalTask.executionTime) ? originalTask.status : AppTask.STATUS_ACTIVE;
+        instance.totalXpValue = originalTask.totalXpValue;
+
+        return instance;
     }
 
 }

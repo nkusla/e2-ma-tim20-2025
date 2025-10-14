@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 //import androidx.navigation.NavController;
 //import androidx.navigation.Navigation;
 import com.kulenina.questix.R;
+import com.kulenina.questix.activity.MainActivity;
 import com.kulenina.questix.databinding.FragmentTaskListBinding;
 import com.kulenina.questix.model.AppTask;
 import com.kulenina.questix.viewmodel.AppTaskViewModel;
@@ -98,11 +99,11 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
 
     @Override
     public void onTaskClick(String taskId) {
-        // Otvaranje detalja zadatka (sledi u sledećem koraku)
-        Bundle bundle = new Bundle();
-        bundle.putString("taskId", taskId);
-        // Pretpostavljamo da postoji akcija ka Detail fragmentu
-        // navController.navigate(R.id.action_taskListFragment_to_taskDetailFragment, bundle);
-        Toast.makeText(requireContext(), "Kliknuto na zadatak: " + taskId, Toast.LENGTH_SHORT).show();
+        // Otvaranje detalja zadatka preko MainActivity
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).showTaskDetail(taskId);
+        } else {
+            Toast.makeText(requireContext(), "Greška pri otvaranju detalja zadatka", Toast.LENGTH_SHORT).show();
+        }
     }
 }

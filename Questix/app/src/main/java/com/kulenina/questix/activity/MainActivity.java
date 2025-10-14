@@ -39,6 +39,7 @@ import com.kulenina.questix.fragment.CategoryManagementFragment;
 import com.kulenina.questix.fragment.TaskListFragment; // Za prikaz liste
 import com.kulenina.questix.fragment.CalendarFragment; // Za prikaz kalendara
 import com.kulenina.questix.fragment.CreateTaskFragment; // Za kreiranje
+import com.kulenina.questix.fragment.TaskDetailFragment; // Za prikaz detalja
 
 public class MainActivity extends AppCompatActivity {
 	private AuthService authService = new AuthService();
@@ -172,6 +173,14 @@ public class MainActivity extends AppCompatActivity {
 		transaction.commit();
 	}
 
+	private void replaceFragmentWithBackStack(Fragment fragment) {
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		transaction.replace(R.id.fragment_container, fragment);
+		transaction.addToBackStack(null);
+		transaction.commit();
+	}
+
 
 	public void logout() {
 		authService.logout();
@@ -199,5 +208,10 @@ public class MainActivity extends AppCompatActivity {
 	public void showCreateTask() {
 		CreateTaskFragment fragment = new CreateTaskFragment();
 		replaceFragment(fragment);
+	}
+
+	public void showTaskDetail(String taskId) {
+		TaskDetailFragment fragment = TaskDetailFragment.newInstance(taskId);
+		replaceFragmentWithBackStack(fragment);
 	}
 }
