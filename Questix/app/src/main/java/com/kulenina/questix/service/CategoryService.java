@@ -96,4 +96,21 @@ public class CategoryService {
         String userId = getCurrentUserId();
         return categoryRepository.findAllByUser(userId);
     }
+
+    public Task<Category> read(String categoryId) {
+        String userId = getCurrentUserId();
+
+        return categoryRepository.read(categoryId)
+                .continueWith(task -> {
+                    Category category = task.getResult();
+
+                    if (category == null || !userId.equals(category.getUserId())) {
+                        // Ako kategorija ne postoji ili ne pripada korisniku
+                        // Važno: Možda ne želite da bacate izuzetak ovde, već da vratite null.
+                        // Za LiveData posmatrače u ViewModelu je lakše vratiti null.
+                        return null;
+                    }
+                    return category;
+                });
+    }
 }

@@ -80,6 +80,10 @@ public class AppTask implements IIdentifiable, Serializable {
         return id;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
     public void setColorHex(String colorHex) {
         this.colorHex = colorHex;
         this.updatedAt = System.currentTimeMillis();

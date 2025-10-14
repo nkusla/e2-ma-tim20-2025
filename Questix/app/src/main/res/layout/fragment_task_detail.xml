@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground"
+        tools:context=".ui.task.TaskDetailFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv_task_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status: Aktivan"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:paddingBottom="8dp"
+                android:textColor="@color/colorAccent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_title_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Naziv Zadataka"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_task_status" />
+
+            <EditText
+                android:id="@+id/et_task_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Unesite kratak naziv"
+                android:inputType="textCapSentences"
+                android:minHeight="48dp"
+                android:textColor="@color/colorTextPrimary"
+                android:background="@drawable/bg_input_field"
+                android:padding="12dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_name" />
+
+            <TextView
+                android:id="@+id/tv_title_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Opis"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_task_name" />
+
+            <EditText
+                android:id="@+id/et_task_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Detaljan opis zadatka"
+                android:inputType="textMultiLine"
+                android:gravity="top"
+                android:minLines="3"
+                android:maxLines="5"
+                android:textColor="@color/colorTextPrimary"
+                android:background="@drawable/bg_input_field"
+                android:padding="12dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_description" />
+
+            <TextView
+                android:id="@+id/tv_title_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Kategorija"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_task_description" />
+
+            <TextView
+                android:id="@+id/tv_category_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:background="@drawable/bg_input_field"
+                android:textColor="@color/colorTextPrimary"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_category"
+                tools:text="Lični Razvoj" />
+
+            <TextView
+                android:id="@+id/tv_title_execution_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Vreme Izvršenja"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_category_name" />
+
+            <LinearLayout
+                android:id="@+id/layout_execution_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_execution_time">
+
+                <Button
+                    android:id="@+id/btn_select_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Odaberi Datum"
+                    android:layout_marginEnd="8dp"
+                    style="@style/Widget.AppCompat.Button.Colored" />
+
+                <Button
+                    android:id="@+id/btn_select_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Odaberi Vreme"
+                    style="@style/Widget.AppCompat.Button.Colored" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_title_difficulty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Težina Zadataka (XP)"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_execution_time" />
+
+            <Spinner
+                android:id="@+id/spinner_difficulty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:entries="@array/task_difficulties"
+                android:background="@drawable/bg_spinner"
+                android:minHeight="48dp"
+                android:padding="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_difficulty" />
+
+            <TextView
+                android:id="@+id/tv_title_importance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Bitnost Zadataka (XP)"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/spinner_difficulty" />
+
+            <Spinner
+                android:id="@+id/spinner_importance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:entries="@array/task_importance"
+                android:background="@drawable/bg_spinner"
+                android:minHeight="48dp"
+                android:padding="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_importance" />
+
+            <LinearLayout
+                android:id="@+id/layout_action_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="24dp"
+                app:layout_constraintTop_toBottomOf="@id/spinner_importance">
+
+                <Button
+                    android:id="@+id/btn_delete_task"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Obriši"
+                    android:backgroundTint="@color/colorError"
+                    android:layout_marginEnd="8dp"
+                    style="@style/Widget.AppCompat.Button.Colored" />
+
+                <Button
+                    android:id="@+id/btn_pause_resume"
+                    android_layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Pauziraj"
+                    android:backgroundTint="@color/colorWarning"
+                    android:layout_marginEnd="8dp"
+                    style="@style/Widget.AppCompat.Button.Colored" />
+
+                <Button
+                    android:id="@+id/btn_update_task"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Izmeni"
+                    android:backgroundTint="@color/colorPrimary"
+                    style="@style/Widget.AppCompat.Button.Colored" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>

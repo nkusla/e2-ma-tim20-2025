@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="task"
+            type="com.kulenina.questix.model.AppTask" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="@color/colorCardBackground">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <View
+                android:id="@+id/category_color_indicator"
+                android:layout_width="6dp"
+                android:layout_height="0dp"
+                android:background="@color/colorAccent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:backgroundTint="#FF5722"/>
+
+            <TextView
+                android:id="@+id/tv_task_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorTextPrimary"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/category_color_indicator"
+                app:layout_constraintEnd_toStartOf="@id/btn_complete"
+                tools:text="Dovrši projekat Questix" />
+
+            <TextView
+                android:id="@+id/tv_execution_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="14sp"
+                android:textColor="@color/colorTextSecondary"
+                app:layout_constraintTop_toBottomOf="@id/tv_task_name"
+                app:layout_constraintStart_toStartOf="@id/tv_task_name"
+                app:layout_constraintEnd_toStartOf="@id/btn_complete"
+                tools:text="25. Okt. 2025. - 10:00" />
+
+            <TextView
+                android:id="@+id/tv_recurrence_xp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="12sp"
+                android:textColor="@color/colorTextSecondary"
+                app:layout_constraintTop_toBottomOf="@id/tv_execution_time"
+                app:layout_constraintStart_toStartOf="@id/tv_task_name"
+                app:layout_constraintEnd_toStartOf="@id/btn_complete"
+                tools:text="Dnevno ponavljanje | 10 XP" />
+
+            <ImageButton
+                android:id="@+id/btn_complete"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Završi Zadatak"
+                android:src="@drawable/ic_check"
+                app:tint="@color/colorSuccess"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

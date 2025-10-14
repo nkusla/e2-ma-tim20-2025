@@ -45,34 +45,42 @@ public class CategoryManagementFragment extends Fragment implements CategoryAdap
         progressBar = view.findViewById(R.id.progressBar);
         fabAddCategory = view.findViewById(R.id.fabAddCategory);
 
-        viewModel = new CategoryViewModel();
+        // KORISTIMO ViewModelProvider ZA ISPRAVNU INICIJALIZACIJU
+        viewModel = new androidx.lifecycle.ViewModelProvider(requireActivity()).get(CategoryViewModel.class);
 
         adapter = new CategoryAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        viewModel.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                if (propertyId == BR.categories) {
-                    adapter.setCategories(viewModel.getCategories());
-                }
-                else if (propertyId == BR.isLoading) {
-                    progressBar.setVisibility(viewModel.getIsLoading() ? View.VISIBLE : View.GONE);
-                }
-                else if (propertyId == BR.errorMessage) {
-                    String errorMessage = viewModel.getErrorMessage();
-                    if (errorMessage != null && !errorMessage.isEmpty()) {
-                        Toast.makeText(getContext(), "Error: " + errorMessage, Toast.LENGTH_LONG).show();
-                        viewModel.clearErrorMessage();
-                    }
-                }
+        // --- KORIŠĆENJE LIVEDATA OBSERVERA ---
+
+        // 1. Posmatranje liste kategorija
+        viewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
+            if (categories != null) {
+                adapter.setCategories(categories);
             }
         });
 
-        fabAddCategory.setOnClickListener(v -> showCreateCategoryDialog(getContext()));
-    }
+        // 2. Posmatranje Loading stanja
+        viewModel.isLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        });
 
+        // 3. Posmatranje grešaka
+        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), errorMessage -> {
+            if (errorMessage != null && !errorMessage.isEmpty()) {
+                Toast.makeText(getContext(), "Error: " + errorMessage, Toast.LENGTH_LONG).show();
+                viewModel.clearErrorMessage(); // Briše poruku nakon prikaza
+            }
+        });
+
+        // --- POSTAVLJANJE LISTENER-A ---
+
+        fabAddCategory.setOnClickListener(v -> showCreateCategoryDialog(getContext()));
+
+        // Učitavanje kategorija, ako već nije urađeno u VM konstruktoru
+        // viewModel.loadCategories(); // Ova linija verovatno nije potrebna jer VM učitava u konstruktoru
+    }
     @Override
     public void onDeleteClicked(Category category) {
         new AlertDialog.Builder(getContext())

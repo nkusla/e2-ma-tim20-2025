@@ -8,4 +8,22 @@
     <string name="category_delete_message">Are you sure you want to delete category \'%1$s\'? This operation cannot be undone.</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string-array name="repetition_units">
+        <item>Dan</item>
+        <item>Nedelja</item>
+    </string-array>
+
+    <string-array name="task_difficulties">
+        <item>Very Easy (1 XP)</item>
+        <item>Easy (3 XP)</item>
+        <item>Hard (7 XP)</item>
+        <item>Extremely Hard (20 XP)</item>
+    </string-array>
+
+    <string-array name="task_importance">
+        <item>Normal (1 XP)</item>
+        <item>Important (3 XP)</item>
+        <item>Extremely Important (10 XP)</item>
+        <item>Special (100 XP)</item>
+    </string-array>
 </resources>

@@ -36,6 +36,9 @@ import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.fragment.UserSearchFragment;
 import com.kulenina.questix.fragment.ChangePasswordFragment;
 import com.kulenina.questix.fragment.CategoryManagementFragment;
+import com.kulenina.questix.fragment.TaskListFragment; // Za prikaz liste
+import com.kulenina.questix.fragment.CalendarFragment; // Za prikaz kalendara
+import com.kulenina.questix.fragment.CreateTaskFragment; // Za kreiranje
 
 public class MainActivity extends AppCompatActivity {
 	private AuthService authService = new AuthService();
@@ -115,7 +118,12 @@ public class MainActivity extends AppCompatActivity {
 			showChangePassword();
 		} else if (itemId == R.id.nav_category_management) {
 			showCategoryManagement();
-		} else if (itemId == R.id.nav_logout) {
+		} else if (itemId == R.id.nav_task_list) {     
+			showTaskList();
+		} else if (itemId == R.id.nav_calendar) {
+			showCalendar();
+		}
+		else if (itemId == R.id.nav_logout) {
 			logout();
 		}
 		drawerLayout.closeDrawer(navigationView);
@@ -172,6 +180,23 @@ public class MainActivity extends AppCompatActivity {
 
 	private void showCategoryManagement() {
 		CategoryManagementFragment fragment = new CategoryManagementFragment();
+		replaceFragment(fragment);
+	}
+
+	public void showTaskList() {
+		TaskListFragment fragment = new TaskListFragment();
+		// Dodajemo u Back Stack da bismo mogli da se vratimo na Listu iz detalja/kreiranja
+		replaceFragment(fragment);
+	}
+
+	public void showCalendar() {
+		CalendarFragment fragment = new CalendarFragment();
+		replaceFragment(fragment); // Nema potrebe za Back Stackom iz Drawera
+	}
+
+	public void showCreateTask() {
+		CreateTaskFragment fragment = new CreateTaskFragment();
+		// Obično se kreiranje stavlja u Back Stack da bi se dugme Nazad vratilo na Listu
 		replaceFragment(fragment);
 	}
 }
