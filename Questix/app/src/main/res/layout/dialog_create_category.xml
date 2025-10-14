@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <EditText
+        android:id="@+id/editTextCategoryName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Category Name"
+        android:inputType="textCapWords"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/editTextCategoryColorHex"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Color Hex (e.g., #FF00AA)"
+        android:inputType="textCapCharacters"
+        android:maxLength="7"/>
+</LinearLayout>

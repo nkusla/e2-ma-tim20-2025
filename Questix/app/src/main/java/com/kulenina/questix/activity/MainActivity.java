@@ -35,6 +35,7 @@ import com.kulenina.questix.fragment.QRScannerFragment;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.fragment.UserSearchFragment;
 import com.kulenina.questix.fragment.ChangePasswordFragment;
+import com.kulenina.questix.fragment.CategoryManagementFragment;
 
 public class MainActivity extends AppCompatActivity {
 	private AuthService authService = new AuthService();
@@ -112,6 +113,8 @@ public class MainActivity extends AppCompatActivity {
 			showInvites();
 		} else if (itemId == R.id.nav_change_password) {
 			showChangePassword();
+		} else if (itemId == R.id.nav_category_management) {
+			showCategoryManagement();
 		} else if (itemId == R.id.nav_logout) {
 			logout();
 		}
@@ -165,5 +168,10 @@ public class MainActivity extends AppCompatActivity {
 		Toast.makeText(MainActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
 		startActivity(new Intent(MainActivity.this, LoginActivity.class));
 		finish();
+	}
+
+	private void showCategoryManagement() {
+		CategoryManagementFragment fragment = new CategoryManagementFragment();
+		replaceFragment(fragment);
 	}
 }

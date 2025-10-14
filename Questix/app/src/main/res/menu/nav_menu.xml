@@ -23,6 +23,9 @@
 			android:icon="@drawable/ic_mail"
 			android:title="Alliance Invites" />
 		<item
+			android:id="@+id/nav_category_management"
+			android:icon="@drawable/ic_create" android:title="Category Management" />
+		<item
 			android:title=""
 			android:enabled="false" />
 		<item
