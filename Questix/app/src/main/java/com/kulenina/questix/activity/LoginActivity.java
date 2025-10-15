@@ -74,7 +74,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         showProgressBar(false);
-        Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
         finish();
       })

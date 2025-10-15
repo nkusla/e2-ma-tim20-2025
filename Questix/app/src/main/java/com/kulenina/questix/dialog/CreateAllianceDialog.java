@@ -180,7 +180,6 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
                     // No friends selected, just show success
                     progressBar.setVisibility(View.GONE);
                     buttonCreate.setEnabled(true);
-                    Toast.makeText(getContext(), "Alliance created successfully!", Toast.LENGTH_SHORT).show();
                     if (listener != null) {
                         listener.onAllianceCreated(allianceId);
                     }
@@ -207,9 +206,6 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
                         // All invitations sent
                         progressBar.setVisibility(View.GONE);
                         buttonCreate.setEnabled(true);
-                        Toast.makeText(getContext(),
-                            "Alliance created and " + totalInvitations + " invitations sent!",
-                            Toast.LENGTH_SHORT).show();
                         if (listener != null) {
                             listener.onAllianceCreated(allianceId);
                         }
@@ -222,9 +218,6 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
                         // All invitations processed (some may have failed)
                         progressBar.setVisibility(View.GONE);
                         buttonCreate.setEnabled(true);
-                        Toast.makeText(getContext(),
-                            "Alliance created! Some invitations may have failed to send.",
-                            Toast.LENGTH_SHORT).show();
                         if (listener != null) {
                             listener.onAllianceCreated(allianceId);
                         }

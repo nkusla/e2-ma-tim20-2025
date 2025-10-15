@@ -29,13 +29,12 @@ import com.kulenina.questix.dialog.CreateAllianceDialog;
 
 import java.util.List;
 
-public class AllianceListFragment extends Fragment implements CreateAllianceDialog.OnAllianceCreatedListener, AllianceInvitationFragment.OnInvitationUpdateListener {
+public class AllianceListFragment extends Fragment implements CreateAllianceDialog.OnAllianceCreatedListener {
     private FragmentAllianceListBinding binding;
     private AllianceService allianceService;
     private AuthService authService;
     private String currentUserId;
     private Alliance currentAlliance;
-    private AllianceInvitationFragment invitationFragment;
 
     // Messaging components
     private AllianceMessageAdapter messageAdapter;
@@ -60,7 +59,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         setupUI();
         setupMessaging();
         loadUserAlliance();
-        setupInvitationFragment();
     }
 
     private void setupUI() {
@@ -85,14 +83,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         binding.buttonSendMessage.setOnClickListener(v -> sendMessage());
     }
 
-    private void setupInvitationFragment() {
-        invitationFragment = new AllianceInvitationFragment();
-        invitationFragment.setOnInvitationUpdateListener(this);
-
-        getChildFragmentManager().beginTransaction()
-            .replace(R.id.fragment_container_invitations, invitationFragment)
-            .commit();
-    }
 
     private void loadUserAlliance() {
         allianceService.getUserAlliance(currentUserId)
@@ -113,7 +103,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         binding.layoutNoAlliance.setVisibility(View.GONE);
         binding.layoutAllianceInfo.setVisibility(View.GONE);
         binding.layoutAllianceChat.setVisibility(View.GONE);
-        binding.fragmentContainerInvitations.setVisibility(View.GONE);
     }
 
     private void updateAllianceUI() {
@@ -140,21 +129,8 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
             binding.layoutAllianceChat.setVisibility(View.GONE);
             binding.layoutNoAlliance.setVisibility(View.VISIBLE);
         }
-
-        // Update invitations UI
-        updateInvitationsUI();
     }
 
-    private void updateInvitationsUI() {
-        // Only update invitations if we're not in loading state
-        if (binding.layoutLoading.getVisibility() != View.VISIBLE) {
-            if (invitationFragment != null && invitationFragment.hasInvitations()) {
-                binding.fragmentContainerInvitations.setVisibility(View.VISIBLE);
-            } else {
-                binding.fragmentContainerInvitations.setVisibility(View.GONE);
-            }
-        }
-    }
 
     private void showCreateAllianceDialog() {
         CreateAllianceDialog dialog = CreateAllianceDialog.newInstance(this);
@@ -166,7 +142,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         if (currentAlliance != null) {
             allianceService.leaveAlliance(currentAlliance.id, currentUserId)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Left alliance successfully", Toast.LENGTH_SHORT).show();
                     currentAlliance = null;
                     updateAllianceUI();
                 })
@@ -180,7 +155,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         if (currentAlliance != null) {
             allianceService.disbandAlliance(currentAlliance.id, currentUserId)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Alliance disbanded successfully", Toast.LENGTH_SHORT).show();
                     currentAlliance = null;
                     updateAllianceUI();
                 })
@@ -194,21 +168,8 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
     public void onAllianceCreated(String allianceId) {
         // Refresh the alliance data
         loadUserAlliance();
-        Toast.makeText(getContext(), "Alliance created successfully!", Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onInvitationAccepted() {
-        // Refresh alliance data when invitation is accepted
-        loadUserAlliance();
-        updateInvitationsUI();
-    }
-
-    @Override
-    public void onInvitationDeclined() {
-        // Update invitations UI when invitation is declined
-        updateInvitationsUI();
-    }
 
     private void loadAllianceMessages() {
         if (currentAlliance != null) {

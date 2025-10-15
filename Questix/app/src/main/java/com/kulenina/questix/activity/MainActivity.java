@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -162,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
 
 	public void logout() {
 		authService.logout();
-		Toast.makeText(MainActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
 		startActivity(new Intent(MainActivity.this, LoginActivity.class));
 		finish();
 	}
