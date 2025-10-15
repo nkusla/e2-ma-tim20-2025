@@ -26,7 +26,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class NotificationSenderService {
-    private static final String NOTIFICATION_SERVER_URL = "http://localhost:3000";  // localhost server URL for testing
+    // Use 10.0.2.2 for Android emulator (maps to host machine's localhost)
+    // For physical device, replace with your computer's IP address (e.g., "http://192.168.1.3:3000")
+    private static final String NOTIFICATION_SERVER_URL = "http://10.0.2.2:3000";
 
     private final FirebaseFirestore db;
     private final UserRepository userRepository;
