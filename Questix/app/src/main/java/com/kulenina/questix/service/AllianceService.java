@@ -20,12 +20,14 @@ public class AllianceService {
     private final AllianceRepository allianceRepository;
     private final AllianceMessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final NotificationSenderService notificationService;
 
     public AllianceService() {
         this.db = FirebaseFirestore.getInstance();
         this.allianceRepository = new AllianceRepository();
         this.messageRepository = new AllianceMessageRepository();
         this.userRepository = new UserRepository();
+        this.notificationService = new NotificationSenderService();
     }
 
     public Task<String> createAlliance(String name, String leaderId) {

@@ -20,12 +20,14 @@ public class AllianceInvitationService {
     private final AllianceInvitationRepository invitationRepository;
     private final AllianceRepository allianceRepository;
     private final UserRepository userRepository;
+    private final NotificationSenderService notificationService;
 
     public AllianceInvitationService() {
         this.db = FirebaseFirestore.getInstance();
         this.invitationRepository = new AllianceInvitationRepository();
         this.allianceRepository = new AllianceRepository();
         this.userRepository = new UserRepository();
+        this.notificationService = new NotificationSenderService();
     }
 
     public Task<String> createInvitation(String allianceId, String inviterId, String inviteeId) {
@@ -75,7 +77,16 @@ public class AllianceInvitationService {
             batch.update(userRepository.getDocumentReference(inviteeId),
                        "allianceInvitations", invitee.allianceInvitations);
 
-            return batch.commit().continueWith(commitTask -> invitationId);
+            return batch.commit().continueWith(commitTask -> {
+                // Send notification to invitee
+                notificationService.sendAllianceInvitationNotification(
+                    inviteeId, alliance.name, inviter.username)
+                    .addOnSuccessListener(aVoid ->
+                        android.util.Log.d("AllianceInvitationService", "Notification sent successfully for invitation: " + invitationId))
+                    .addOnFailureListener(e ->
+                        android.util.Log.e("AllianceInvitationService", "Failed to send notification for invitation: " + invitationId, e));
+                return invitationId;
+            });
         });
     }
 
@@ -152,7 +163,13 @@ public class AllianceInvitationService {
                                        "memberIds", oldAlliance.memberIds);
                         }
 
-                        return batch.commit();
+                        return batch.commit().continueWithTask(batchTask -> {
+                            // Send notification to alliance leader about acceptance
+                            notificationService.sendInvitationAcceptedNotification(
+                                newAlliance.leaderId, user.username, newAlliance.name);
+
+                            return Tasks.forResult(null);
+                        });
                     });
                 });
         });

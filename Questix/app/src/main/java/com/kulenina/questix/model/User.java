@@ -16,6 +16,7 @@ public class User implements IIdentifiable, Serializable {
 	public List<String> friends;
 	public String currentAllianceId;
 	public List<String> allianceInvitations;
+	public String fcmToken; // Firebase Cloud Messaging token for push notifications
 
 	public User() {
 		this.level = 0;
@@ -96,5 +97,17 @@ public class User implements IIdentifiable, Serializable {
 
 	public int getPendingInvitationCount() {
 		return allianceInvitations != null ? allianceInvitations.size() : 0;
+	}
+
+	public void setFcmToken(String fcmToken) {
+		this.fcmToken = fcmToken;
+	}
+
+	public String getFcmToken() {
+		return fcmToken;
+	}
+
+	public boolean hasFcmToken() {
+		return fcmToken != null && !fcmToken.isEmpty();
 	}
 }
