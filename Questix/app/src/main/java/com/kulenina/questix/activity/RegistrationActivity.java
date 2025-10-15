@@ -91,7 +91,7 @@ public class RegistrationActivity extends AppCompatActivity {
             .addOnSuccessListener(authResult -> {
                 showProgressBar(false);
                 Toast.makeText(RegistrationActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
+                startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));
                 finish();
             })
             .addOnFailureListener(e -> {

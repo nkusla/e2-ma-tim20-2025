@@ -21,7 +21,12 @@ public class AuthService {
 	}
 
 	public boolean isUserLoggedIn() {
-		return getCurrentUser() != null;
+		FirebaseUser currentUser = getCurrentUser();
+		if (currentUser == null) {
+			return false;
+		}
+
+		return isEmailVerified();
 	}
 
 	public Task<AuthResult> signupUser(String email, String password, String username, String avatar) {
@@ -37,6 +42,7 @@ public class AuthService {
 
 	private Task<AuthResult> createUserProfile(Task<AuthResult> authTask, String username, String avatar) {
 		FirebaseUser user = mAuth.getCurrentUser();
+		user.sendEmailVerification();
 		if (user == null) {
 			throw new RuntimeException("User creation failed");
 		}
@@ -99,5 +105,16 @@ public class AuthService {
 					throw authTask.getException();
 				}
 			});
+	}
+
+	public boolean isEmailVerified() {
+		FirebaseUser user = getCurrentUser();
+		if (user == null) {
+			return false;
+		}
+
+		// TODO: Remove this once email verification is implemented
+		// return user.isEmailVerified();
+		return true;
 	}
 }

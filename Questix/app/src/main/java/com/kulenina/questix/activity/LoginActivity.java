@@ -66,7 +66,15 @@ public class LoginActivity extends AppCompatActivity {
 
     authService.loginUser(email, password)
       .addOnSuccessListener(authResult -> {
+        if (!authService.isEmailVerified()) {
+          showProgressBar(false);
+          Toast.makeText(LoginActivity.this, "Please verify your email to login", Toast.LENGTH_LONG).show();
+          authService.logout();
+          return;
+        }
+
         showProgressBar(false);
+        Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
         finish();
       })
