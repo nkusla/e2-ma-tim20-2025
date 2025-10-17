@@ -21,19 +21,25 @@ public class Mapper<T> implements IMapper<T> {
         Map<String, Object> map = new HashMap<>();
 
         try {
+            Class<?> currentClass = object.getClass();
 
-            Field[] fields = clazz.getDeclaredFields();
+            while (currentClass != null && currentClass != Object.class) {
+                Field[] fields = currentClass.getDeclaredFields();
 
-            for (Field field : fields) {
+                for (Field field : fields) {
+                    field.setAccessible(true);
 
-                field.setAccessible(true);
+                    Object value = field.get(object);
+                    String fieldName = field.getName();
 
-                Object value = field.get(object);
-                String fieldName = field.getName();
-
-                if (!"id".equals(fieldName)) {
-                    map.put(fieldName, value);
+                    // Only add if not already present (child class fields take precedence)
+                    // and if it's not the id field
+                    if (!"id".equals(fieldName) && !map.containsKey(fieldName)) {
+                        map.put(fieldName, value);
+                    }
                 }
+
+                currentClass = currentClass.getSuperclass();
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Failed to convert object to map", e);
@@ -56,32 +62,43 @@ public class Mapper<T> implements IMapper<T> {
         try {
             T object = clazz.getDeclaredConstructor().newInstance();
 
-            Field[] fields = clazz.getDeclaredFields();
+            Class<?> currentClass = clazz;
+            while (currentClass != null && currentClass != Object.class) {
+                Field[] fields = currentClass.getDeclaredFields();
 
-            for (Field field : fields) {
-                String fieldName = field.getName();
-                Object value = map.get(fieldName);
+                for (Field field : fields) {
+                    String fieldName = field.getName();
+                    Object value = map.get(fieldName);
 
+                    field.setAccessible(true);
 
-                field.setAccessible(true);
-
-
-                if (value != null) {
-                    Object convertedValue = convertValue(value, field.getType());
-                    field.set(object, convertedValue);
+                    if (value != null) {
+                        Object convertedValue = convertValue(value, field.getType());
+                        field.set(object, convertedValue);
+                    }
                 }
+
+                currentClass = currentClass.getSuperclass();
             }
 
             if (id != null) {
-                try {
-                    Field idField = clazz.getDeclaredField("id");
-                    idField.setAccessible(true);
-                    idField.set(object, id);
-                } catch (NoSuchFieldException e) {
-                    if (object instanceof IIdentifiable) {
-                        throw new RuntimeException("Class " + clazz.getSimpleName() +
-                            " implements IIdentifiable but doesn't have an 'id' field", e);
+                Class<?> searchClass = clazz;
+                boolean idSet = false;
+
+                while (searchClass != null && searchClass != Object.class && !idSet) {
+                    try {
+                        Field idField = searchClass.getDeclaredField("id");
+                        idField.setAccessible(true);
+                        idField.set(object, id);
+                        idSet = true;
+                    } catch (NoSuchFieldException e) {
+                        searchClass = searchClass.getSuperclass();
                     }
+                }
+
+                if (!idSet && object instanceof IIdentifiable) {
+                    throw new RuntimeException("Class " + clazz.getSimpleName() +
+                        " implements IIdentifiable but doesn't have an 'id' field in its hierarchy");
                 }
             }
 
@@ -97,6 +114,19 @@ public class Mapper<T> implements IMapper<T> {
         }
 
         if (targetType.isAssignableFrom(value.getClass())) {
+            return value;
+        }
+
+        if (targetType.isEnum()) {
+            if (value instanceof String) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    Class<? extends Enum> enumType = (Class<? extends Enum>) targetType;
+                    return Enum.valueOf(enumType, (String) value);
+                } catch (IllegalArgumentException e) {
+                    return null;
+                }
+            }
             return value;
         }
 
