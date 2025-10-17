@@ -16,7 +16,7 @@ public class User implements IIdentifiable, Serializable {
 	public List<String> friends;
 	public String currentAllianceId;
 	public List<String> allianceInvitations;
-	public String fcmToken; // Firebase Cloud Messaging token for push notifications
+	public String fcmToken;
 
 	public User() {
 		this.level = 0;

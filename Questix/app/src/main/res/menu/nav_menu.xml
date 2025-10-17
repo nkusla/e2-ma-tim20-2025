@@ -7,13 +7,25 @@
 			android:icon="@drawable/ic_person"
 			android:title="Profile" />
 		<item
+			android:id="@+id/nav_calendar"
+			android:icon="@drawable/ic_calendar"
+			android:title="Calendar" />
+		<item
+			android:id="@+id/nav_task_list"
+			android:icon="@drawable/ic_list"
+			android:title="Tasks" />
+		<item
+			android:id="@+id/nav_create_task"
+			android:icon="@drawable/ic_create_task"
+			android:title="Create Task" />
+		<item
+			android:id="@+id/nav_category_management"
+			android:icon="@drawable/ic_category"
+			android:title="Categories" />
+		<item
 			android:id="@+id/nav_search_users"
 			android:icon="@drawable/ic_person_search"
 			android:title="Friends &amp; Search" />
-		<item
-			android:id="@+id/nav_qr_scanner"
-			android:icon="@drawable/ic_qr_code_scanner"
-			android:title="Scan QR Code" />
 		<item
 			android:id="@+id/nav_alliances"
 			android:icon="@drawable/ic_group"
@@ -23,20 +35,9 @@
 			android:icon="@drawable/ic_mail"
 			android:title="Alliance Invites" />
 		<item
-			android:id="@+id/nav_category_management"
-			android:icon="@drawable/ic_create" android:title="Category Management" />
-		<item
-			android:id="@+id/nav_task_list"
-			android:icon="@drawable/ic_list"
-			android:title="Task List" />
-		<item
-			android:id="@+id/nav_calendar"
-			android:icon="@drawable/ic_calendar"
-			android:title="Calendar" />
-		<item
-			android:id="@+id/nav_create_task"
-			android:icon="@android:drawable/ic_input_add"
-			android:title="Create Task" />
+			android:id="@+id/nav_qr_scanner"
+			android:icon="@drawable/ic_qr_code_scanner"
+			android:title="Scan QR Code" />
 		<item
 			android:title=""
 			android:enabled="false" />
