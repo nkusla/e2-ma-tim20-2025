@@ -34,6 +34,11 @@ import com.kulenina.questix.fragment.QRScannerFragment;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.fragment.UserSearchFragment;
 import com.kulenina.questix.fragment.ChangePasswordFragment;
+import com.kulenina.questix.fragment.CategoryManagementFragment;
+import com.kulenina.questix.fragment.TaskListFragment; // Za prikaz liste
+import com.kulenina.questix.fragment.CalendarFragment; // Za prikaz kalendara
+import com.kulenina.questix.fragment.CreateTaskFragment; // Za kreiranje
+import com.kulenina.questix.fragment.TaskDetailFragment; // Za prikaz detalja
 
 public class MainActivity extends AppCompatActivity {
 	private AuthService authService = new AuthService();
@@ -111,7 +116,16 @@ public class MainActivity extends AppCompatActivity {
 			showInvites();
 		} else if (itemId == R.id.nav_change_password) {
 			showChangePassword();
-		} else if (itemId == R.id.nav_logout) {
+		} else if (itemId == R.id.nav_category_management) {
+			showCategoryManagement();
+		} else if (itemId == R.id.nav_task_list) {
+			showTaskList();
+		} else if (itemId == R.id.nav_calendar) {
+			showCalendar();
+		} else if (itemId == R.id.nav_create_task) {
+			showCreateTask();
+		}
+		else if (itemId == R.id.nav_logout) {
 			logout();
 		}
 		drawerLayout.closeDrawer(navigationView);
@@ -158,10 +172,44 @@ public class MainActivity extends AppCompatActivity {
 		transaction.commit();
 	}
 
+	private void replaceFragmentWithBackStack(Fragment fragment) {
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		transaction.replace(R.id.fragment_container, fragment);
+		transaction.addToBackStack(null);
+		transaction.commit();
+	}
+
 
 	public void logout() {
 		authService.logout();
 		startActivity(new Intent(MainActivity.this, LoginActivity.class));
 		finish();
+	}
+
+	private void showCategoryManagement() {
+		CategoryManagementFragment fragment = new CategoryManagementFragment();
+		replaceFragment(fragment);
+	}
+
+	public void showTaskList() {
+		TaskListFragment fragment = new TaskListFragment();
+		// Dodajemo u Back Stack da bismo mogli da se vratimo na Listu iz detalja/kreiranja
+		replaceFragment(fragment);
+	}
+
+	public void showCalendar() {
+		CalendarFragment fragment = new CalendarFragment();
+		replaceFragment(fragment); // Nema potrebe za Back Stackom iz Drawera
+	}
+
+	public void showCreateTask() {
+		CreateTaskFragment fragment = new CreateTaskFragment();
+		replaceFragment(fragment);
+	}
+
+	public void showTaskDetail(String taskId) {
+		TaskDetailFragment fragment = TaskDetailFragment.newInstance(taskId);
+		replaceFragmentWithBackStack(fragment);
 	}
 }

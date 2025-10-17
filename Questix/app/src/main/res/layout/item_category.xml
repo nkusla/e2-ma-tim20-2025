@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="category"
+            type="com.kulenina.questix.model.Category" />
+        <variable
+            name="listener"
+            type="com.kulenina.questix.adapter.CategoryAdapter.CategoryActionListener" />
+        <variable
+            name="categoryColor"
+            type="String" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginVertical="4dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <View
+                android:id="@+id/colorIndicator"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/avatar_border_unselected"
+                app:colorTint="@{category.colorHex}"
+                android:backgroundTint="?attr/colorPrimary" />
+
+            <TextView
+                android:id="@+id/categoryNameTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:text="@{category.name}"
+                tools:text="Personal Development" />
+
+            <ImageButton
+                android:id="@+id/buttonChangeColor"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Change Color"
+                android:src="@drawable/ic_lightning"
+                app:tint="@android:color/darker_gray"
+                android:onClick="@{() -> listener.onColorChangeClicked(category)}" />
+
+            <ImageButton
+                android:id="@+id/buttonDelete"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Delete Category"
+                android:src="@drawable/ic_close"
+                app:tint="@color/design_default_color_error"
+                android:onClick="@{() -> listener.onDeleteClicked(category)}" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground"
+        tools:context=".ui.task.CreateTaskFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv_title_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Naziv Zadataka"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/et_task_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Unesite kratak naziv"
+                android:inputType="textCapSentences"
+                android:minHeight="48dp"
+                android:textColor="@color/colorTextPrimary"
+                android:background="@drawable/bg_input_field"
+                android:padding="12dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_name" />
+
+            <TextView
+                android:id="@+id/tv_title_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Opis (Opciono)"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_task_name" />
+
+            <EditText
+                android:id="@+id/et_task_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Detaljan opis zadatka"
+                android:inputType="textMultiLine"
+                android:gravity="top"
+                android:minLines="3"
+                android:maxLines="5"
+                android:textColor="@color/colorTextPrimary"
+                android:background="@drawable/bg_input_field"
+                android:padding="12dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_description" />
+
+            <TextView
+                android:id="@+id/tv_title_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Kategorija"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_task_description" />
+
+            <Spinner
+                android:id="@+id/spinner_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_spinner"
+                android:minHeight="48dp"
+                android:padding="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_category" />
+
+            <TextView
+                android:id="@+id/tv_title_execution_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Datum i Vreme Izvršenja"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/spinner_category" />
+
+            <LinearLayout
+                android:id="@+id/layout_execution_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_execution_time">
+
+                <Button
+                    android:id="@+id/btn_select_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Odaberi Datum"
+                    android:layout_marginEnd="8dp"
+                    style="@style/Widget.AppCompat.Button.Colored" />
+
+                <Button
+                    android:id="@+id/btn_select_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Odaberi Vreme"
+                    style="@style/Widget.AppCompat.Button.Colored" />
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/cb_is_recurring"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Ponavljajući Zadatak"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_execution_time" />
+
+            <LinearLayout
+                android:id="@+id/layout_recurring_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/cb_is_recurring">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ponavljanje (Interval i Jedinica)"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <EditText
+                        android:id="@+id/et_repetition_interval"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Broj (npr. 1)"
+                        android:inputType="number"
+                        android:minHeight="48dp"
+                        android:maxLength="2"
+                        android:background="@drawable/bg_input_field"
+                        android:padding="12dp"
+                        android:layout_marginEnd="8dp" />
+
+                    <Spinner
+                        android:id="@+id/spinner_repetition_unit"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:entries="@array/repetition_units"
+                        android:background="@drawable/bg_spinner"
+                        android:padding="8dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Period Ponavljanja"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <Button
+                        android:id="@+id/btn_select_start_date"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Početni Datum"
+                        android:layout_marginEnd="8dp"
+                        style="@style/Widget.AppCompat.Button.Colored" />
+
+                    <Button
+                        android:id="@+id/btn_select_end_date"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Krajnji Datum"
+                        style="@style/Widget.AppCompat.Button.Colored" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_title_difficulty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Težina Zadataka (XP)"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_recurring_details" />
+
+            <Spinner
+                android:id="@+id/spinner_difficulty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:entries="@array/task_difficulties"
+                android:background="@drawable/bg_spinner"
+                android:minHeight="48dp"
+                android:padding="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_difficulty" />
+
+            <TextView
+                android:id="@+id/tv_title_importance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Bitnost Zadataka (XP)"
+                android:textColor="@color/colorTextPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/spinner_difficulty" />
+
+            <Spinner
+                android:id="@+id/spinner_importance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:entries="@array/task_importance"
+                android:background="@drawable/bg_spinner"
+                android:minHeight="48dp"
+                android:padding="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_title_importance" />
+
+            <Button
+                android:id="@+id/btn_create_task"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Kreiraj Zadatak"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:backgroundTint="@color/colorPrimary"
+                android:padding="16dp"
+                app:layout_constraintTop_toBottomOf="@id/spinner_importance"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="16dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>

@@ -90,4 +90,16 @@ public class LevelProgressionService {
             default: return 10;
         }
     }
+
+    public Task<Integer> getCurrentLevel(String userId) {
+        return userRepository.read(userId)
+                .continueWith(task -> {
+                    User user = task.getResult();
+                    if (user == null) {
+                        throw new RuntimeException("User not found");
+                    }
+                    // Pretpostavljamo da User model ima polje 'level'
+                    return user.level;
+                });
+    }
 }
