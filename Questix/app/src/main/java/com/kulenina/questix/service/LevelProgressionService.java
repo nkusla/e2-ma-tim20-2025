@@ -34,9 +34,9 @@ public class LevelProgressionService {
         if (level <= 1) return 200;
 
         int previousLevelXp = getXpRequiredForLevel(level - 1);
-        int nextLevelXp = previousLevelXp * 2 + previousLevelXp / 2;
+        float nextLevelXp = previousLevelXp * 2 + previousLevelXp / 2.0f;
 
-        return ((nextLevelXp + 99) / 100) * 100;
+        return Math.round(nextLevelXp);
     }
 
     public int calculateDynamicXpReward(int userLevel, String importance, String difficulty) {
@@ -68,7 +68,7 @@ public class LevelProgressionService {
         if (level == 2) return 40;
 
         int previousPP = calculatePowerPointReward(level - 1);
-        return previousPP + (3 * previousPP / 4);
+        return Math.round(previousPP + (3 * previousPP / 4.0f));
     }
 
     private int getBaseImportanceXp(String importance) {
@@ -98,7 +98,6 @@ public class LevelProgressionService {
                     if (user == null) {
                         throw new RuntimeException("User not found");
                     }
-                    // Pretpostavljamo da User model ima polje 'level'
                     return user.level;
                 });
     }
