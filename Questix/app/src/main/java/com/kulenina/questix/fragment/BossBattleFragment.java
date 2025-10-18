@@ -125,7 +125,7 @@ public class BossBattleFragment extends Fragment {
         // Update boss name
         binding.tvBossName.setText("Shadow Boss Lv." + currentBossBattle.getBossLevel());
 
-        // Update boss HP
+        // Update
         binding.tvBossHp.setText(String.format(Locale.getDefault(), "%d/%d",
             currentBossBattle.getCurrentHp(), currentBossBattle.getMaxHp()));
 
@@ -200,7 +200,7 @@ public class BossBattleFragment extends Fragment {
         currentBossBattle.setAttacksRemaining(battleResult.attacksRemaining);
         updateBossDisplay();
 
-        if (battleResult.battleFinished) {
+        if (battleResult.bossDefeated) {
             showBattleResult(battleResult);
             awardRewards(battleResult);
         } else {
@@ -245,9 +245,27 @@ public class BossBattleFragment extends Fragment {
     }
 
     private void continueBattle() {
-        // Navigate back or to next screen
-        if (getActivity() != null) {
-            getActivity().onBackPressed();
+        // If boss was defeated, progress to next boss
+        if (currentBossBattle != null && currentBossBattle.isDefeated()) {
+            bossBattleService.createNextBoss()
+                .addOnSuccessListener(nextBoss -> {
+                    currentBossBattle = nextBoss;
+                    binding.cvBattleResult.setVisibility(View.GONE);
+                    updateBossDisplay();
+                    Toast.makeText(getContext(), "New boss battle started!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to start next boss: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    // Navigate back on failure
+                    if (getActivity() != null) {
+                        getActivity().onBackPressed();
+                    }
+                });
+        } else {
+            // Navigate back or to next screen
+            if (getActivity() != null) {
+                getActivity().onBackPressed();
+            }
         }
     }
 

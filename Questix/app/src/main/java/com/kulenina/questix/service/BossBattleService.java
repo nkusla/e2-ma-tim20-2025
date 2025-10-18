@@ -5,11 +5,13 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.kulenina.questix.model.*;
 import com.kulenina.questix.repository.UserRepository;
+import com.kulenina.questix.repository.BossBattleRepository;
 
 import java.util.Random;
 
 public class BossBattleService {
     private final UserRepository userRepository;
+    private final BossBattleRepository bossBattleRepository;
     private final EquipmentService equipmentService;
     private final LevelProgressionService levelProgressionService;
     private final FirebaseAuth auth;
@@ -17,6 +19,7 @@ public class BossBattleService {
 
     public BossBattleService() {
         this.userRepository = new UserRepository();
+        this.bossBattleRepository = new BossBattleRepository();
         this.equipmentService = new EquipmentService();
         this.levelProgressionService = new LevelProgressionService();
         this.auth = FirebaseAuth.getInstance();
@@ -27,21 +30,28 @@ public class BossBattleService {
         return auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
     }
 
-    // Create a new boss battle for the current user level
-    public Task<BossBattle> createBossBattle(int userLevel) {
+    // Create a new boss battle for the current user's boss level
+    public Task<BossBattle> createBossBattle(int bossLevel) {
         String userId = getCurrentUserId();
         if (userId == null) {
             return Tasks.forException(new RuntimeException("User not authenticated"));
         }
 
-        BossBattle bossBattle = new BossBattle(userId, userLevel);
-        bossBattle.setId("boss_" + userId + "_" + userLevel);
-        bossBattle.setActive(true);
+        BossBattle bossBattle = new BossBattle(userId, bossLevel);
+        bossBattle.setId("boss_" + userId); // Single active boss battle per user
 
         // For now, use hardcoded success rate of 67%
         bossBattle.setSuccessRate(0.67);
 
-        return Tasks.forResult(bossBattle);
+        // Save to Firebase
+        return bossBattleRepository.createWithId(bossBattle)
+            .continueWith(task -> {
+                if (task.isSuccessful()) {
+                    return bossBattle;
+                } else {
+                    throw task.getException() != null ? task.getException() : new RuntimeException("Failed to create boss battle");
+                }
+            });
     }
 
     // Get current active boss battle for user
@@ -51,10 +61,29 @@ public class BossBattleService {
             return Tasks.forException(new RuntimeException("User not authenticated"));
         }
 
-        return levelProgressionService.getCurrentLevel(userId)
+        return userRepository.read(userId)
             .continueWithTask(task -> {
-                int userLevel = task.getResult();
-                return createBossBattle(userLevel);
+                User user = task.getResult();
+                if (user == null) {
+                    throw new RuntimeException("User not found");
+                }
+
+                int bossLevel = user.bossLevel != null ? user.bossLevel : 1;
+                String bossBattleId = "boss_" + userId;
+
+                // Try to load existing boss battle from Firebase
+                return bossBattleRepository.read(bossBattleId)
+                    .continueWithTask(readTask -> {
+                        BossBattle existingBattle = readTask.getResult();
+
+                        // If boss battle exists and is not finished, return it
+                        if (existingBattle != null && !existingBattle.isDefeated()) {
+                            return Tasks.forResult(existingBattle);
+                        }
+
+                        // Otherwise, create a new boss battle
+                        return createBossBattle(bossLevel);
+                    });
             });
     }
 
@@ -95,10 +124,18 @@ public class BossBattleService {
                         result.battleFinished = bossBattle.isBattleFinished();
                         result.bossDefeated = bossBattle.isDefeated();
 
-                        if (result.battleFinished) {
-                            result.coinsReward = bossBattle.getFinalCoinsReward();
+                        if (bossBattle.isDefeated()) {
+                            result.coinsReward = bossBattle.getCoinsReward();
                             result.equipmentDropped = rollForEquipmentDrop(bossBattle);
                         }
+                        else if (bossBattle.isBattleFinished()) {
+                            bossBattle.reduceEquipmentDropChance();
+                            bossBattle.reduceCoinsReward();
+                            bossBattle.restartBattle();
+                        }
+
+                        // Save updated boss battle state to Firebase
+                        bossBattleRepository.update(bossBattle);
 
                         return result;
                     });
@@ -112,10 +149,6 @@ public class BossBattleService {
             return Tasks.forException(new RuntimeException("User not authenticated"));
         }
 
-        if (!battleResult.battleFinished) {
-            return Tasks.forResult(false);
-        }
-
         return userRepository.read(userId)
             .continueWithTask(task -> {
                 User user = task.getResult();
@@ -125,6 +158,11 @@ public class BossBattleService {
 
                 // Award coins
                 user.coins = (user.coins != null ? user.coins : 0) + battleResult.coinsReward;
+
+                // If boss was defeated, increment boss level for next battle
+                if (battleResult.bossDefeated) {
+                    user.bossLevel = (user.bossLevel != null ? user.bossLevel : 1) + 1;
+                }
 
                 Task<Void> updateUserTask = userRepository.update(user);
 
@@ -164,11 +202,25 @@ public class BossBattleService {
         }
     }
 
-    // Check if user needs to face a boss (after leveling up)
-    public Task<Boolean> shouldFaceBoss(int userLevel) {
-        // For simplicity, user faces a boss after every level
-        // In a full implementation, you might have more complex logic
-        return Tasks.forResult(userLevel > 0);
+    // Create next boss battle after current one is defeated
+    public Task<BossBattle> createNextBoss() {
+        String userId = getCurrentUserId();
+        if (userId == null) {
+            return Tasks.forException(new RuntimeException("User not authenticated"));
+        }
+
+        return userRepository.read(userId)
+            .continueWithTask(task -> {
+                User user = task.getResult();
+                if (user == null) {
+                    throw new RuntimeException("User not found");
+                }
+
+                int bossLevel = user.bossLevel != null ? user.bossLevel : 1;
+
+                // Create boss battle for current boss level
+                return createBossBattle(bossLevel);
+            });
     }
 
     // Battle result class to encapsulate attack results

@@ -13,6 +13,7 @@ public class User implements IIdentifiable, Serializable {
 	public Integer powerPoints;
 	public Integer xp;
 	public Integer coins;
+	public Integer bossLevel;
 	public List<String> friends;
 	public String currentAllianceId;
 	public List<String> allianceInvitations;
@@ -23,6 +24,7 @@ public class User implements IIdentifiable, Serializable {
 		this.powerPoints = 0;
 		this.xp = 0;
 		this.coins = 0;
+		this.bossLevel = 1;
 		this.friends = new ArrayList<>();
 		this.allianceInvitations = new ArrayList<>();
 	}
@@ -36,6 +38,7 @@ public class User implements IIdentifiable, Serializable {
 		this.powerPoints = powerPoints;
 		this.xp = xp;
 		this.coins = coins;
+		this.bossLevel = 1;
 		this.friends = new ArrayList<>();
 		this.allianceInvitations = new ArrayList<>();
 	}

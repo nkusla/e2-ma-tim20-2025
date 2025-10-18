@@ -16,7 +16,7 @@
 			android:title="Shop" />
 		<item
 			android:id="@+id/nav_boss_battle"
-			android:icon="@drawable/ic_lightning"
+			android:icon="@drawable/ic_boss"
 			android:title="Boss Battle" />
 		<item
 			android:id="@+id/nav_calendar"
