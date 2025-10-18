@@ -4,7 +4,6 @@ public class Potion extends Equipment {
     public PotionType potionType;
     public int effectValue;
     public boolean isPermanent;
-    public boolean isConsumed;
 
     public enum PotionType {
         SINGLE_POWER_20("Elixir of Vigor", 20, false, 50),
@@ -44,7 +43,6 @@ public class Potion extends Equipment {
     public Potion() {
         super();
         this.type = EquipmentType.POTION;
-        this.isConsumed = false;
     }
 
     public Potion(String userId, PotionType potionType) {
@@ -52,7 +50,6 @@ public class Potion extends Equipment {
         this.potionType = potionType;
         this.effectValue = potionType.getEffectValue();
         this.isPermanent = potionType.isPermanent();
-        this.isConsumed = false;
     }
 
     @Override
@@ -85,23 +82,11 @@ public class Potion extends Equipment {
         return isPermanent;
     }
 
-    public boolean isConsumed() {
-        return isConsumed;
-    }
-
-    public void setConsumed(boolean consumed) {
-        this.isConsumed = consumed;
-    }
-
-    public void consume() {
-        if (!isPermanent) {
-            this.isConsumed = true;
-        }
-    }
-
     @Override
     public void useBattle() {
         if (isPermanent)
             return;
+
+        this.isExpired = true;
     }
 }

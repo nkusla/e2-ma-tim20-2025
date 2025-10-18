@@ -96,12 +96,9 @@ public class Clothing extends Equipment {
 
     @Override
     public void useBattle() {
-        if (isExpired)
-            return;
+        this.remainingBattles--;
 
-        remainingBattles--;
-
-        if (remainingBattles <= 0) {
+        if (this.remainingBattles <= 0) {
             this.isExpired = true;
         }
     }
