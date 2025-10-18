@@ -77,19 +77,6 @@
                         android:tint="@color/primary_text"
                         android:scaleType="centerInside" />
 
-                    <!-- Boss Name -->
-                    <TextView
-                        android:id="@+id/tv_boss_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/iv_boss"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="8dp"
-                        android:text="Shadow Boss"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/primary_text" />
-
                 </RelativeLayout>
 
             </androidx.cardview.widget.CardView>

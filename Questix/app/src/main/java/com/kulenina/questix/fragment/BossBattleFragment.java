@@ -122,8 +122,6 @@ public class BossBattleFragment extends Fragment {
         // Update boss level
         binding.tvBossLevel.setText("Level " + currentBossBattle.getBossLevel());
 
-        // Update boss name
-        binding.tvBossName.setText("Shadow Boss Lv." + currentBossBattle.getBossLevel());
 
         // Update
         binding.tvBossHp.setText(String.format(Locale.getDefault(), "%d/%d",
