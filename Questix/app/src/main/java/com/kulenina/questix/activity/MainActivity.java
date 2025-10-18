@@ -41,6 +41,7 @@ import com.kulenina.questix.fragment.CreateTaskFragment; // Za kreiranje
 import com.kulenina.questix.fragment.TaskDetailFragment; // Za prikaz detalja
 import com.kulenina.questix.fragment.ShopFragment;
 import com.kulenina.questix.fragment.EquipmentInventoryFragment;
+import com.kulenina.questix.fragment.BossBattleFragment;
 
 public class MainActivity extends AppCompatActivity {
 	private AuthService authService = new AuthService();
@@ -128,6 +129,8 @@ public class MainActivity extends AppCompatActivity {
 			showCreateTask();
 		} else if (itemId == R.id.nav_shop) {
 			showShop();
+		} else if (itemId == R.id.nav_boss_battle) {
+			showBossBattle();
 		} else if (itemId == R.id.nav_equipment_inventory) {
 			showEquipmentInventory();
 		} else if (itemId == R.id.nav_logout) {
@@ -225,6 +228,11 @@ public class MainActivity extends AppCompatActivity {
 
 	private void showEquipmentInventory() {
 		EquipmentInventoryFragment fragment = new EquipmentInventoryFragment();
+		replaceFragment(fragment);
+	}
+
+	private void showBossBattle() {
+		BossBattleFragment fragment = new BossBattleFragment();
 		replaceFragment(fragment);
 	}
 }
