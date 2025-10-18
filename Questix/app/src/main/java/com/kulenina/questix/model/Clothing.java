@@ -106,6 +106,10 @@ public class Clothing extends Equipment {
     public void combineWith(Clothing other) {
         if (other.clothingType == this.clothingType) {
             this.effectValue += other.effectValue;
+            this.remainingBattles += other.remainingBattles;
+            if (this.remainingBattles > 0) {
+                this.isExpired = false;
+            }
         }
     }
 }

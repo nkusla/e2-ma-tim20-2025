@@ -58,46 +58,77 @@ public class EquipmentService {
             return Tasks.forException(new RuntimeException("User not authenticated"));
         }
 
-        return userRepository.read(userId)
-            .continueWithTask(task -> {
-                User user = task.getResult();
-                if (user == null) {
-                    throw new RuntimeException("User not found");
+        return Tasks.whenAllSuccess(
+            userRepository.read(userId),
+            getUserEquipment(userId)
+        ).continueWithTask(task -> {
+            List<Object> results = task.getResult();
+            User user = (User) results.get(0);
+            @SuppressWarnings("unchecked")
+            List<Equipment> userEquipment = (List<Equipment>) results.get(1);
+
+            if (user == null) {
+                throw new RuntimeException("User not found");
+            }
+
+            Equipment equipment = null;
+            int price = 0;
+
+            // Use fixed base price for calculations (mock value)
+            int basePrice = 100; // Mock base price
+
+            if ("POTION".equals(equipmentType)) {
+                Potion.PotionType potionType = Potion.PotionType.valueOf(itemType);
+                equipment = new Potion(userId, potionType);
+                price = equipment.getPrice(basePrice);
+            } else if ("CLOTHING".equals(equipmentType)) {
+                Clothing.ClothingType clothingType = Clothing.ClothingType.valueOf(itemType);
+                equipment = new Clothing(userId, clothingType);
+                price = equipment.getPrice(basePrice);
+
+                Clothing existingClothing = null;
+                for (Equipment eq : userEquipment) {
+                    if (eq instanceof Clothing) {
+                        Clothing clothing = (Clothing) eq;
+                        if (clothing.getClothingType() == clothingType && !clothing.isExpired) {
+                            existingClothing = clothing;
+                            break;
+                        }
+                    }
                 }
 
-                Equipment equipment = null;
-                int price = 0;
+                if (existingClothing != null) {
+                    if (user.coins < price) {
+                        throw new RuntimeException("Insufficient coins");
+                    }
 
-                // Use fixed base price for calculations (mock value)
-                int basePrice = 100; // Mock base price
+                    user.coins -= price;
+                    existingClothing.combineWith((Clothing) equipment);
 
-                if ("POTION".equals(equipmentType)) {
-                    Potion.PotionType potionType = Potion.PotionType.valueOf(itemType);
-                    equipment = new Potion(userId, potionType);
-                    price = equipment.getPrice(basePrice);
-                } else if ("CLOTHING".equals(equipmentType)) {
-                    Clothing.ClothingType clothingType = Clothing.ClothingType.valueOf(itemType);
-                    equipment = new Clothing(userId, clothingType);
-                    price = equipment.getPrice(basePrice);
+                    return Tasks.whenAll(
+                        equipmentRepository.update(existingClothing),
+                        userRepository.update(user)
+                    ).continueWith(updateTask -> true);
                 }
+            }
 
-                if (equipment == null) {
-                    throw new RuntimeException("Invalid equipment type");
-                }
+            if (equipment == null) {
+                throw new RuntimeException("Invalid equipment type");
+            }
 
-                if (user.coins < price) {
-                    throw new RuntimeException("Insufficient coins");
-                }
+            if (user.coins < price) {
+                throw new RuntimeException("Insufficient coins");
+            }
 
-                // Deduct coins
-                user.coins -= price;
-                equipment.setId(UUID.randomUUID().toString());
+            // Deduct coins
+            user.coins -= price;
+            equipment.setId(UUID.randomUUID().toString());
 
-                // Save equipment and update user
-                return equipmentRepository.create(equipment)
-                    .continueWithTask(createTask -> userRepository.update(user))
-                    .continueWith(updateTask -> true);
-            });
+            // Save equipment and update user
+            return equipmentRepository.create(equipment)
+                .continueWithTask(createTask -> userRepository.update(user))
+                .continueWith(updateTask -> true);
+        });
     }
 
     // --- EQUIPMENT MANAGEMENT ---
