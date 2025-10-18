@@ -14,4 +14,12 @@
     <color name="colorSuccess">#4CAF50</color>
     <color name="colorWarning">#FF9800</color>
     <color name="colorError">#F44336</color>
+
+    <!-- Equipment Shop Colors -->
+    <color name="primary_color">@color/colorPrimary</color>
+    <color name="accent_color">@color/colorAccent</color>
+    <color name="primary_text">@color/colorTextPrimary</color>
+    <color name="secondary_text">@color/colorTextSecondary</color>
+    <color name="card_background">@color/colorCardBackground</color>
+    <color name="border_color">#E0E0E0</color>
 </resources>
