@@ -7,6 +7,14 @@
 			android:icon="@drawable/ic_person"
 			android:title="Profile" />
 		<item
+			android:id="@+id/nav_equipment_inventory"
+			android:icon="@drawable/ic_inventory"
+			android:title="Inventory" />
+		<item
+			android:id="@+id/nav_shop"
+			android:icon="@drawable/ic_shop"
+			android:title="Shop" />
+		<item
 			android:id="@+id/nav_calendar"
 			android:icon="@drawable/ic_calendar"
 			android:title="Calendar" />
@@ -34,10 +42,6 @@
 			android:id="@+id/nav_invites"
 			android:icon="@drawable/ic_mail"
 			android:title="Alliance Invites" />
-		<item
-			android:id="@+id/nav_shop"
-			android:icon="@drawable/ic_shop"
-			android:title="Equipment Shop" />
 		<item
 			android:id="@+id/nav_qr_scanner"
 			android:icon="@drawable/ic_qr_code_scanner"

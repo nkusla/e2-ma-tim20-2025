@@ -40,6 +40,7 @@ import com.kulenina.questix.fragment.CalendarFragment; // Za prikaz kalendara
 import com.kulenina.questix.fragment.CreateTaskFragment; // Za kreiranje
 import com.kulenina.questix.fragment.TaskDetailFragment; // Za prikaz detalja
 import com.kulenina.questix.fragment.ShopFragment;
+import com.kulenina.questix.fragment.EquipmentInventoryFragment;
 
 public class MainActivity extends AppCompatActivity {
 	private AuthService authService = new AuthService();
@@ -127,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
 			showCreateTask();
 		} else if (itemId == R.id.nav_shop) {
 			showShop();
+		} else if (itemId == R.id.nav_equipment_inventory) {
+			showEquipmentInventory();
 		} else if (itemId == R.id.nav_logout) {
 			logout();
 		}
@@ -217,6 +220,11 @@ public class MainActivity extends AppCompatActivity {
 
 	private void showShop() {
 		ShopFragment fragment = new ShopFragment();
+		replaceFragment(fragment);
+	}
+
+	private void showEquipmentInventory() {
+		EquipmentInventoryFragment fragment = new EquipmentInventoryFragment();
 		replaceFragment(fragment);
 	}
 }

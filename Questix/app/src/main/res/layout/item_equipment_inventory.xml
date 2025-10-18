@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- Checkbox for activation -->
+        <CheckBox
+            android:id="@+id/checkBoxActivate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp" />
+
+        <!-- Equipment Icon -->
+        <ImageView
+            android:id="@+id/imageViewEquipmentIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_potion"
+            android:layout_marginEnd="12dp"
+            android:padding="8dp"
+            android:background="@drawable/rounded_background" />
+
+        <!-- Equipment Details -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Equipment Name and Type Badge -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:id="@+id/textViewEquipmentName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Equipment Name"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_text"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/textViewEquipmentType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TYPE"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:background="@color/accent_color"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginEnd="4dp" />
+
+            </LinearLayout>
+
+            <!-- Equipment Effect -->
+            <TextView
+                android:id="@+id/textViewEquipmentEffect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Effect: +10% power"
+                android:textSize="13sp"
+                android:textStyle="italic"
+                android:textColor="@color/secondary_text"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Status Indicator (Active, Expired) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/textViewStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Active"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/holo_green_dark"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/textViewExpired"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Expired"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:visibility="gone" />
+
+                <!-- Duration Info for Clothing -->
+                <TextView
+                    android:id="@+id/textViewDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" 2 battles remaining"
+                    android:textSize="12sp"
+                    android:textColor="@color/secondary_text"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
