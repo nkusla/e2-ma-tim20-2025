@@ -9,6 +9,31 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Shop Title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_shop"
+                android:layout_marginEnd="8dp"
+                android:tint="@color/primary_text" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Equipment Shop"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_text" />
+
+        </LinearLayout>
+
         <!-- User Info Header -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -18,15 +43,38 @@
             android:background="@drawable/rounded_background"
             android:layout_marginBottom="16dp">
 
-            <TextView
-                android:id="@+id/textViewCoins"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Coins: 0"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary_text" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wallet: "
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_text" />
+
+                <TextView
+                    android:id="@+id/textViewCoins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/holo_orange_dark" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_coin"
+                    android:layout_marginStart="4dp"
+                    android:tint="@android:color/holo_orange_dark" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textViewLevel"
@@ -38,17 +86,6 @@
                 android:textColor="@color/primary_text" />
 
         </LinearLayout>
-
-        <!-- Shop Title -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Equipment Shop"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textAlignment="center"
-            android:layout_marginBottom="16dp"
-            android:textColor="@color/primary_text" />
 
         <!-- Shop Items RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView

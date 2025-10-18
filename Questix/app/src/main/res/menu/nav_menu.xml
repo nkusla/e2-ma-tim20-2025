@@ -35,13 +35,13 @@
 			android:icon="@drawable/ic_mail"
 			android:title="Alliance Invites" />
 		<item
+			android:id="@+id/nav_shop"
+			android:icon="@drawable/ic_shop"
+			android:title="Equipment Shop" />
+		<item
 			android:id="@+id/nav_qr_scanner"
 			android:icon="@drawable/ic_qr_code_scanner"
 			android:title="Scan QR Code" />
-		<item
-			android:id="@+id/nav_shop"
-			android:icon="@drawable/ic_shopping_cart"
-			android:title="Equipment Shop" />
 		<item
 			android:title=""
 			android:enabled="false" />

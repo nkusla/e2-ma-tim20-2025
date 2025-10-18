@@ -18,7 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/textViewEquipmentName"
@@ -30,6 +31,14 @@
                 android:textStyle="bold"
                 android:textColor="@color/primary_text" />
 
+            <ImageView
+                android:id="@+id/imageViewEquipmentIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_potion"
+                android:layout_marginEnd="6dp"
+                android:tint="@android:color/darker_gray" />
+
             <TextView
                 android:id="@+id/textViewEquipmentType"
                 android:layout_width="wrap_content"
@@ -39,8 +48,7 @@
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
                 android:background="@color/accent_color"
-                android:padding="4dp"
-                android:layout_marginStart="8dp" />
+                android:padding="4dp" />
 
         </LinearLayout>
 
@@ -52,7 +60,6 @@
             android:text="Effect: +10% power"
             android:textSize="14sp"
             android:textStyle="italic"
-            android:textColor="@color/accent_color"
             android:layout_marginBottom="12dp" />
 
         <!-- Price and Purchase Button -->
@@ -62,24 +69,39 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/textViewEquipmentPrice"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="100 coins"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary_text" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-            <Button
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_coin"
+                    android:layout_marginEnd="4dp"
+                    android:tint="@android:color/holo_orange_dark" />
+
+                <TextView
+                    android:id="@+id/textViewEquipmentPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/holo_orange_dark" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonPurchase"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Purchase"
                 android:textColor="@android:color/white"
-                android:background="@color/primary_color"
-                android:padding="12dp" />
+                app:backgroundTint="?attr/colorPrimary"
+                app:cornerRadius="24dp" />
 
         </LinearLayout>
 

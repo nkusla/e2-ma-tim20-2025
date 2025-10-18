@@ -77,7 +77,7 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
 
     private void updateUserInfo() {
         if (currentUser != null && binding != null) {
-            binding.textViewCoins.setText("Coins: " + currentUser.coins);
+            binding.textViewCoins.setText(String.valueOf(currentUser.coins));
             binding.textViewLevel.setText("Level: " + currentUser.level);
         }
     }

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -53,6 +54,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
     }
 
     class ShopViewHolder extends RecyclerView.ViewHolder {
+        private ImageView imageViewIcon;
         private TextView textViewName;
         private TextView textViewEffect;
         private TextView textViewPrice;
@@ -61,6 +63,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
 
         public ShopViewHolder(@NonNull View itemView) {
             super(itemView);
+            imageViewIcon = itemView.findViewById(R.id.imageViewEquipmentIcon);
             textViewName = itemView.findViewById(R.id.textViewEquipmentName);
             textViewEffect = itemView.findViewById(R.id.textViewEquipmentEffect);
             textViewPrice = itemView.findViewById(R.id.textViewEquipmentPrice);
@@ -74,18 +77,17 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
             textViewType.setText(equipment.getType().name());
 
             int price = equipment.getPrice(basePrice);
-            textViewPrice.setText(price + " coins");
+            textViewPrice.setText(String.valueOf(price));
 
-            // Set type-specific styling
+            // Set type-specific styling and icon
             switch (equipment.getType()) {
                 case POTION:
+                    imageViewIcon.setImageResource(R.drawable.ic_potion);
                     textViewType.setBackgroundColor(itemView.getContext().getColor(android.R.color.holo_blue_light));
                     break;
                 case CLOTHING:
+                    imageViewIcon.setImageResource(R.drawable.ic_clothing);
                     textViewType.setBackgroundColor(itemView.getContext().getColor(android.R.color.holo_green_light));
-                    break;
-                case WEAPON:
-                    textViewType.setBackgroundColor(itemView.getContext().getColor(android.R.color.holo_red_light));
                     break;
             }
 
