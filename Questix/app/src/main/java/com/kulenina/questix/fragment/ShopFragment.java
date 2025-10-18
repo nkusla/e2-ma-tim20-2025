@@ -133,7 +133,7 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
             binding.progressBar.setVisibility(View.VISIBLE);
         }
 
-        String equipmentType = equipment.getType().name();
+        Equipment.EquipmentType equipmentType = equipment.getType();
         String itemType = "";
 
         if (equipment instanceof com.kulenina.questix.model.Potion) {
@@ -142,7 +142,7 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
             itemType = ((com.kulenina.questix.model.Clothing) equipment).getClothingType().name();
         }
 
-        equipmentService.purchaseEquipment(equipmentType, itemType)
+        equipmentService.purchaseEquipment(equipment.getType(), itemType)
             .addOnSuccessListener(success -> {
                 if (binding != null) {
                     binding.progressBar.setVisibility(View.GONE);

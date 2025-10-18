@@ -9,40 +9,32 @@ import com.kulenina.questix.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class EquipmentService {
     private final EquipmentRepository equipmentRepository;
     private final UserRepository userRepository;
     private final FirebaseAuth auth;
-    private final Random random;
 
     public EquipmentService() {
         this.equipmentRepository = new EquipmentRepository();
         this.userRepository = new UserRepository();
         this.auth = FirebaseAuth.getInstance();
-        this.random = new Random();
     }
 
     private String getCurrentUserId() {
         return auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
     }
 
-    // --- SHOP OPERATIONS ---
-
     public Task<List<Equipment>> getShopItems() {
         List<Equipment> shopItems = new ArrayList<>();
 
-        // Add all potion types
         for (Potion.PotionType potionType : Potion.PotionType.values()) {
             Potion potion = new Potion(getCurrentUserId(), potionType);
             potion.setId("shop_" + potionType.name());
             shopItems.add(potion);
         }
 
-        // Add all clothing types
         for (Clothing.ClothingType clothingType : Clothing.ClothingType.values()) {
             Clothing clothing = new Clothing(getCurrentUserId(), clothingType);
             clothing.setId("shop_" + clothingType.name());
@@ -52,7 +44,7 @@ public class EquipmentService {
         return Tasks.forResult(shopItems);
     }
 
-    public Task<Boolean> purchaseEquipment(String equipmentType, String itemType) {
+    public Task<Boolean> purchaseEquipment(Equipment.EquipmentType equipmentType, String itemType) {
         String userId = getCurrentUserId();
         if (userId == null) {
             return Tasks.forException(new RuntimeException("User not authenticated"));
@@ -72,19 +64,16 @@ public class EquipmentService {
             }
 
             Equipment equipment = null;
-            int price = 0;
+            int price = 100;
 
-            // Use fixed base price for calculations (mock value)
-            int basePrice = 100; // Mock base price
-
-            if ("POTION".equals(equipmentType)) {
+            if (equipmentType == Equipment.EquipmentType.POTION) {
                 Potion.PotionType potionType = Potion.PotionType.valueOf(itemType);
                 equipment = new Potion(userId, potionType);
-                price = equipment.getPrice(basePrice);
-            } else if ("CLOTHING".equals(equipmentType)) {
+                price = equipment.getPrice(price);
+            } else if (equipmentType == Equipment.EquipmentType.CLOTHING) {
                 Clothing.ClothingType clothingType = Clothing.ClothingType.valueOf(itemType);
                 equipment = new Clothing(userId, clothingType);
-                price = equipment.getPrice(basePrice);
+                price = equipment.getPrice(price);
 
                 Clothing existingClothing = null;
                 for (Equipment eq : userEquipment) {
@@ -120,18 +109,13 @@ public class EquipmentService {
                 throw new RuntimeException("Insufficient coins");
             }
 
-            // Deduct coins
             user.coins -= price;
-            equipment.setId(UUID.randomUUID().toString());
 
-            // Save equipment and update user
             return equipmentRepository.create(equipment)
                 .continueWithTask(createTask -> userRepository.update(user))
                 .continueWith(updateTask -> true);
         });
     }
-
-    // --- EQUIPMENT MANAGEMENT ---
 
     public Task<List<Equipment>> getUserEquipment(String userId) {
         return equipmentRepository.readAll()
@@ -167,7 +151,6 @@ public class EquipmentService {
 
                 equipment.setActive(true);
 
-                // Special handling for clothing activation
                 if (equipment instanceof Clothing) {
                     Clothing clothing = (Clothing) equipment;
                     clothing.setActive(true);
@@ -195,8 +178,6 @@ public class EquipmentService {
                     .continueWith(updateTask -> true);
             });
     }
-
-    // --- WEAPON UPGRADES ---
 
     public Task<Boolean> upgradeWeapon(String weaponId) {
         String userId = getCurrentUserId();
@@ -228,7 +209,6 @@ public class EquipmentService {
                 throw new RuntimeException("Insufficient coins");
             }
 
-            // Deduct coins and upgrade weapon
             user.coins -= upgradePrice;
             weapon.upgrade();
 
