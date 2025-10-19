@@ -86,9 +86,13 @@ public class BattleResultDialog extends DialogFragment {
         if (bossDefeated) {
             tvBattleOutcome.setText("Victory!");
             tvBattleOutcome.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+            ivTreasureChest.setImageResource(R.drawable.ic_coin);
+            ivTreasureChest.setColorFilter(getResources().getColor(android.R.color.holo_orange_dark));
         } else {
             tvBattleOutcome.setText("Defeat!");
             tvBattleOutcome.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            ivTreasureChest.setImageResource(R.drawable.ic_defeat);
+            ivTreasureChest.setColorFilter(getResources().getColor(android.R.color.holo_red_dark));
         }
 
         if(coinsReward > 0) {

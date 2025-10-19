@@ -40,10 +40,10 @@
             android:id="@+id/tv_coins_reward"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+ 200 Coins"
+            android:text="No rewards"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/holo_orange_dark"
+            android:textColor="@color/primary_text"
             android:layout_marginBottom="8dp"
             android:gravity="center_vertical" />
 
@@ -52,7 +52,7 @@
             android:id="@+id/tv_equipment_reward"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+ Power Gloves"
+            android:text="No equipment rewarded"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/primary_text"
