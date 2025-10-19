@@ -72,7 +72,7 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
         // Observator za greške
         appTaskViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
-                Toast.makeText(requireContext(), "Greška: " + error, Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_LONG).show();
                 appTaskViewModel.clearError(); // Obriši grešku nakon prikaza
             }
         });
@@ -88,11 +88,11 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
         appTaskViewModel.resolveTask(taskId, AppTask.STATUS_DONE)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(requireContext(), "Zadatak završen! XP dodeljen.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Task completed! XP awarded.", Toast.LENGTH_SHORT).show();
                         // Potrebno je ponovo učitati listu da bi se ažurirala
                         appTaskViewModel.loadTasksForList();
                     } else {
-                        Toast.makeText(requireContext(), "Greška: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -103,7 +103,7 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).showTaskDetail(taskId);
         } else {
-            Toast.makeText(requireContext(), "Greška pri otvaranju detalja zadatka", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Error opening task details", Toast.LENGTH_SHORT).show();
         }
     }
 }

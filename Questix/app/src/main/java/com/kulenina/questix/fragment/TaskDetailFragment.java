@@ -49,7 +49,7 @@ public class TaskDetailFragment extends Fragment {
         }
 
         if (taskId == null) {
-            Toast.makeText(requireContext(), "Greška: ID zadatka nije prosleđen.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Error: Task ID not provided.", Toast.LENGTH_SHORT).show();
             NavHostFragment.findNavController(this).popBackStack();
             return;
         }
@@ -76,7 +76,7 @@ public class TaskDetailFragment extends Fragment {
                 currentTask = task;
                 populateUI(task);
             } else {
-                Toast.makeText(requireContext(), "Zadatak nije pronađen.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Task not found.", Toast.LENGTH_SHORT).show();
                 NavHostFragment.findNavController(this).popBackStack();
             }
         });
@@ -87,7 +87,7 @@ public class TaskDetailFragment extends Fragment {
         // Observator za greške
         appTaskViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
-                Toast.makeText(requireContext(), "Greška: " + error, Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_LONG).show();
                 appTaskViewModel.clearError();
             }
         });
@@ -127,10 +127,10 @@ public class TaskDetailFragment extends Fragment {
             // Ponavljajući zadaci mogu se pauzirati/nastaviti
             binding.btnPauseResume.setVisibility(View.VISIBLE);
             if (task.status.equals(AppTask.STATUS_PAUSED)) {
-                binding.btnPauseResume.setText("Nastavi");
+                binding.btnPauseResume.setText("Resume");
                 binding.btnPauseResume.setBackgroundResource(R.color.colorSuccess);
             } else {
-                binding.btnPauseResume.setText("Pauziraj");
+                binding.btnPauseResume.setText("Pause");
                 binding.btnPauseResume.setBackgroundResource(R.color.colorWarning);
             }
         } else {
@@ -203,7 +203,7 @@ public class TaskDetailFragment extends Fragment {
         String description = binding.etTaskDescription.getText().toString();
 
         if (name.isEmpty()) {
-            binding.etTaskName.setError("Naziv zadatka je obavezan.");
+            binding.etTaskName.setError("Task name is required.");
             return;
         }
 
@@ -217,10 +217,10 @@ public class TaskDetailFragment extends Fragment {
                         difficulty, importance)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(requireContext(), "Zadatak uspešno izmenjen.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Task updated successfully.", Toast.LENGTH_SHORT).show();
                         NavHostFragment.findNavController(this).popBackStack();
                     } else {
-                        Toast.makeText(requireContext(), "Greška pri izmeni: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Error updating task: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -232,10 +232,10 @@ public class TaskDetailFragment extends Fragment {
         appTaskViewModel.deleteTask(currentTask.id)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(requireContext(), "Zadatak uspešno obrisan.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Task deleted successfully.", Toast.LENGTH_SHORT).show();
                         NavHostFragment.findNavController(this).popBackStack();
                     } else {
-                        Toast.makeText(requireContext(), "Greška pri brisanju: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Error deleting task: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -248,11 +248,11 @@ public class TaskDetailFragment extends Fragment {
         appTaskViewModel.resolveTask(currentTask.id, newStatus)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(requireContext(), "Status zadatka promenjen na: " + newStatus, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Task status changed to: " + newStatus, Toast.LENGTH_SHORT).show();
                         // Pošto se status menja, ponovo učitavamo detalje da bismo osvežili UI
                         appTaskViewModel.loadTaskDetails(currentTask.id);
                     } else {
-                        Toast.makeText(requireContext(), "Greška pri promeni statusa: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Error changing status: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }

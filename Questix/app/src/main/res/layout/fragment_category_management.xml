@@ -43,7 +43,7 @@
             android:clickable="true"
             android:contentDescription="Add New Category"
             android:focusable="true"
-            android:src="@drawable/ic_add_friend"
+            android:src="@drawable/ic_create"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

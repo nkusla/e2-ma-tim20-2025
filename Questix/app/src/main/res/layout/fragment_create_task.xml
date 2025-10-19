@@ -17,22 +17,49 @@
             android:layout_height="wrap_content"
             android:padding="16dp">
 
+            <LinearLayout
+                android:id="@+id/layout_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_create_task"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Create Task Icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Create Task"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textStyle="bold"
+                    android:textSize="24sp" />
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/tv_title_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Naziv Zadataka"
+                android:layout_marginTop="24dp"
+                android:text="Task Name"
                 android:textColor="@color/colorTextPrimary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/layout_header" />
 
             <EditText
                 android:id="@+id/et_task_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Unesite kratak naziv"
+                android:hint="Enter a short name"
                 android:inputType="textCapSentences"
                 android:minHeight="48dp"
                 android:textColor="@color/colorTextPrimary"
@@ -45,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Opis (Opciono)"
+                android:text="Description (Optional)"
                 android:textColor="@color/colorTextPrimary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -56,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Detaljan opis zadatka"
+                android:hint="Detailed task description"
                 android:inputType="textMultiLine"
                 android:gravity="top"
                 android:minLines="3"
@@ -71,7 +98,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Kategorija"
+                android:text="Category"
                 android:textColor="@color/colorTextPrimary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -92,7 +119,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Datum i Vreme Izvršenja"
+                android:text="Execution Date and Time"
                 android:textColor="@color/colorTextPrimary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -106,22 +133,24 @@
                 android:layout_marginTop="8dp"
                 app:layout_constraintTop_toBottomOf="@id/tv_title_execution_time">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_select_date"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Odaberi Datum"
+                    android:text="Select Date"
                     android:layout_marginEnd="8dp"
-                    style="@style/Widget.AppCompat.Button.Colored" />
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    app:cornerRadius="8dp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_select_time"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Odaberi Vreme"
-                    style="@style/Widget.AppCompat.Button.Colored" />
+                    android:text="Select Time"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    app:cornerRadius="8dp" />
             </LinearLayout>
 
             <CheckBox
@@ -129,7 +158,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Ponavljajući Zadatak"
+                android:text="Recurring Task"
                 android:textColor="@color/colorTextPrimary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -147,7 +176,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ponavljanje (Interval i Jedinica)"
+                    android:text="Repetition (Interval and Unit)"
                     android:textColor="@color/colorTextPrimary"
                     android:textStyle="bold" />
 
@@ -162,7 +191,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Broj (npr. 1)"
+                        android:hint="Number (e.g. 1)"
                         android:inputType="number"
                         android:minHeight="48dp"
                         android:maxLength="2"
@@ -184,7 +213,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Period Ponavljanja"
+                    android:text="Repetition Period"
                     android:textColor="@color/colorTextPrimary"
                     android:textStyle="bold" />
 
@@ -194,22 +223,24 @@
                     android:orientation="horizontal"
                     android:layout_marginTop="8dp">
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_select_start_date"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Početni Datum"
+                        android:text="Start Date"
                         android:layout_marginEnd="8dp"
-                        style="@style/Widget.AppCompat.Button.Colored" />
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        app:cornerRadius="8dp" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_select_end_date"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Krajnji Datum"
-                        style="@style/Widget.AppCompat.Button.Colored" />
+                        android:text="End Date"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        app:cornerRadius="8dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -218,7 +249,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Težina Zadataka (XP)"
+                android:text="Task Difficulty (XP)"
                 android:textColor="@color/colorTextPrimary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -240,7 +271,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Bitnost Zadataka (XP)"
+                android:text="Task Importance (XP)"
                 android:textColor="@color/colorTextPrimary"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -257,15 +288,16 @@
                 android:padding="8dp"
                 app:layout_constraintTop_toBottomOf="@id/tv_title_importance" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_create_task"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Kreiraj Zadatak"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:backgroundTint="@color/colorPrimary"
+                android:text="Create"
+                style="@style/Widget.Material3.Button"
+                app:backgroundTint="?attr/colorPrimary"
                 android:padding="16dp"
+                app:cornerRadius="8dp"
                 app:layout_constraintTop_toBottomOf="@id/spinner_importance"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginBottom="16dp"/>
