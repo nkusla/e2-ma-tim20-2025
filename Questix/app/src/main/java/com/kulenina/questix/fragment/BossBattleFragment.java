@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.kulenina.questix.R;
 import com.kulenina.questix.databinding.FragmentBossBattleBinding;
 import com.kulenina.questix.dialog.ActiveEquipmentDialog;
+import com.kulenina.questix.dialog.BattleResultDialog;
 import com.kulenina.questix.model.*;
 import com.kulenina.questix.service.*;
 import com.kulenina.questix.repository.UserRepository;
@@ -66,7 +68,6 @@ public class BossBattleFragment extends Fragment {
 
     private void setupClickListeners() {
         binding.btnAttack.setOnClickListener(v -> performAttack());
-        binding.btnContinue.setOnClickListener(v -> continueBattle());
         binding.btnViewEquipment.setOnClickListener(v -> showActiveEquipmentDialog());
     }
 
@@ -247,6 +248,10 @@ public class BossBattleFragment extends Fragment {
     }
 
     private void handleBattleResult(BossBattleService.BattleResult battleResult) {
+        Log.d("BossBattle", "Battle result - Hit: " + battleResult.attackHit +
+              ", Finished: " + battleResult.battleFinished +
+              ", Defeated: " + battleResult.bossDefeated);
+
         if (battleResult.attackHit) {
             showHitAnimation();
         } else {
@@ -257,71 +262,50 @@ public class BossBattleFragment extends Fragment {
         currentBossBattle.setAttacksRemaining(battleResult.attacksRemaining);
         updateBossDisplay();
 
+        if (battleResult.bossDefeated) {
+            awardRewards(battleResult);
+        }
 
         if(battleResult.battleFinished) {
+            Log.d("BossBattle", "Showing battle result dialog");
             showBattleResult(battleResult);
         } else {
             binding.btnAttack.setEnabled(true);
         }
-
-        if (battleResult.bossDefeated) {
-            awardRewards(battleResult);
-        }
     }
 
     private void showBattleResult(BossBattleService.BattleResult battleResult) {
-        binding.cvBattleResult.setVisibility(View.VISIBLE);
-
-        if (battleResult.bossDefeated) {
-            binding.tvBattleOutcome.setText("Victory!");
-            binding.tvBattleOutcome.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-        } else {
-            binding.tvBattleOutcome.setText("Defeat!");
-            binding.tvBattleOutcome.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-        }
-
-        binding.tvCoinsReward.setText("+ " + battleResult.coinsReward + " Coins");
-
-        if (battleResult.equipmentDropped != null) {
-            binding.tvEquipmentReward.setVisibility(View.VISIBLE);
-            binding.tvEquipmentReward.setText("+ " + battleResult.equipmentDropped.getName());
-        } else {
-            binding.tvEquipmentReward.setVisibility(View.GONE);
-        }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (getActivity() != null && !getActivity().isFinishing() && isAdded()) {
+                BattleResultDialog dialog = BattleResultDialog.newInstance(battleResult);
+                dialog.setOnBattleResultListener(() -> {
+                    continueBattle();
+                });
+                dialog.show(getChildFragmentManager(), "BattleResultDialog");
+            }
+        }, 500);
     }
 
     private void awardRewards(BossBattleService.BattleResult battleResult) {
         bossBattleService.awardBattleRewards(battleResult)
-            .addOnSuccessListener(success -> {
-                if (success) {
-                    loadBattleData();
-                }
-            })
             .addOnFailureListener(e -> {
                 Toast.makeText(getContext(), "Failed to award rewards: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             });
     }
 
     private void continueBattle() {
-        if (currentBossBattle != null && currentBossBattle.isDefeated()) {
-            bossBattleService.createNextBoss()
-                .addOnSuccessListener(nextBoss -> {
-                    currentBossBattle = nextBoss;
-                    binding.cvBattleResult.setVisibility(View.GONE);
-                    updateBossDisplay();
-                    Toast.makeText(getContext(), "New boss battle started!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to start next boss: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    if (getActivity() != null) {
-                        getActivity().onBackPressed();
-                    }
-                });
-        } else {
-            if (getActivity() != null) {
-                getActivity().onBackPressed();
-            }
-        }
+        // Always get current boss battle (which resets the battle state)
+        bossBattleService.getCurrentBossBattle()
+            .addOnSuccessListener(bossBattle -> {
+                currentBossBattle = bossBattle;
+                updateBossDisplay();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Failed to reload boss battle: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) {
+                    getActivity().onBackPressed();
+                }
+            });
     }
 
     @Override

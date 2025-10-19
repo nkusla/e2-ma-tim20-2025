@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <!-- Battle Outcome -->
+    <TextView
+        android:id="@+id/tv_battle_outcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Victory!"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/holo_green_dark"
+        android:layout_marginBottom="24dp"
+        android:gravity="center" />
+
+    <!-- Treasure Chest Icon -->
+    <ImageView
+        android:id="@+id/iv_treasure_chest"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_coin"
+        android:layout_marginBottom="24dp"
+        android:tint="@android:color/holo_orange_dark" />
+
+    <!-- Rewards Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="24dp">
+
+        <!-- Coins Reward -->
+        <TextView
+            android:id="@+id/tv_coins_reward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ 200 Coins"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/holo_orange_dark"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical" />
+
+        <!-- Equipment Reward (optional) -->
+        <TextView
+            android:id="@+id/tv_equipment_reward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ Power Gloves"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_text"
+            android:visibility="gone"
+            android:gravity="center_vertical" />
+
+    </LinearLayout>
+
+    <!-- Continue Button -->
+    <Button
+        android:id="@+id/btn_continue"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Next Battle"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:background="@drawable/button_primary_selector"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

@@ -202,27 +202,6 @@ public class BossBattleService {
         }
     }
 
-    // Create next boss battle after current one is defeated
-    public Task<BossBattle> createNextBoss() {
-        String userId = getCurrentUserId();
-        if (userId == null) {
-            return Tasks.forException(new RuntimeException("User not authenticated"));
-        }
-
-        return userRepository.read(userId)
-            .continueWithTask(task -> {
-                User user = task.getResult();
-                if (user == null) {
-                    throw new RuntimeException("User not found");
-                }
-
-                int bossLevel = user.bossLevel != null ? user.bossLevel : 1;
-
-                // Create boss battle for current boss level
-                return createBossBattle(bossLevel);
-            });
-    }
-
     // Battle result class to encapsulate attack results
     public static class BattleResult {
         public boolean attackHit;

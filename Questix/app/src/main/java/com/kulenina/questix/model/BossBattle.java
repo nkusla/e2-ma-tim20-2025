@@ -141,7 +141,7 @@ public class BossBattle implements IIdentifiable, Serializable {
     }
 
     public boolean isBattleFinished() {
-        return attacksRemaining <= 0;
+        return attacksRemaining <= 0 || isDefeated;
     }
 
     public double getHpPercentage() {
