@@ -15,12 +15,17 @@ import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.kulenina.questix.R;
+import com.kulenina.questix.adapter.MemberProgressAdapter;
 import com.kulenina.questix.databinding.FragmentAllianceMissionBinding;
 import com.kulenina.questix.model.Alliance;
 import com.kulenina.questix.model.MissionProgress;
+import com.kulenina.questix.model.User;
 import com.kulenina.questix.service.AllianceMissionService;
 import com.kulenina.questix.service.AllianceMissionService.AllianceMissionListener;
+import com.kulenina.questix.service.AllianceService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -28,9 +33,12 @@ public class AllianceMissionFragment extends Fragment {
 
     private FragmentAllianceMissionBinding binding;
     private AllianceMissionService missionService;
+    private AllianceService allianceService;
     private String allianceId;
     private String currentUserId;
     private ListenerRegistration allianceListenerRegistration;
+    private MemberProgressAdapter memberProgressAdapter;
+    private List<User> allianceMembers = new ArrayList<>();
 
     private Handler timerHandler = new Handler(Looper.getMainLooper());
     private Runnable timerRunnable;
@@ -47,8 +55,20 @@ public class AllianceMissionFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         missionService = new AllianceMissionService();
+        allianceService = new AllianceService();
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        // Initialize RecyclerView adapter
+        memberProgressAdapter = new MemberProgressAdapter();
+        binding.recyclerViewMembersProgress.setAdapter(memberProgressAdapter);
+        
+        // Set up RecyclerView layout manager
+        androidx.recyclerview.widget.LinearLayoutManager layoutManager = 
+                new androidx.recyclerview.widget.LinearLayoutManager(getContext());
+        binding.recyclerViewMembersProgress.setLayoutManager(layoutManager);
+        
+        System.out.println("DEBUG: RecyclerView adapter and layout manager set up");
+        
         // 1. Dobijanje allianceId iz argumenata
         if (getArguments() != null) {
             allianceId = getArguments().getString("allianceId");
@@ -67,6 +87,7 @@ public class AllianceMissionFragment extends Fragment {
                     // Bez obzira na ishod, pokušavamo da prikažemo stanje
                     startRealtimeListener();
                     loadUserProgress();
+                    loadAllMembersProgress();
                 });
     }
 
@@ -88,6 +109,9 @@ public class AllianceMissionFragment extends Fragment {
                             // Misija je aktivna, ažuriraj UI
                             updateBossUI(alliance);
                             startTimer(alliance.getMissionStartedAt());
+                            
+                            // Reload member progress when alliance updates
+                            loadAllMembersProgress();
                         }
                     }
 
@@ -100,12 +124,72 @@ public class AllianceMissionFragment extends Fragment {
         );
     }
 
-    private void loadUserProgress() {
-        missionService.getUserProgress(allianceId, currentUserId)
-                .addOnSuccessListener(this::updateUserProgressUI)
+    private void loadAllMembersProgress() {
+        System.out.println("DEBUG: loadAllMembersProgress() called for allianceId: " + allianceId);
+        
+        // First, try to fix missing MissionProgress documents
+        System.out.println("DEBUG: Attempting to fix missing MissionProgress documents...");
+        missionService.createMissingMissionProgress(allianceId)
+                .addOnCompleteListener(fixTask -> {
+                    System.out.println("DEBUG: createMissingMissionProgress completed, success: " + fixTask.isSuccessful());
+                    if (fixTask.getException() != null) {
+                        System.out.println("DEBUG: createMissingMissionProgress error: " + fixTask.getException().getMessage());
+                    }
+                    
+                    // Now load the progress
+                    loadMembersProgressAfterFix();
+                });
+    }
+    
+    private void loadMembersProgressAfterFix() {
+        System.out.println("DEBUG: loadMembersProgressAfterFix() called");
+        
+        missionService.getAllMembersProgress(allianceId)
+                .addOnSuccessListener(progressList -> {
+                    System.out.println("DEBUG: Got progress list with " + (progressList != null ? progressList.size() : 0) + " members");
+                    
+                    // Also get alliance members for display names
+                    allianceService.getAllianceMembers(allianceId)
+                            .addOnSuccessListener(members -> {
+                                System.out.println("DEBUG: Got members list with " + (members != null ? members.size() : 0) + " members");
+                                
+                                allianceMembers = members != null ? members : new ArrayList<>();
+                                memberProgressAdapter.setData(progressList, allianceMembers, currentUserId);
+                                
+                                System.out.println("DEBUG: Adapter data set with " + progressList.size() + " progress items and " + allianceMembers.size() + " members");
+                                
+                                // Update the total HP contribution display
+                                updateTotalContributionDisplay();
+                            })
+                            .addOnFailureListener(e -> {
+                                System.out.println("DEBUG: Failed to load alliance members: " + e.getMessage());
+                                Toast.makeText(getContext(), "Failed to load alliance members: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                // Still show progress with unknown names
+                                memberProgressAdapter.setData(progressList, new ArrayList<>(), currentUserId);
+                                
+                                // Update the total HP contribution display
+                                updateTotalContributionDisplay();
+                            });
+                })
                 .addOnFailureListener(e -> {
-                    binding.textViewMemberContributions.setText(getString(R.string.mission_progress_load_error));
-                    // Obezbedite da imate string resurs mission_progress_load_error = "Error loading your contribution."
+                    System.out.println("DEBUG: Failed to load members progress: " + e.getMessage());
+                    Toast.makeText(getContext(), "Failed to load members progress: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void loadUserProgress() {
+        String progressId = allianceId + "_" + currentUserId;
+        Toast.makeText(getContext(), "Loading progress for ID: " + progressId, Toast.LENGTH_LONG).show();
+        
+        missionService.getUserProgress(allianceId, currentUserId)
+                .addOnSuccessListener(progress -> {
+                    Toast.makeText(getContext(), "Progress loaded successfully!", Toast.LENGTH_SHORT).show();
+                    updateUserProgressUI(progress);
+                })
+                .addOnFailureListener(e -> {
+                    String errorMsg = "Error loading progress: " + e.getMessage();
+                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
+                    binding.textViewMemberContributions.setText("Error: " + e.getMessage());
                 });
     }
 
@@ -146,15 +230,48 @@ public class AllianceMissionFragment extends Fragment {
             return;
         }
 
-        // Prikaz totalnog doprinosa (po specifikaciji 7.3)
+        // Calculate total HP contribution from all alliance members
+        int totalAllianceContribution = calculateTotalAllianceContribution();
+        
+        // Prikaz totalnog doprinosa svih članova saveza
         binding.textViewMemberContributions.setText(String.format(
                 Locale.US,
                 "Total HP Contribution: %d",
-                progress.totalHpContribution
+                totalAllianceContribution
         ));
 
         // Ovde bi trebalo dodati prikaz svih pojedinačnih kvota (purchasesCount, successfulHitsCount, itd.)
         // Za sada ostavljamo samo Total HP Contribution.
+    }
+    
+    private int calculateTotalAllianceContribution() {
+        int total = 0;
+        
+        // Get all members' progress from the adapter
+        if (memberProgressAdapter != null) {
+            List<MissionProgress> allProgress = memberProgressAdapter.getAllProgress();
+            if (allProgress != null) {
+                for (MissionProgress progress : allProgress) {
+                    total += progress.totalHpContribution;
+                }
+            }
+        }
+        
+        System.out.println("DEBUG: Total alliance contribution calculated: " + total);
+        return total;
+    }
+    
+    private void updateTotalContributionDisplay() {
+        int totalAllianceContribution = calculateTotalAllianceContribution();
+        
+        // Update the total HP contribution display
+        binding.textViewMemberContributions.setText(String.format(
+                Locale.US,
+                "Total HP Contribution: %d",
+                totalAllianceContribution
+        ));
+        
+        System.out.println("DEBUG: Total HP contribution display updated to: " + totalAllianceContribution);
     }
 
     private void startTimer(long missionStartedAt) {

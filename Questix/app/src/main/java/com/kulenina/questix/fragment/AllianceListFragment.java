@@ -248,24 +248,49 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
             });
     }
 
-    private void startMission() {
-        if (currentAlliance == null || !currentAlliance.isLeader(currentUserId)) {
-            Toast.makeText(getContext(), "Only the leader can start a mission.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    // U AllianceListFragment.java
 
-        // Provera da li je članova > 1 je na back-endu, ali je dobra praksa dodati ovde validaciju ako je moguće
-
-        missionService.startMission(currentAlliance.id)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Special Mission started successfully!", Toast.LENGTH_LONG).show();
-                    // Ponovo učitaj da bi se UI ažurirao (Mission Active, dugme za pregled)
-                    loadUserAlliance();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error starting mission: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                });
+private void startMission() {
+    if (currentAlliance == null || !currentAlliance.isLeader(currentUserId)) {
+        Toast.makeText(getContext(), "Only the leader can start a mission.", Toast.LENGTH_SHORT).show();
+        return;
     }
+
+    System.out.println("DEBUG: AllianceListFragment.startMission() called for alliance: " + currentAlliance.id);
+    System.out.println("DEBUG: Current user is leader: " + currentAlliance.isLeader(currentUserId));
+    System.out.println("DEBUG: Mission currently active: " + currentAlliance.isMissionActive());
+
+    missionService.startMission(currentAlliance.id)
+            .addOnSuccessListener(aVoid -> {
+                System.out.println("DEBUG: Mission started successfully!");
+                Toast.makeText(getContext(), "Special Mission started successfully! Refreshing status...", Toast.LENGTH_LONG).show();
+                
+                
+                allianceService.getUserAlliance(currentUserId)
+                    .addOnSuccessListener(updatedAlliance -> {
+                        currentAlliance = updatedAlliance;
+                        
+                        if (currentAlliance.isMissionActive()) {
+                            Toast.makeText(getContext(), "UI successfully updated to Mission Active.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Error: Mission is still reported as inactive after start. Check Firebase console.", Toast.LENGTH_LONG).show();
+                        }
+                        
+                        updateAllianceUI();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to refresh alliance data after mission start: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+
+            })
+            .addOnFailureListener(e -> {
+                System.out.println("DEBUG: Failed to start mission: " + e.getMessage());
+                if (e.getCause() != null) {
+                    System.out.println("DEBUG: Cause: " + e.getCause().getMessage());
+                }
+                Toast.makeText(getContext(), "Error starting mission: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            });
+}
 
     private void viewMissionDetails() {
         if (currentAlliance == null || !currentAlliance.isMissionActive()) {

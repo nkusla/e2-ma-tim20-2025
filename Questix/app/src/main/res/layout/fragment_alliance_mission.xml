@@ -95,5 +95,32 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Section Header for All Members -->
+        <TextView
+            android:id="@+id/textViewMembersHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Alliance Members Progress"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/textViewMemberContributions"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- RecyclerView for Members Progress -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewMembersProgress"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            app:layout_constraintTop_toBottomOf="@id/textViewMembersHeader"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:listitem="@layout/item_member_progress" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

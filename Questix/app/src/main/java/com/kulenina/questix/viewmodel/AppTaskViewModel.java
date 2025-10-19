@@ -158,6 +158,34 @@ public class AppTaskViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * Označava zadatak kao završen (done)
+     */
+    public Task<Void> markTaskAsDone(String taskId) {
+        return resolveTask(taskId, AppTask.STATUS_DONE);
+    }
+
+    /**
+     * Otkazuje zadatak (canceled)
+     */
+    public Task<Void> cancelTask(String taskId) {
+        return resolveTask(taskId, AppTask.STATUS_CANCELED);
+    }
+
+    /**
+     * Pauzira ponavljajući zadatak (paused) - samo za ponavljajuće zadatke
+     */
+    public Task<Void> pauseTask(String taskId) {
+        return resolveTask(taskId, AppTask.STATUS_PAUSED);
+    }
+
+    /**
+     * Nastavlja ponavljajući zadatak (active) - samo za pauzirane zadatke
+     */
+    public Task<Void> resumeTask(String taskId) {
+        return resolveTask(taskId, AppTask.STATUS_ACTIVE);
+    }
+
     // Dodatna sistemska provera (za background service/worker)
     public Task<Void> checkMissedTasks() {
         String userId = getCurrentUserId();
