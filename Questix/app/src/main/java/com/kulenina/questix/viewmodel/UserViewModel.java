@@ -4,8 +4,12 @@ import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 import androidx.lifecycle.ViewModel;
 
+import com.kulenina.questix.model.Equipment;
 import com.kulenina.questix.model.User;
 import com.kulenina.questix.service.LevelProgressionService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserViewModel extends BaseObservable {
     private User user;
@@ -13,12 +17,14 @@ public class UserViewModel extends BaseObservable {
     private String errorMessage;
     private boolean isOwnProfile;
     private LevelProgressionService levelProgressionService;
+    private List<Equipment> activeEquipment;
 
     public UserViewModel() {
         this.isLoading = false;
         this.errorMessage = null;
         this.isOwnProfile = false;
         this.levelProgressionService = new LevelProgressionService();
+        this.activeEquipment = new ArrayList<>();
     }
 
     @Bindable
@@ -156,5 +162,15 @@ public class UserViewModel extends BaseObservable {
     public void setIsOwnProfile(boolean isOwnProfile) {
         this.isOwnProfile = isOwnProfile;
         notifyPropertyChanged(com.kulenina.questix.BR.isOwnProfile);
+    }
+
+    @Bindable
+    public List<Equipment> getActiveEquipment() {
+        return activeEquipment;
+    }
+
+    public void setActiveEquipment(List<Equipment> activeEquipment) {
+        this.activeEquipment = activeEquipment != null ? activeEquipment : new ArrayList<>();
+        notifyPropertyChanged(com.kulenina.questix.BR.activeEquipment);
     }
 }

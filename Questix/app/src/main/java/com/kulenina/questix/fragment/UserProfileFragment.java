@@ -12,12 +12,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.kulenina.questix.R;
+import com.kulenina.questix.adapter.EquipmentDisplayAdapter;
 import com.kulenina.questix.databinding.FragmentUserProfileBinding;
 import com.kulenina.questix.model.User;
 import com.kulenina.questix.service.AuthService;
+import com.kulenina.questix.service.EquipmentService;
 import com.kulenina.questix.service.FriendshipService;
 import com.kulenina.questix.viewmodel.UserViewModel;
 
@@ -25,6 +28,8 @@ public class UserProfileFragment extends Fragment {
     private FragmentUserProfileBinding binding;
     private UserViewModel userViewModel;
     private AuthService authService;
+    private EquipmentService equipmentService;
+    private EquipmentDisplayAdapter equipmentAdapter;
 
     @Nullable
     @Override
@@ -39,7 +44,10 @@ public class UserProfileFragment extends Fragment {
 
         userViewModel = new UserViewModel();
         authService = new AuthService();
+        equipmentService = new EquipmentService();
         binding.setViewModel(userViewModel);
+
+        setupRecyclerView();
 
         // Initialize UI state - show loading by default
         showLoadingState();
@@ -52,9 +60,17 @@ public class UserProfileFragment extends Fragment {
                 userViewModel.setIsOwnProfile(currentUserId.equals(userId));
 
                 fetchUserById(userId);
+                fetchActiveEquipment(userId);
                 setupFriendButton(userId);
             }
         }
+    }
+
+    private void setupRecyclerView() {
+        equipmentAdapter = new EquipmentDisplayAdapter();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        binding.recyclerViewActiveEquipment.setLayoutManager(layoutManager);
+        binding.recyclerViewActiveEquipment.setAdapter(equipmentAdapter);
     }
 
     private void showLoadingState() {
@@ -78,6 +94,19 @@ public class UserProfileFragment extends Fragment {
             .addOnFailureListener(e -> {
                 userViewModel.setIsLoading(false);
                 userViewModel.setErrorMessage("Failed to load user: " + e.getMessage());
+            });
+    }
+
+    private void fetchActiveEquipment(String userId) {
+        equipmentService.getActiveEquipment(userId)
+            .addOnSuccessListener(activeEquipment -> {
+                userViewModel.setActiveEquipment(activeEquipment);
+                equipmentAdapter.setEquipmentList(activeEquipment);
+            })
+            .addOnFailureListener(e -> {
+                // Silently handle equipment loading failure - not critical for profile display
+                userViewModel.setActiveEquipment(new java.util.ArrayList<>());
+                equipmentAdapter.setEquipmentList(new java.util.ArrayList<>());
             });
     }
 
