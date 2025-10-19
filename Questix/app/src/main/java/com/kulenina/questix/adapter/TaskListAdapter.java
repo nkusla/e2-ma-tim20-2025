@@ -65,7 +65,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
             // Prikaz XP i Ponavljanja
             String recurrenceInfo = task.isRecurring ?
-                    String.format("(%d %s)", task.repetitionInterval, task.repetitionUnit) : "Jednokratno";
+                    String.format("(%d %s)", task.repetitionInterval, task.repetitionUnit) : "Non-recurring";
             String xpInfo = String.format("%s | %d XP", recurrenceInfo, task.totalXpValue);
             binding.tvRecurrenceXp.setText(xpInfo);
 
