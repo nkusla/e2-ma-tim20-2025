@@ -55,7 +55,7 @@
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Change Color"
-                android:src="@drawable/ic_lightning"
+                android:src="@drawable/ic_palette"
                 app:tint="@android:color/darker_gray"
                 android:onClick="@{() -> listener.onColorChangeClicked(category)}" />
 

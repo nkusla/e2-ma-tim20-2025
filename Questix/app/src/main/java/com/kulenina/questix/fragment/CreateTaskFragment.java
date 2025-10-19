@@ -206,15 +206,15 @@ public class CreateTaskFragment extends Fragment {
                         }
 
                         if (task.isSuccessful()) {
-                            Toast.makeText(requireContext(), "Zadatak kreiran uspešno!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), "Task created successfully!", Toast.LENGTH_SHORT).show();
                             // Resetuj formu za kreiranje novog zadatka
                             resetForm();
                         } else {
-                            String errorMessage = "Nepoznata greška";
+                            String errorMessage = "Unknown error";
                             if (task.getException() != null && task.getException().getMessage() != null) {
                                 errorMessage = task.getException().getMessage();
                             }
-                            Toast.makeText(requireContext(), "Greška: " + errorMessage, Toast.LENGTH_LONG).show();
+                            Toast.makeText(requireContext(), "Error: " + errorMessage, Toast.LENGTH_LONG).show();
                         }
                     });
         });
@@ -224,21 +224,21 @@ public class CreateTaskFragment extends Fragment {
 
     private boolean validateInputs() {
         if (binding.etTaskName.getText().toString().trim().isEmpty()) {
-            binding.etTaskName.setError("Naziv zadatka je obavezan.");
+            binding.etTaskName.setError("Task name is required.");
             return false;
         }
         if (selectedCategoryId == null) {
-            Toast.makeText(requireContext(), "Morate odabrati kategoriju.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "You must select a category.", Toast.LENGTH_SHORT).show();
             return false;
         }
         if (binding.cbIsRecurring.isChecked()) {
             String intervalStr = binding.etRepetitionInterval.getText().toString();
             if (intervalStr.isEmpty() || Integer.parseInt(intervalStr) <= 0) {
-                binding.etRepetitionInterval.setError("Interval ponavljanja mora biti pozitivan broj.");
+                binding.etRepetitionInterval.setError("Repetition interval must be a positive number.");
                 return false;
             }
             if (startCalendar.after(endCalendar)) {
-                Toast.makeText(requireContext(), "Početni datum ponavljanja ne može biti nakon krajnjeg.", Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), "Start date cannot be after end date.", Toast.LENGTH_LONG).show();
                 return false;
             }
         }
@@ -249,9 +249,9 @@ public class CreateTaskFragment extends Fragment {
      * Konvertuje UI string (srpski) u kod string (engleski)
      */
     private String convertRepetitionUnit(String uiUnit) {
-        if (uiUnit.equals("Dan")) {
+        if (uiUnit.equals("Day")) {
             return AppTask.UNIT_DAY;
-        } else if (uiUnit.equals("Nedelja")) {
+        } else if (uiUnit.equals("Week")) {
             return AppTask.UNIT_WEEK;
         }
         return null;
