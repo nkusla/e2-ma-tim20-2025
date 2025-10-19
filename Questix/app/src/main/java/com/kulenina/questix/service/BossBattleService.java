@@ -129,8 +129,11 @@ public class BossBattleService {
                             result.equipmentDropped = rollForEquipmentDrop(bossBattle);
                         }
                         else if (bossBattle.isBattleFinished()) {
-                            bossBattle.reduceEquipmentDropChance();
-                            bossBattle.reduceCoinsReward();
+                            if (bossBattle.getHpPercentage() < 0.5) {
+                                bossBattle.reduceEquipmentDropChance();
+                                bossBattle.reduceCoinsReward();
+                            }
+
                             bossBattle.restartBattle();
                         }
 
