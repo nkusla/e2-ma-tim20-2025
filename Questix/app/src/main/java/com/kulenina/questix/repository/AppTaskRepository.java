@@ -28,6 +28,13 @@ public class AppTaskRepository extends Repository<AppTask> {
                 .continueWith(t -> toList(t.getResult()));
     }
 
+    public Task<List<AppTask>> findAllByUser(String userId) {
+        return getCollectionReference()
+                .whereEqualTo("userId", userId)
+                .get()
+                .continueWith(task -> toList(task.getResult()));
+    }
+
     public Task<Void> batchUpdateTaskColors(List<AppTask> tasksToUpdate, String newColorHex) {
         if (tasksToUpdate.isEmpty()) {
             return com.google.android.gms.tasks.Tasks.forResult(null);

@@ -22,4 +22,13 @@
     <color name="secondary_text">@color/colorTextSecondary</color>
     <color name="card_background">@color/colorCardBackground</color>
     <color name="border_color">#E0E0E0</color>
+
+    <!-- Statistics Colors -->
+    <color name="background_color">@color/colorBackground</color>
+    <color name="primary_text_color">@color/colorTextPrimary</color>
+    <color name="secondary_text_color">@color/colorTextSecondary</color>
+    <color name="success_color">@color/colorSuccess</color>
+    <color name="warning_color">@color/colorWarning</color>
+    <color name="error_color">@color/colorError</color>
+    <color name="info_color">#2196F3</color>
 </resources>

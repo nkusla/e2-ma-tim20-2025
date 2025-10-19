@@ -58,10 +58,8 @@ public class UserStatisticsService {
     private StatisticsData calculateStatistics(List<AppTask> allTasks, List<Category> categories) {
         StatisticsData stats = new StatisticsData();
 
-        // Calculate active days count (days with at least one completed task)
         stats.activeDaysCount = calculateActiveDays(allTasks);
 
-        // Calculate task counts
         stats.totalCreatedTasks = allTasks.size();
         stats.totalCompletedTasks = (int) allTasks.stream()
             .filter(task -> AppTask.STATUS_DONE.equals(task.status))
@@ -73,19 +71,14 @@ public class UserStatisticsService {
             .filter(task -> AppTask.STATUS_CANCELED.equals(task.status))
             .count();
 
-        // Calculate longest success streak
         stats.longestSuccessStreak = calculateLongestStreak(allTasks);
 
-        // Calculate completed tasks by category
         stats.completedTasksByCategory = calculateTasksByCategory(allTasks, categories);
 
-        // Calculate average difficulty XP data
         stats.averageDifficultyData = calculateAverageDifficultyData(allTasks);
 
-        // Calculate last 7 days XP progress
         stats.last7DaysXp = calculateLast7DaysXp(allTasks);
 
-        // Calculate special missions
         calculateSpecialMissions(allTasks, stats);
 
         return stats;
@@ -106,7 +99,6 @@ public class UserStatisticsService {
     }
 
     private int calculateLongestStreak(List<AppTask> allTasks) {
-        // Group tasks by day and check for consecutive days with completed tasks
         Map<String, Boolean> dayHasCompletedTask = new HashMap<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
@@ -117,32 +109,27 @@ public class UserStatisticsService {
             }
         }
 
-        // Find longest consecutive streak
         int longestStreak = 0;
         int currentStreak = 0;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
 
-        // Check backwards from today
-        for (int i = 0; i < 365; i++) { // Check last year
+        for (int i = 0; i < 365; i++) {
             String dateKey = dateFormat.format(calendar.getTime());
 
             if (dayHasCompletedTask.containsKey(dateKey)) {
                 currentStreak++;
                 longestStreak = Math.max(longestStreak, currentStreak);
             } else {
-                // Check if there are any tasks for this day (active or missed)
                 boolean hasTasksForDay = allTasks.stream()
                     .anyMatch(task -> {
                         String taskDate = dateFormat.format(new Date(task.executionTime));
                         return taskDate.equals(dateKey);
                     });
 
-                // Only break streak if there were tasks but none completed
                 if (hasTasksForDay) {
                     currentStreak = 0;
                 }
-                // If no tasks for the day, streak continues
             }
 
             calendar.add(Calendar.DAY_OF_MONTH, -1);
@@ -155,12 +142,10 @@ public class UserStatisticsService {
         Map<String, Integer> categoryMap = new HashMap<>();
         Map<String, String> categoryIdToName = new HashMap<>();
 
-        // Create mapping from category ID to name
         for (Category category : categories) {
             categoryIdToName.put(category.getId(), category.name);
         }
 
-        // Count completed tasks by category
         for (AppTask task : allTasks) {
             if (AppTask.STATUS_DONE.equals(task.status)) {
                 String categoryName = categoryIdToName.getOrDefault(task.categoryId, "Unknown");
@@ -218,7 +203,6 @@ public class UserStatisticsService {
     }
 
     private void calculateSpecialMissions(List<AppTask> allTasks, StatisticsData stats) {
-        // Special missions are tasks with "Special" importance
         stats.startedSpecialMissions = (int) allTasks.stream()
             .filter(task -> "Special".equals(task.importance))
             .count();
