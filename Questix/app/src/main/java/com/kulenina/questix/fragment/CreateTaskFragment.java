@@ -75,7 +75,7 @@ public class CreateTaskFragment extends Fragment {
     private void setupCategorySpinner() {
         categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
             if (categories != null && !categories.isEmpty()) {
-                // Logika za Adapter i Listener je ispravna ovde...
+                // Kreiranje adaptera
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(
                         requireContext(),
                         android.R.layout.simple_spinner_item,
@@ -84,13 +84,25 @@ public class CreateTaskFragment extends Fragment {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 binding.spinnerCategory.setAdapter(adapter);
 
-                // Listener je OK...
+                // DODAVANJE LISTENER-A za odabir kategorije
+                binding.spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (position >= 0 && position < categories.size()) {
+                            selectedCategoryId = categories.get(position).getId();
+                        }
+                    }
 
-                // Sada je SIGURNO: Podrazumevani odabir prve kategorije
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        // Ne radi ništa
+                    }
+                });
+
+                // Podrazumevani odabir prve kategorije
                 selectedCategoryId = categories.get(0).getId();
             } else {
                 // Ako nema kategorija, prikaži poruku i postavi ID na null
-                Toast.makeText(requireContext(), "Nema kreiranih kategorija. Molimo kreirajte jednu.", Toast.LENGTH_LONG).show();
                 selectedCategoryId = null; // Ovde MORA da se postavi na null
             }
         });
@@ -188,14 +200,21 @@ public class CreateTaskFragment extends Fragment {
                             isRecurring, executionTime, repetitionInterval,
                             repetitionUnit, startDate, endDate, description)
                     .addOnCompleteListener(task -> {
+                        // Proverava da li je fragment još uvek aktivan
+                        if (!isAdded() || getContext() == null) {
+                            return; // Fragment je uništen, ne radi ništa
+                        }
+
                         if (task.isSuccessful()) {
                             Toast.makeText(requireContext(), "Zadatak kreiran uspešno!", Toast.LENGTH_SHORT).show();
-                            // Zatvori fragment (navigacija nazad, zavisno od arhitekture)
-                            if (getActivity() != null) {
-                                getActivity().onBackPressed();
-                            }
+                            // Resetuj formu za kreiranje novog zadatka
+                            resetForm();
                         } else {
-                            Toast.makeText(requireContext(), "Greška: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            String errorMessage = "Nepoznata greška";
+                            if (task.getException() != null && task.getException().getMessage() != null) {
+                                errorMessage = task.getException().getMessage();
+                            }
+                            Toast.makeText(requireContext(), "Greška: " + errorMessage, Toast.LENGTH_LONG).show();
                         }
                     });
         });
@@ -271,5 +290,40 @@ public class CreateTaskFragment extends Fragment {
                 android.R.layout.simple_spinner_item);
         importanceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerImportance.setAdapter(importanceAdapter);
+    }
+
+    /**
+     * Resetuje formu nakon uspešnog kreiranja zadatka
+     */
+    private void resetForm() {
+        // Očisti text polja
+        binding.etTaskName.setText("");
+        binding.etTaskDescription.setText("");
+        binding.etRepetitionInterval.setText("");
+
+        // Resetuj checkbox
+        binding.cbIsRecurring.setChecked(false);
+        binding.layoutRecurringDetails.setVisibility(View.GONE);
+
+        // Resetuj spinere na default vrednosti
+        binding.spinnerDifficulty.setSelection(0);
+        binding.spinnerImportance.setSelection(0);
+        binding.spinnerRepetitionUnit.setSelection(0);
+
+        // Resetuj kategoriju na prvu (ako postoji)
+        binding.spinnerCategory.setSelection(0);
+
+        // Resetuj datume na trenutno vreme
+        executionCalendar = Calendar.getInstance();
+        startCalendar = (Calendar) executionCalendar.clone();
+        endCalendar = Calendar.getInstance();
+        endCalendar.add(Calendar.MONTH, 1);
+
+        // Ažuriraj dugmad sa novim vremenima
+        updateDateTimeButtons();
+
+        // Očisti greške
+        binding.etTaskName.setError(null);
+        binding.etRepetitionInterval.setError(null);
     }
 }
