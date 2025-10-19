@@ -65,7 +65,6 @@ public class EquipmentInventoryAdapter extends RecyclerView.Adapter<EquipmentInv
         private TextView textViewName;
         private TextView textViewEffect;
         private TextView textViewType;
-        private TextView textViewStatus;
         private TextView textViewExpired;
         private TextView textViewDuration;
 
@@ -76,7 +75,6 @@ public class EquipmentInventoryAdapter extends RecyclerView.Adapter<EquipmentInv
             textViewName = itemView.findViewById(R.id.textViewEquipmentName);
             textViewEffect = itemView.findViewById(R.id.textViewEquipmentEffect);
             textViewType = itemView.findViewById(R.id.textViewEquipmentType);
-            textViewStatus = itemView.findViewById(R.id.textViewStatus);
             textViewExpired = itemView.findViewById(R.id.textViewExpired);
             textViewDuration = itemView.findViewById(R.id.textViewDuration);
         }
@@ -95,7 +93,6 @@ public class EquipmentInventoryAdapter extends RecyclerView.Adapter<EquipmentInv
                 checkBoxActivate.setEnabled(false);
                 checkBoxActivate.setChecked(false);
                 textViewExpired.setVisibility(View.VISIBLE);
-                textViewStatus.setVisibility(View.GONE);
                 textViewDuration.setVisibility(View.GONE);
                 // Gray out the entire item
                 itemView.setAlpha(0.5f);
@@ -103,12 +100,6 @@ public class EquipmentInventoryAdapter extends RecyclerView.Adapter<EquipmentInv
                 checkBoxActivate.setEnabled(true);
                 textViewExpired.setVisibility(View.GONE);
                 itemView.setAlpha(1.0f);
-
-                if (equipment.isActive()) {
-                    textViewStatus.setVisibility(View.VISIBLE);
-                } else {
-                    textViewStatus.setVisibility(View.GONE);
-                }
 
                 if (equipment instanceof Clothing) {
                     Clothing clothing = (Clothing) equipment;
@@ -133,7 +124,7 @@ public class EquipmentInventoryAdapter extends RecyclerView.Adapter<EquipmentInv
                     textViewType.setBackgroundColor(itemView.getContext().getColor(android.R.color.holo_green_light));
                     break;
                 case WEAPON:
-                    imageViewIcon.setImageResource(R.drawable.ic_lightning);
+                    imageViewIcon.setImageResource(R.drawable.ic_weapon);
                     textViewType.setBackgroundColor(itemView.getContext().getColor(android.R.color.holo_orange_light));
                     break;
             }

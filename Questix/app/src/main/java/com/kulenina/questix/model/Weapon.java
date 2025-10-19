@@ -46,9 +46,8 @@ public class Weapon extends Equipment {
         return 0;
     }
 
-    public int getUpgradePrice(int baseBossReward) {
-        // Each upgrade costs 60% of potential boss reward
-        return (baseBossReward * 60) / 100;
+    public static int getUpgradePrice(int baseBossReward) {
+        return  Math.round((baseBossReward * 60) / 100.0f);
     }
 
     @Override
