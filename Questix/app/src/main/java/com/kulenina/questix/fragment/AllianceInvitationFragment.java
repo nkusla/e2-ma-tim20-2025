@@ -83,7 +83,6 @@ public class AllianceInvitationFragment extends Fragment implements AllianceInvi
             binding.recyclerViewInvitations.setVisibility(View.VISIBLE);
             binding.textViewNoInvitations.setVisibility(View.GONE);
 
-            // Update the adapter with the invitation list
             invitationAdapter.updateInvitations(pendingInvitations);
         } else {
             binding.recyclerViewInvitations.setVisibility(View.GONE);
@@ -104,11 +103,8 @@ public class AllianceInvitationFragment extends Fragment implements AllianceInvi
         invitationService.acceptInvitation(invitation.id, currentUserId)
             .addOnSuccessListener(aVoid -> {
                 Toast.makeText(getContext(), "Invitation accepted! You joined " + invitation.allianceName, Toast.LENGTH_SHORT).show();
-                // Remove the invitation from the list
                 invitationAdapter.removeInvitation(invitation);
-                // Reload invitations to update the count
                 loadPendingInvitations();
-                // Notify parent fragment
                 if (updateListener != null) {
                     updateListener.onInvitationAccepted();
                 }
@@ -123,11 +119,8 @@ public class AllianceInvitationFragment extends Fragment implements AllianceInvi
         invitationService.declineInvitation(invitation.id, currentUserId)
             .addOnSuccessListener(aVoid -> {
                 Toast.makeText(getContext(), "Invitation declined", Toast.LENGTH_SHORT).show();
-                // Remove the invitation from the list
                 invitationAdapter.removeInvitation(invitation);
-                // Reload invitations to update the count
                 loadPendingInvitations();
-                // Notify parent fragment
                 if (updateListener != null) {
                     updateListener.onInvitationDeclined();
                 }

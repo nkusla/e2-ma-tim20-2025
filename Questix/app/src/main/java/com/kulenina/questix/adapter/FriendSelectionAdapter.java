@@ -1,7 +1,6 @@
 package com.kulenina.questix.adapter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -10,10 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kulenina.questix.R;
 import com.kulenina.questix.databinding.ItemFriendSelectionBinding;
-import com.kulenina.questix.model.User;
 import com.kulenina.questix.viewmodel.UserViewModel;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,12 +72,10 @@ public class FriendSelectionAdapter extends RecyclerView.Adapter<FriendSelection
         }
 
         public void bind(UserViewModel userViewModel, boolean isSelected) {
-            // Set data binding variables
             binding.setUserViewModel(userViewModel);
             binding.setIsSelected(isSelected);
             binding.executePendingBindings();
 
-            // Set up checkbox listener
             binding.checkBoxSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 String friendId = userViewModel.getUser().getId();
                 if (isChecked) {
@@ -94,7 +89,6 @@ public class FriendSelectionAdapter extends RecyclerView.Adapter<FriendSelection
                 }
             });
 
-            // Make the entire row clickable
             itemView.setOnClickListener(v -> {
                 binding.checkBoxSelect.setChecked(!binding.checkBoxSelect.isChecked());
             });

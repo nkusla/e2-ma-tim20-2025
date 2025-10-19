@@ -14,11 +14,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.kulenina.questix.R;
-import com.kulenina.questix.model.Equipment;
 import com.kulenina.questix.service.BossBattleService;
 
 public class BattleResultDialog extends DialogFragment {
-    private static final String ARG_BATTLE_RESULT = "battle_result";
     private static final String ARG_BOSS_DEFEATED = "boss_defeated";
     private static final String ARG_COINS_REWARD = "coins_reward";
     private static final String ARG_EQUIPMENT_NAME = "equipment_name";
@@ -82,7 +80,6 @@ public class BattleResultDialog extends DialogFragment {
         TextView tvEquipmentReward = view.findViewById(R.id.tv_equipment_reward);
         Button btnContinue = view.findViewById(R.id.btn_continue);
 
-        // Set battle outcome
         if (bossDefeated) {
             tvBattleOutcome.setText("Victory!");
             tvBattleOutcome.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
@@ -106,7 +103,6 @@ public class BattleResultDialog extends DialogFragment {
             tvEquipmentReward.setVisibility(View.GONE);
         }
 
-        // Always show "Next Battle" regardless of outcome
         btnContinue.setText("Next Battle");
 
         btnContinue.setOnClickListener(v -> {

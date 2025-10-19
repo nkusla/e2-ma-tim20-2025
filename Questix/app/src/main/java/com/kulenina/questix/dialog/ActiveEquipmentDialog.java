@@ -24,7 +24,6 @@ public class ActiveEquipmentDialog extends DialogFragment {
     private static final String ARG_EQUIPMENT_LIST = "equipment_list";
     private List<Equipment> equipmentList;
     private EquipmentDisplayAdapter adapter;
-    // Removed unused hideCheckboxes variable
 
     public static ActiveEquipmentDialog newInstance(List<Equipment> equipmentList) {
         ActiveEquipmentDialog dialog = new ActiveEquipmentDialog();
@@ -79,6 +78,4 @@ public class ActiveEquipmentDialog extends DialogFragment {
             adapter.setEquipmentList(equipmentList);
         }
     }
-
-    // Removed unused methods - now using clean EquipmentDisplayAdapter
 }

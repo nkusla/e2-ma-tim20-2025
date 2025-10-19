@@ -43,23 +43,18 @@ public class ChangePasswordFragment extends Fragment {
     }
 
     private void changePassword() {
-        // Get input values
         String currentPassword = getTextFromEditText(binding.editTextCurrentPassword);
         String newPassword = getTextFromEditText(binding.editTextNewPassword);
         String confirmPassword = getTextFromEditText(binding.editTextConfirmPassword);
 
-        // Clear previous errors
         clearErrors();
 
-        // Validate inputs
         if (!validateInputs(currentPassword, newPassword, confirmPassword)) {
             return;
         }
 
-        // Show loading state
         showLoading(true);
 
-        // Attempt to change password
         authService.changePassword(currentPassword, newPassword)
             .addOnSuccessListener(aVoid -> {
                 showLoading(false);
@@ -76,13 +71,11 @@ public class ChangePasswordFragment extends Fragment {
     private boolean validateInputs(String currentPassword, String newPassword, String confirmPassword) {
         boolean isValid = true;
 
-        // Validate current password
         if (TextUtils.isEmpty(currentPassword)) {
             binding.textInputLayoutCurrentPassword.setError("Enter current password");
             isValid = false;
         }
 
-        // Validate new password
         if (TextUtils.isEmpty(newPassword)) {
             binding.textInputLayoutNewPassword.setError("Enter new password");
             isValid = false;
@@ -91,7 +84,6 @@ public class ChangePasswordFragment extends Fragment {
             isValid = false;
         }
 
-        // Validate confirm password
         if (TextUtils.isEmpty(confirmPassword)) {
             binding.textInputLayoutConfirmPassword.setError("Confirm new password");
             isValid = false;
@@ -100,7 +92,6 @@ public class ChangePasswordFragment extends Fragment {
             isValid = false;
         }
 
-        // Check if new password is the same as current
         if (!TextUtils.isEmpty(currentPassword) && !TextUtils.isEmpty(newPassword) &&
             currentPassword.equals(newPassword)) {
             binding.textInputLayoutNewPassword.setError("New password must be different from current password");
@@ -126,7 +117,6 @@ public class ChangePasswordFragment extends Fragment {
         binding.progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         binding.buttonChangePassword.setEnabled(!show);
 
-        // Disable input fields during loading
         binding.editTextCurrentPassword.setEnabled(!show);
         binding.editTextNewPassword.setEnabled(!show);
         binding.editTextConfirmPassword.setEnabled(!show);
@@ -139,7 +129,6 @@ public class ChangePasswordFragment extends Fragment {
     private String getErrorMessage(Exception e) {
         String message = e.getMessage();
         if (message != null) {
-            // Translate common Firebase auth errors to Serbian
             if (message.contains("The password is invalid")) {
                 return "Current password is incorrect";
             } else if (message.contains("too many requests")) {

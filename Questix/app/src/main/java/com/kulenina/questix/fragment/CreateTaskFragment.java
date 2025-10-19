@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.kulenina.questix.R;
 import com.kulenina.questix.databinding.FragmentCreateTaskBinding;
 import com.kulenina.questix.model.Category;
-import com.kulenina.questix.model.AppTask; // Za konstante
+import com.kulenina.questix.model.AppTask;
 import com.kulenina.questix.viewmodel.AppTaskViewModel;
 import com.kulenina.questix.viewmodel.CategoryViewModel;
 import java.text.SimpleDateFormat;
@@ -30,7 +30,6 @@ public class CreateTaskFragment extends Fragment {
     private AppTaskViewModel appTaskViewModel;
     private CategoryViewModel categoryViewModel;
 
-    // Podaci o zadatku
     private Calendar executionCalendar;
     private Calendar startCalendar;
     private Calendar endCalendar;
@@ -47,35 +46,26 @@ public class CreateTaskFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Inicijalizacija ViewModel-a (koristeći Activity scope, što je uobičajeno)
         appTaskViewModel = new ViewModelProvider(requireActivity()).get(AppTaskViewModel.class);
         categoryViewModel = new ViewModelProvider(requireActivity()).get(CategoryViewModel.class);
 
-        // Inicijalizacija kalendara na trenutno vreme
         executionCalendar = Calendar.getInstance();
         startCalendar = (Calendar) executionCalendar.clone();
         endCalendar = Calendar.getInstance();
-        endCalendar.add(Calendar.MONTH, 1); // Krajnji datum podrazumevano 1 mesec kasnije
+        endCalendar.add(Calendar.MONTH, 1);
 
-        // Povezivanje UI elemenata
         setupCategorySpinner();
         setupDifficultyAndImportanceSpinners();
         setupDateTimePickers();
         setupRecurringToggle();
         setupCreateButton();
 
-        // Ažuriranje vremena na dugmadima pri pokretanju
         updateDateTimeButtons();
     }
-
-    // --- 1. Učitavanje Kategorija ---
-
-    // U CreateTaskFragment.java, Korigovana metoda setupCategorySpinner()
 
     private void setupCategorySpinner() {
         categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
             if (categories != null && !categories.isEmpty()) {
-                // Kreiranje adaptera
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(
                         requireContext(),
                         android.R.layout.simple_spinner_item,
@@ -84,7 +74,6 @@ public class CreateTaskFragment extends Fragment {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 binding.spinnerCategory.setAdapter(adapter);
 
-                // DODAVANJE LISTENER-A za odabir kategorije
                 binding.spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -95,22 +84,16 @@ public class CreateTaskFragment extends Fragment {
 
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
-                        // Ne radi ništa
                     }
                 });
 
-                // Podrazumevani odabir prve kategorije
                 selectedCategoryId = categories.get(0).getId();
             } else {
-                // Ako nema kategorija, prikaži poruku i postavi ID na null
-                selectedCategoryId = null; // Ovde MORA da se postavi na null
+                selectedCategoryId = null;
             }
         });
-        // Poziv za učitavanje kategorija OSTAJE OVDE
         categoryViewModel.loadCategories();
     }
-
-    // --- 2. Odabir Datuma i Vremena ---
 
     private void setupDateTimePickers() {
         binding.btnSelectDate.setOnClickListener(v -> showDatePicker(executionCalendar, binding.btnSelectDate));
@@ -144,8 +127,6 @@ public class CreateTaskFragment extends Fragment {
         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
     }
 
-    // --- 3. Logika Ponavljanja ---
-
     private void setupRecurringToggle() {
         binding.cbIsRecurring.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -155,7 +136,6 @@ public class CreateTaskFragment extends Fragment {
             }
         });
 
-        // Postavljanje jedinica ponavljanja
         ArrayAdapter<CharSequence> unitAdapter = ArrayAdapter.createFromResource(
                 requireContext(),
                 R.array.repetition_units,
@@ -164,19 +144,15 @@ public class CreateTaskFragment extends Fragment {
         binding.spinnerRepetitionUnit.setAdapter(unitAdapter);
     }
 
-    // --- 4. Kreiranje Zadataka ---
-
     private void setupCreateButton() {
         binding.btnCreateTask.setOnClickListener(v -> {
             if (!validateInputs()) return;
 
-            // 1. Prikupljanje osnovnih podataka
             String name = binding.etTaskName.getText().toString();
             String description = binding.etTaskDescription.getText().toString();
             String difficulty = getSelectedDifficulty(binding.spinnerDifficulty.getSelectedItem().toString());
             String importance = getSelectedImportance(binding.spinnerImportance.getSelectedItem().toString());
 
-            // 2. Podaci o vremenu i ponavljanju
             long executionTime = executionCalendar.getTimeInMillis();
             boolean isRecurring = binding.cbIsRecurring.isChecked();
             Integer repetitionInterval = null;
@@ -194,20 +170,17 @@ public class CreateTaskFragment extends Fragment {
                 endDate = endCalendar.getTimeInMillis();
             }
 
-            // 3. Poziv ViewModel-a
             appTaskViewModel.createTask(
                             selectedCategoryId, name, difficulty, importance,
                             isRecurring, executionTime, repetitionInterval,
                             repetitionUnit, startDate, endDate, description)
                     .addOnCompleteListener(task -> {
-                        // Proverava da li je fragment još uvek aktivan
                         if (!isAdded() || getContext() == null) {
-                            return; // Fragment je uništen, ne radi ništa
+                            return;
                         }
 
                         if (task.isSuccessful()) {
                             Toast.makeText(requireContext(), "Task created successfully!", Toast.LENGTH_SHORT).show();
-                            // Resetuj formu za kreiranje novog zadatka
                             resetForm();
                         } else {
                             String errorMessage = "Unknown error";
@@ -219,8 +192,6 @@ public class CreateTaskFragment extends Fragment {
                     });
         });
     }
-
-    // --- 5. Validacija i Pomoćne metode ---
 
     private boolean validateInputs() {
         if (binding.etTaskName.getText().toString().trim().isEmpty()) {
@@ -245,9 +216,6 @@ public class CreateTaskFragment extends Fragment {
         return true;
     }
 
-    /**
-     * Konvertuje UI string (srpski) u kod string (engleski)
-     */
     private String convertRepetitionUnit(String uiUnit) {
         if (uiUnit.equals("Day")) {
             return AppTask.UNIT_DAY;
@@ -257,16 +225,10 @@ public class CreateTaskFragment extends Fragment {
         return null;
     }
 
-    /**
-     * Izvlaci Difficulty string iz niza (e.g., "Very Easy (1 XP)" -> "Very Easy")
-     */
     private String getSelectedDifficulty(String uiText) {
         return uiText.split(" \\(")[0];
     }
 
-    /**
-     * Izvlaci Importance string iz niza (e.g., "Normal (1 XP)" -> "Normal")
-     */
     private String getSelectedImportance(String uiText) {
         return uiText.split(" \\(")[0];
     }
@@ -275,54 +237,42 @@ public class CreateTaskFragment extends Fragment {
 
 
     private void setupDifficultyAndImportanceSpinners() {
-        // 1. Difficulty Spinner
         ArrayAdapter<CharSequence> difficultyAdapter = ArrayAdapter.createFromResource(
                 requireContext(),
-                R.array.task_difficulties, // OVO MORA POSTOJATI U res/values/arrays.xml
+                R.array.task_difficulties,
                 android.R.layout.simple_spinner_item);
         difficultyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerDifficulty.setAdapter(difficultyAdapter);
 
-        // 2. Importance Spinner
         ArrayAdapter<CharSequence> importanceAdapter = ArrayAdapter.createFromResource(
                 requireContext(),
-                R.array.task_importance, // OVO MORA POSTOJATI U res/values/arrays.xml
+                R.array.task_importance,
                 android.R.layout.simple_spinner_item);
         importanceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerImportance.setAdapter(importanceAdapter);
     }
 
-    /**
-     * Resetuje formu nakon uspešnog kreiranja zadatka
-     */
     private void resetForm() {
-        // Očisti text polja
         binding.etTaskName.setText("");
         binding.etTaskDescription.setText("");
         binding.etRepetitionInterval.setText("");
 
-        // Resetuj checkbox
         binding.cbIsRecurring.setChecked(false);
         binding.layoutRecurringDetails.setVisibility(View.GONE);
 
-        // Resetuj spinere na default vrednosti
         binding.spinnerDifficulty.setSelection(0);
         binding.spinnerImportance.setSelection(0);
         binding.spinnerRepetitionUnit.setSelection(0);
 
-        // Resetuj kategoriju na prvu (ako postoji)
         binding.spinnerCategory.setSelection(0);
 
-        // Resetuj datume na trenutno vreme
         executionCalendar = Calendar.getInstance();
         startCalendar = (Calendar) executionCalendar.clone();
         endCalendar = Calendar.getInstance();
         endCalendar.add(Calendar.MONTH, 1);
 
-        // Ažuriraj dugmad sa novim vremenima
         updateDateTimeButtons();
 
-        // Očisti greške
         binding.etTaskName.setError(null);
         binding.etRepetitionInterval.setError(null);
     }

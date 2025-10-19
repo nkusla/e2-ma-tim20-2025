@@ -63,16 +63,14 @@ public class UserSearchFragment extends Fragment implements UserAdapter.OnUserCl
     }
 
     private void setupRecyclerView() {
-        userAdapter = new UserAdapter(friendsViewModels, this);  // Start with friends list
+        userAdapter = new UserAdapter(friendsViewModels, this);
         binding.recyclerViewUsers.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerViewUsers.setAdapter(userAdapter);
     }
 
     private void setupToggleButtons() {
-        // Set friends button as selected by default
         binding.buttonFriends.setChecked(true);
 
-        // Handle toggle button changes
         binding.toggleGroup.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
             @Override
             public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
@@ -88,10 +86,8 @@ public class UserSearchFragment extends Fragment implements UserAdapter.OnUserCl
     }
 
     private void setupSearchInput() {
-        // Handle search button click
         binding.buttonDoSearch.setOnClickListener(v -> performSearch());
 
-        // Handle enter key in search field
         binding.editTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -146,7 +142,6 @@ public class UserSearchFragment extends Fragment implements UserAdapter.OnUserCl
             return;
         }
 
-        // Load friends by default
         loadFriends();
     }
 
@@ -156,7 +151,6 @@ public class UserSearchFragment extends Fragment implements UserAdapter.OnUserCl
 
         friendshipService.getFriends(currentUserId)
             .addOnSuccessListener(friends -> {
-                // Create UserViewModels for friends
                 friendsViewModels.clear();
 
                 for (User friend : friends) {
@@ -191,7 +185,6 @@ public class UserSearchFragment extends Fragment implements UserAdapter.OnUserCl
     private void loadAllUsers() {
         friendshipService.getAllUsers()
             .addOnSuccessListener(users -> {
-                // Filter out only the current user and create UserViewModels
                 allUserViewModels.clear();
                 List<UserViewModel> filteredUsers = new ArrayList<>();
 
@@ -201,7 +194,6 @@ public class UserSearchFragment extends Fragment implements UserAdapter.OnUserCl
                         userViewModel.setUser(user);
                         allUserViewModels.add(userViewModel);
 
-                        // Apply search filter if in search mode
                         if (!isShowingFriends && !TextUtils.isEmpty(currentSearchQuery)) {
                             String username = userViewModel.getUsername().toLowerCase();
                             String title = userViewModel.getTitle().toLowerCase();
@@ -253,7 +245,6 @@ public class UserSearchFragment extends Fragment implements UserAdapter.OnUserCl
 
     @Override
     public void onUserClick(User user) {
-        // Navigate to user profile
         if (getActivity() != null) {
             UserProfileFragment profileFragment = UserProfileFragment.newInstance(user.id);
             getActivity().getSupportFragmentManager()

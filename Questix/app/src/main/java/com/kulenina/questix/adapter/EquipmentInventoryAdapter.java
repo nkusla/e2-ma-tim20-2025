@@ -84,17 +84,14 @@ public class EquipmentInventoryAdapter extends RecyclerView.Adapter<EquipmentInv
             textViewEffect.setText(equipment.getEffectDescription());
             textViewType.setText(equipment.getType().name());
 
-            // Set checkbox state without triggering listener
             checkBoxActivate.setOnCheckedChangeListener(null);
             checkBoxActivate.setChecked(equipment.isActive());
 
-            // Disable checkbox if equipment is expired
             if (equipment.isExpired()) {
                 checkBoxActivate.setEnabled(false);
                 checkBoxActivate.setChecked(false);
                 textViewExpired.setVisibility(View.VISIBLE);
                 textViewDuration.setVisibility(View.GONE);
-                // Gray out the entire item
                 itemView.setAlpha(0.5f);
             } else {
                 checkBoxActivate.setEnabled(true);

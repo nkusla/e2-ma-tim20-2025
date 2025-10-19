@@ -90,13 +90,11 @@ public class QRScannerFragment extends Fragment {
                     }
                 } else {
                     viewModel.setStatusMessage("Invalid QR code. Please scan a Questix user QR code.");
-                    // Allow scanning to continue for invalid codes
                 }
             }
 
             @Override
             public void possibleResultPoints(List<ResultPoint> resultPoints) {
-                // Optional: Handle result points for visual feedback
             }
         });
     }
@@ -107,11 +105,10 @@ public class QRScannerFragment extends Fragment {
     }
 
     private void handleQRCodeScanned(String scannedUserId) {
-        isScanning = false; // Stop scanning while processing
+        isScanning = false;
 
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Check if trying to add self
         if (currentUserId.equals(scannedUserId)) {
             viewModel.setStatusMessage("You cannot add yourself as a friend!");
             resumeScanning();
@@ -121,7 +118,6 @@ public class QRScannerFragment extends Fragment {
         viewModel.setIsLoading(true);
         viewModel.setLoadingMessage("Checking user...");
 
-        // First check if user exists
         authService.getUser(scannedUserId)
             .addOnSuccessListener(user -> {
                 if (user == null) {
@@ -131,7 +127,6 @@ public class QRScannerFragment extends Fragment {
                     return;
                 }
 
-                // Check if already friends
                 friendshipService.areFriends(currentUserId, scannedUserId)
                     .addOnSuccessListener(areFriends -> {
                         if (areFriends) {
@@ -139,7 +134,6 @@ public class QRScannerFragment extends Fragment {
                             viewModel.setStatusMessage("You are already friends with " + user.username + "!");
                             resumeScanning();
                         } else {
-                            // Add as friend
                             addFriend(scannedUserId, user.username);
                         }
                     })
@@ -165,7 +159,7 @@ public class QRScannerFragment extends Fragment {
             .addOnSuccessListener(aVoid -> {
                 viewModel.setIsLoading(false);
                 Toast.makeText(getContext(), "Added " + friendUsername + " as friend!", Toast.LENGTH_LONG).show();
-                navigateToProfile(); // Navigate to profile after successful friend addition
+                navigateToProfile();
             })
             .addOnFailureListener(e -> {
                 viewModel.setIsLoading(false);
@@ -175,14 +169,13 @@ public class QRScannerFragment extends Fragment {
     }
 
     private void resumeScanning() {
-        // Resume scanning after a delay
         if (getView() != null) {
             getView().postDelayed(() -> {
                 if (isAdded()) {
                     isScanning = true;
                     viewModel.setStatusMessage(null);
                 }
-            }, 3000); // 3 second delay
+            }, 3000);
         }
     }
 
@@ -204,13 +197,10 @@ public class QRScannerFragment extends Fragment {
 
     private void navigateToProfile() {
         if (getActivity() != null) {
-            // Get current user ID
             String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-            // Create new profile fragment
             UserProfileFragment profileFragment = UserProfileFragment.newInstance(currentUserId);
 
-            // Replace current fragment with profile fragment
             getActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, profileFragment)

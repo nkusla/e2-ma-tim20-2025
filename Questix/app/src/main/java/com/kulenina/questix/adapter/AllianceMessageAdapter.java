@@ -82,7 +82,6 @@ public class AllianceMessageAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         notifyItemInserted(messages.size() - 1);
     }
 
-    // ViewHolder for user's own messages (right side)
     class UserMessageViewHolder extends RecyclerView.ViewHolder {
         private TextView textMessage;
         private TextView textTimestamp;
@@ -99,7 +98,6 @@ public class AllianceMessageAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    // ViewHolder for other users' messages (left side)
     class OtherMessageViewHolder extends RecyclerView.ViewHolder {
         private TextView textUsername;
         private TextView textMessage;

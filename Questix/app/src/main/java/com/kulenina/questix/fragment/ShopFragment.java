@@ -80,11 +80,9 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
         if (currentUser != null && binding != null) {
             binding.textViewCoins.setText(String.valueOf(currentUser.coins));
 
-            // Display boss level instead of user level
             int bossLevel = currentUser.bossLevel != null ? currentUser.bossLevel : 1;
             binding.textViewLevel.setText("Boss Level: " + bossLevel);
 
-            // Update shop adapter with current boss level for dynamic pricing
             shopAdapter.setBossLevel(bossLevel);
         }
     }
@@ -125,7 +123,6 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
             return;
         }
 
-        // Show confirmation dialog
         new androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle("Purchase Equipment")
             .setMessage("Do you want to purchase " + equipment.getName() + " for " + price + " coins?\n\n" +
@@ -157,7 +154,7 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
                 if (success) {
                     Toast.makeText(getContext(), "Successfully purchased " + equipment.getName() + "!",
                         Toast.LENGTH_SHORT).show();
-                    loadUserData(); // Refresh user data to update coins
+                    loadUserData();
                 } else {
                     Toast.makeText(getContext(), "Purchase failed", Toast.LENGTH_SHORT).show();
                 }
@@ -175,7 +172,7 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
     public void onResume() {
         super.onResume();
         if (currentUser != null) {
-            loadUserData(); // Refresh user data when returning to shop
+            loadUserData();
         }
     }
 
