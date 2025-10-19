@@ -14,6 +14,40 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Loading State -->
+            <LinearLayout
+                android:id="@+id/ll_loading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp"
+                android:visibility="visible">
+
+                <ProgressBar
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_marginBottom="16dp"
+                    android:indeterminateTint="@color/primary_text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Loading Boss Battle..."
+                    android:textSize="16sp"
+                    android:textColor="@color/primary_text"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <!-- Main Content (initially hidden) -->
+            <LinearLayout
+                android:id="@+id/ll_main_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
             <!-- Boss Battle Title -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -67,15 +101,24 @@
                     android:background="@drawable/card_background"
                     android:padding="16dp">
 
-                    <!-- Boss Image Placeholder -->
+                    <!-- Boss Animation -->
                     <ImageView
                         android:id="@+id/iv_boss"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
+                        android:layout_width="360dp"
+                        android:layout_height="360dp"
                         android:layout_centerInParent="true"
-                        android:src="@drawable/ic_boss"
-                        android:tint="@color/primary_text"
+                        android:src="@drawable/boss_idle"
                         android:scaleType="centerInside" />
+
+                    <!-- Hit Animation Overlay -->
+                    <ImageView
+                        android:id="@+id/iv_hit_animation"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:scaleType="center"
+                        android:visibility="gone"
+                        android:alpha="0.8" />
 
                 </RelativeLayout>
 
@@ -341,6 +384,8 @@
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
+
+            </LinearLayout> <!-- End of ll_main_content -->
 
         </LinearLayout>
 

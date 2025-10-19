@@ -57,6 +57,9 @@ dependencies {
     // HTTP client for FCM notifications
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+    // Glide for image loading and GIF animation
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
