@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.kulenina.questix.R;
 import com.kulenina.questix.adapter.ShopAdapter;
 import com.kulenina.questix.databinding.FragmentShopBinding;
+import com.kulenina.questix.model.BossBattle;
 import com.kulenina.questix.model.Equipment;
 import com.kulenina.questix.model.User;
 import com.kulenina.questix.service.EquipmentService;
@@ -78,7 +79,13 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
     private void updateUserInfo() {
         if (currentUser != null && binding != null) {
             binding.textViewCoins.setText(String.valueOf(currentUser.coins));
-            binding.textViewLevel.setText("Level: " + currentUser.level);
+
+            // Display boss level instead of user level
+            int bossLevel = currentUser.bossLevel != null ? currentUser.bossLevel : 1;
+            binding.textViewLevel.setText("Boss Level: " + bossLevel);
+
+            // Update shop adapter with current boss level for dynamic pricing
+            shopAdapter.setBossLevel(bossLevel);
         }
     }
 
@@ -110,7 +117,7 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
             return;
         }
 
-        int basePrice = 100; // Mock base price
+        int basePrice = BossBattle.calculateCoinsReward(currentUser.bossLevel);
         int price = equipment.getPrice(basePrice);
         if (currentUser.coins < price) {
             Toast.makeText(getContext(), "Insufficient coins! You need " + price + " coins.",

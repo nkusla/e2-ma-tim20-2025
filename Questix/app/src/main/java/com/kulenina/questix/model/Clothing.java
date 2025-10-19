@@ -48,7 +48,7 @@ public class Clothing extends Equipment {
 
     @Override
     public int getPrice(int baseBossReward) {
-        return (baseBossReward * clothingType.getPricePercentage()) / 100;
+        return Math.round((baseBossReward * clothingType.getPricePercentage()) / 100.0f);
     }
 
     @Override

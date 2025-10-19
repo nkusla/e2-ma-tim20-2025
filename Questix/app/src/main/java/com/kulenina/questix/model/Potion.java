@@ -54,7 +54,7 @@ public class Potion extends Equipment {
 
     @Override
     public int getPrice(int baseBossReward) {
-        return (baseBossReward * potionType.getPricePercentage()) / 100;
+        return Math.round((baseBossReward * potionType.getPricePercentage()) / 100.0f);
     }
 
     @Override

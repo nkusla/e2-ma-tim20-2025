@@ -169,11 +169,11 @@ public class BossBattleService {
 
                 Task<Void> updateUserTask = userRepository.update(user);
 
-                // Create equipment if dropped
+                // Register equipment drop if any
                 if (battleResult.equipmentDropped != null) {
-                    // In a full implementation, you'd save the equipment to the repository
-                    // For now, we'll just return the update task
-                    return updateUserTask.continueWith(updateTask -> true);
+                    return updateUserTask.continueWithTask(updateTask ->
+                        equipmentService.registerEquipmentDrop(battleResult.equipmentDropped)
+                    );
                 } else {
                     return updateUserTask.continueWith(updateTask -> true);
                 }

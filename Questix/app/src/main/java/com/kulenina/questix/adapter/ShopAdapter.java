@@ -12,13 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kulenina.questix.R;
 import com.kulenina.questix.model.Equipment;
+import com.kulenina.questix.model.BossBattle;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder> {
     private List<Equipment> shopItems = new ArrayList<>();
-    private int basePrice = 100; // Mock base price for calculations
+    private int bossLevel = 1; // Default boss level
     private OnShopItemClickListener listener;
 
     public interface OnShopItemClickListener {
@@ -34,6 +35,11 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
         notifyDataSetChanged();
     }
 
+    public void setBossLevel(int bossLevel) {
+        this.bossLevel = bossLevel;
+        notifyDataSetChanged(); // Refresh prices when boss level changes
+    }
+
     @NonNull
     @Override
     public ShopViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -45,7 +51,8 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
     @Override
     public void onBindViewHolder(@NonNull ShopViewHolder holder, int position) {
         Equipment equipment = shopItems.get(position);
-        holder.bind(equipment, basePrice);
+        int basePriceFromBossLevel = BossBattle.calculateCoinsReward(bossLevel);
+        holder.bind(equipment, basePriceFromBossLevel);
     }
 
     @Override

@@ -73,7 +73,7 @@ public class EquipmentDisplayAdapter extends RecyclerView.Adapter<EquipmentDispl
                     textViewType.setBackgroundColor(itemView.getContext().getColor(android.R.color.holo_green_light));
                     break;
                 case WEAPON:
-                    imageViewIcon.setImageResource(R.drawable.ic_lightning);
+                    imageViewIcon.setImageResource(R.drawable.ic_weapon);
                     textViewType.setBackgroundColor(itemView.getContext().getColor(android.R.color.holo_orange_light));
                     break;
             }

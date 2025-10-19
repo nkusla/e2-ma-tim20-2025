@@ -11,7 +11,7 @@ public class BossBattle implements IIdentifiable, Serializable {
     public int attacksRemaining;
     public boolean isDefeated;
     public int coinsReward;
-    public double equipmentDropChance = 1.0;
+    public double equipmentDropChance = 0.2;
     public double successRate;
 
     public BossBattle() {

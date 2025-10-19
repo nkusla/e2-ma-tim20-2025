@@ -64,16 +64,17 @@ public class EquipmentService {
             }
 
             Equipment equipment = null;
-            int price = 100;
+            int bossRewardPrice = BossBattle.calculateCoinsReward(user.bossLevel);
+            int price = 0;
 
             if (equipmentType == Equipment.EquipmentType.POTION) {
                 Potion.PotionType potionType = Potion.PotionType.valueOf(itemType);
                 equipment = new Potion(userId, potionType);
-                price = equipment.getPrice(price);
+                price = equipment.getPrice(bossRewardPrice);
             } else if (equipmentType == Equipment.EquipmentType.CLOTHING) {
                 Clothing.ClothingType clothingType = Clothing.ClothingType.valueOf(itemType);
                 equipment = new Clothing(userId, clothingType);
-                price = equipment.getPrice(price);
+                price = equipment.getPrice(bossRewardPrice);
 
                 Clothing existingClothing = null;
                 for (Equipment eq : userEquipment) {
@@ -202,8 +203,8 @@ public class EquipmentService {
             }
 
             Weapon weapon = (Weapon) equipment;
-            int basePrice = 100; // Mock base price
-            int upgradePrice = weapon.getUpgradePrice(basePrice);
+            int basePrice = BossBattle.calculateCoinsReward(user.bossLevel);
+            int upgradePrice = Weapon.getUpgradePrice(basePrice);
 
             if (user.coins < upgradePrice) {
                 throw new RuntimeException("Insufficient coins");
@@ -217,5 +218,66 @@ public class EquipmentService {
                 userRepository.update(user)
             ).continueWith(updateTask -> true);
         });
+    }
+
+    // Register equipment drop from boss battles, handling combining with existing equipment
+    public Task<Boolean> registerEquipmentDrop(Equipment droppedEquipment) {
+        String userId = getCurrentUserId();
+        if (userId == null) {
+            return Tasks.forException(new RuntimeException("User not authenticated"));
+        }
+
+        if (droppedEquipment == null) {
+            return Tasks.forResult(true); // No equipment dropped
+        }
+
+        return getUserEquipment(userId)
+            .continueWithTask(task -> {
+                List<Equipment> userEquipment = task.getResult();
+
+                // Check for existing equipment of the same type
+                Equipment existingEquipment = null;
+
+                if (droppedEquipment instanceof Clothing) {
+                    Clothing droppedClothing = (Clothing) droppedEquipment;
+                    for (Equipment eq : userEquipment) {
+                        if (eq instanceof Clothing) {
+                            Clothing clothing = (Clothing) eq;
+                            if (clothing.getClothingType() == droppedClothing.getClothingType() && !clothing.isExpired) {
+                                existingEquipment = clothing;
+                                break;
+                            }
+                        }
+                    }
+                } else if (droppedEquipment instanceof Weapon) {
+                    Weapon droppedWeapon = (Weapon) droppedEquipment;
+                    for (Equipment eq : userEquipment) {
+                        if (eq instanceof Weapon) {
+                            Weapon weapon = (Weapon) eq;
+                            if (weapon.getWeaponType() == droppedWeapon.getWeaponType()) {
+                                existingEquipment = weapon;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // If existing equipment found, combine with it
+                if (existingEquipment != null) {
+                    if (existingEquipment instanceof Clothing && droppedEquipment instanceof Clothing) {
+                        ((Clothing) existingEquipment).combineWith((Clothing) droppedEquipment);
+                    } else if (existingEquipment instanceof Weapon && droppedEquipment instanceof Weapon) {
+                        ((Weapon) existingEquipment).combineWith((Weapon) droppedEquipment);
+                    }
+
+                    // Update the existing equipment
+                    return equipmentRepository.update(existingEquipment)
+                        .continueWith(updateTask -> true);
+                } else {
+                    // Create new equipment
+                    return equipmentRepository.create(droppedEquipment)
+                        .continueWith(createTask -> true);
+                }
+            });
     }
 }
