@@ -79,6 +79,11 @@ public class UserViewModel extends BaseObservable {
     }
 
     @Bindable
+    public String getBadgesCount() {
+        return user != null && user.badgesCount != null ? user.badgesCount.toString() : "0";
+    }
+
+    @Bindable
     public String getAvatar() {
         return user != null && user.avatar != null ? user.avatar : "avatar_1";
     }
@@ -143,6 +148,7 @@ public class UserViewModel extends BaseObservable {
         notifyPropertyChanged(com.kulenina.questix.BR.xp);
         notifyPropertyChanged(com.kulenina.questix.BR.coins);
         notifyPropertyChanged(com.kulenina.questix.BR.powerPoints);
+        notifyPropertyChanged(com.kulenina.questix.BR.badgesCount);
         notifyPropertyChanged(com.kulenina.questix.BR.avatar);
         notifyPropertyChanged(com.kulenina.questix.BR.title);
         notifyPropertyChanged(com.kulenina.questix.BR.userId);

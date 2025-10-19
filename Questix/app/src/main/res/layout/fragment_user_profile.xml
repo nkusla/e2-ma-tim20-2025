@@ -206,6 +206,44 @@
 
 						</LinearLayout>
 
+						<!-- Badge Display -->
+						<LinearLayout
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:orientation="horizontal"
+							android:gravity="center_vertical"
+							android:layout_marginTop="8dp"
+							android:background="@drawable/level_badge_background"
+							android:padding="8dp">
+
+							<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="★"
+								android:textSize="16sp"
+								android:textColor="@android:color/white"
+								android:layout_marginEnd="6dp" />
+
+							<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Badges:"
+								android:textSize="14sp"
+								android:textStyle="bold"
+								android:textColor="@android:color/white"
+								android:layout_marginEnd="6dp" />
+
+							<TextView
+								android:id="@+id/textViewBadges"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="@{viewModel.badgesCount}"
+								android:textSize="16sp"
+								android:textStyle="bold"
+								android:textColor="@android:color/white" />
+
+						</LinearLayout>
+
 						<!-- XP Progression Bar (only shown for own profile) -->
 						<LinearLayout
 							android:layout_width="match_parent"

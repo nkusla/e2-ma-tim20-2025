@@ -134,9 +134,16 @@ public class AllianceMissionFragment extends Fragment {
                     System.out.println("DEBUG: createMissingMissionProgress completed, success: " + fixTask.isSuccessful());
                     if (fixTask.getException() != null) {
                         System.out.println("DEBUG: createMissingMissionProgress error: " + fixTask.getException().getMessage());
+                        fixTask.getException().printStackTrace();
                     }
                     
                     // Now load the progress
+                    loadMembersProgressAfterFix();
+                })
+                .addOnFailureListener(e -> {
+                    System.out.println("DEBUG: createMissingMissionProgress failed: " + e.getMessage());
+                    e.printStackTrace();
+                    // Still try to load progress even if fixing failed
                     loadMembersProgressAfterFix();
                 });
     }
@@ -179,7 +186,7 @@ public class AllianceMissionFragment extends Fragment {
 
     private void loadUserProgress() {
         String progressId = allianceId + "_" + currentUserId;
-        Toast.makeText(getContext(), "Loading progress for ID: " + progressId, Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "Loading progress for ID: " + progressId, Toast.LENGTH_SHORT).show(); // Changed to SHORT to prevent hanging
         
         missionService.getUserProgress(allianceId, currentUserId)
                 .addOnSuccessListener(progress -> {
@@ -188,8 +195,24 @@ public class AllianceMissionFragment extends Fragment {
                 })
                 .addOnFailureListener(e -> {
                     String errorMsg = "Error loading progress: " + e.getMessage();
-                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
-                    binding.textViewMemberContributions.setText("Error: " + e.getMessage());
+                    System.out.println("DEBUG: loadUserProgress failed: " + errorMsg);
+                    e.printStackTrace();
+                    
+                    // Check if it's a network error
+                    if (e.getMessage() != null && (e.getMessage().contains("Broken pipe") || 
+                        e.getMessage().contains("Connection") || e.getMessage().contains("Network") ||
+                        e.getMessage().contains("SSL") || e.getMessage().contains("I/O"))) {
+                        System.out.println("DEBUG: Network error detected in loadUserProgress");
+                        Toast.makeText(getContext(), "Network error - please check your connection", Toast.LENGTH_SHORT).show();
+                        binding.textViewMemberContributions.setText("Network error - please try again");
+                    } else {
+                        Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
+                        binding.textViewMemberContributions.setText("Error: " + e.getMessage());
+                    }
+                })
+                .addOnCompleteListener(task -> {
+                    // Always hide loading indicator or perform cleanup
+                    System.out.println("DEBUG: loadUserProgress completed, success: " + task.isSuccessful());
                 });
     }
 

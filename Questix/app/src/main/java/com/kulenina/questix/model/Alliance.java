@@ -9,7 +9,7 @@ public class Alliance implements IIdentifiable, Serializable {
     public String name;
     public String leaderId; // Creator's user ID
     public List<String> memberIds; // All member user IDs (including leader)
-    public boolean isMissionActive; // Whether a mission is currently running
+    public boolean isMissionActive = false; // Whether a mission is currently running
 
     public int bossCurrentHp = 0;
     public int bossMaxHp = 0;

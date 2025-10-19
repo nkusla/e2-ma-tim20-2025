@@ -90,11 +90,12 @@ public class Potion extends Equipment {
         this.isExpired = true;
     }
     public void combineWith(Potion other) {
-
         if (this.isPermanent && other.isPermanent()) {
             this.effectValue += other.getEffectValue();
         } else {
-
-    }}
+            // For non-permanent potions, just add the effect value
+            this.effectValue += other.getEffectValue();
+        }
+    }
 }
 
