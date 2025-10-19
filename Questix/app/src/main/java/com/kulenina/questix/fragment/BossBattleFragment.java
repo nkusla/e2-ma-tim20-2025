@@ -4,6 +4,8 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,6 +28,7 @@ import com.kulenina.questix.dialog.BattleResultDialog;
 import com.kulenina.questix.model.*;
 import com.kulenina.questix.service.*;
 import com.kulenina.questix.repository.UserRepository;
+import com.kulenina.questix.util.ShakeDetector;
 
 import java.util.List;
 import java.util.Locale;
@@ -42,6 +45,11 @@ public class BossBattleFragment extends Fragment {
     private User currentUser;
     private List<Equipment> activeEquipment;
 
+    // Shake detection
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private ShakeDetector shakeDetector;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,6 +63,7 @@ public class BossBattleFragment extends Fragment {
 
         initializeServices();
         setupClickListeners();
+        setupShakeDetection();
         loadBattleData();
     }
 
@@ -69,6 +78,22 @@ public class BossBattleFragment extends Fragment {
     private void setupClickListeners() {
         binding.btnAttack.setOnClickListener(v -> performAttack());
         binding.btnViewEquipment.setOnClickListener(v -> showActiveEquipmentDialog());
+    }
+
+    private void setupShakeDetection() {
+        sensorManager = (SensorManager) getActivity().getSystemService(getActivity().SENSOR_SERVICE);
+        if (sensorManager != null) {
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            shakeDetector = new ShakeDetector();
+            shakeDetector.setOnShakeListener(count -> {
+                // Trigger attack on shake
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        performAttack();
+                    });
+                }
+            });
+        }
     }
 
     private void showLoading() {
@@ -309,8 +334,30 @@ public class BossBattleFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        // Register shake detector
+        if (sensorManager != null && accelerometer != null && shakeDetector != null) {
+            sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Unregister shake detector to save battery
+        if (sensorManager != null && shakeDetector != null) {
+            sensorManager.unregisterListener(shakeDetector);
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Clean up sensor resources
+        if (sensorManager != null && shakeDetector != null) {
+            sensorManager.unregisterListener(shakeDetector);
+        }
         binding = null;
     }
 }
