@@ -17,6 +17,8 @@ public class BossBattleService {
     private final FirebaseAuth auth;
     private final Random random;
 
+    private final AllianceMissionService allianceMissionService;
+
     public BossBattleService() {
         this.userRepository = new UserRepository();
         this.bossBattleRepository = new BossBattleRepository();
@@ -24,6 +26,7 @@ public class BossBattleService {
         this.levelProgressionService = new LevelProgressionService();
         this.auth = FirebaseAuth.getInstance();
         this.random = new Random();
+        this.allianceMissionService = new AllianceMissionService();
     }
 
     private String getCurrentUserId() {
@@ -123,6 +126,10 @@ public class BossBattleService {
                         result.attacksRemaining = bossBattle.getAttacksRemaining();
                         result.battleFinished = bossBattle.isBattleFinished();
                         result.bossDefeated = bossBattle.isDefeated();
+                        if (attackHit && user.isInAlliance()) {
+                            allianceMissionService.updateMissionProgress(
+                                    user.currentAllianceId, userId, "SUCCESSFUL_HIT");
+                        }
 
                         if (bossBattle.isDefeated()) {
                             result.coinsReward = bossBattle.getCoinsReward();

@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 		transaction.commit();
 	}
 
-	private void replaceFragmentWithBackStack(Fragment fragment) {
+	public void replaceFragmentWithBackStack(Fragment fragment) {
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 		transaction.replace(R.id.fragment_container, fragment);

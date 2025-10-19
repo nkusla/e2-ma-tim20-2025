@@ -16,6 +16,7 @@ public class EquipmentService {
     private final UserRepository userRepository;
     private final FirebaseAuth auth;
 
+
     public EquipmentService() {
         this.equipmentRepository = new EquipmentRepository();
         this.userRepository = new UserRepository();

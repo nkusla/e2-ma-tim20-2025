@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth; // Dodao sam ga ovde jer ga Catego
 import com.kulenina.questix.model.Category;
 import com.kulenina.questix.model.AppTask;
 import com.kulenina.questix.model.QuotaState;
+import com.kulenina.questix.model.User;
 import com.kulenina.questix.repository.CategoryRepository;
 import com.kulenina.questix.repository.AppTaskRepository;
 import com.kulenina.questix.repository.UserRepository;
@@ -49,6 +50,7 @@ public class AppTaskService {
 
     // Ograničenje: Koliko dana unazad se može rešiti zadatak
     private static final long MAX_RESOLUTION_TIME_MILLIS = TimeUnit.DAYS.toMillis(3);
+    private final AllianceMissionService missionService;
 
     public AppTaskService() {
         this.taskRepository = new AppTaskRepository();
@@ -58,6 +60,7 @@ public class AppTaskService {
         this.auth = FirebaseAuth.getInstance(); // Inicijalizacija
         this.quotaRepository = new QuotaStateRepository(); // NOVO
         this.taskGeneratorService = new TaskGeneratorService(); // NOVO
+        this.missionService = new AllianceMissionService();
     }
 
     private String getCurrentUserId() {
@@ -326,7 +329,20 @@ public class AppTaskService {
 
                     // Dodeljivanje XP-a
                     if (newStatus.equals(AppTask.STATUS_DONE)) {
-                        return handleXpAward(appTask).continueWithTask(xpTask -> updateTask);
+                        return handleXpAward(appTask).continueWithTask(xpTask -> {
+                            // --- POZIV ZA SPECIJALNU MISIJU ---
+                            return userRepository.read(appTask.userId).continueWithTask(userTask -> {
+                                User user = userTask.getResult();
+                                if (user != null && user.isInAlliance()) {
+                                    String actionType = getMissionTaskActionType(appTask.difficulty, appTask.importance);
+                                    if (actionType != null) {
+                                        return missionService.updateMissionProgress(user.currentAllianceId, appTask.userId, actionType);
+                                    }
+                                }
+                                return Tasks.forResult(null);
+                            }).continueWithTask(missionTask -> updateTask);
+                            // ---------------------------------
+                        });
                     }
 
                     return updateTask;
@@ -425,6 +441,7 @@ public class AppTaskService {
                     for (AppTask t : missedTasks) {
                         t.setStatus(AppTask.STATUS_MISSED);
                         updateTasks.add(taskRepository.update(t));
+                        updateTasks.add(missionService.setMissedTaskFlag(userId));
                     }
 
                     return Tasks.whenAll(updateTasks);
@@ -517,6 +534,33 @@ public class AppTaskService {
         instance.totalXpValue = originalTask.totalXpValue;
 
         return instance;
+    }
+
+    private String getMissionTaskActionType(String difficulty, String importance) {
+        // Rešavanje veoma lakog, lakog, normalnog ili važnog zadatka (max 10) - 1 HP
+        if ((difficulty.equals("Very Easy") || difficulty.equals("Easy")) &&
+                (importance.equals("Normal") || importance.equals("Important"))) {
+
+            // Specijalni slučaj: ako je Lak I Normalan, računa se 2 puta
+            if (difficulty.equals("Easy") && importance.equals("Normal")) {
+                return "LIGHT_TASK_DOUBLE";
+            }
+            return "LIGHT_TASK";
+        }
+
+        // Rešavanje ostalih zadataka (max 6) - 4 HP
+        if (difficulty.equals("Hard") || difficulty.equals("Extremely Hard") ||
+                importance.equals("Extremely Important") || importance.equals("Special")) {
+            // Paziti: Lak + Važan se kvotira, ali nije "Ostali" zadatak.
+            // Pretpostavljamo da "Ostali" obuhvata Težak, Ekstremno Težak, Ekstremno Važan i Specijalan.
+
+            // Laki zadaci su već obrađeni iznad. Fokusiramo se na T/ET/EV/S.
+            if (difficulty.equals("Hard") || difficulty.equals("Extremely Hard") ||
+                    importance.equals("Extremely Important") || importance.equals("Special")) {
+                return "HEAVY_TASK";
+            }
+        }
+        return null; // Zadatak ne doprinosi misiji
     }
 
 }
