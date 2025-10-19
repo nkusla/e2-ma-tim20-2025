@@ -147,6 +147,12 @@ public class AppTaskService {
 
                     newTask.totalXpValue = totalXp;
 
+                    // Check if task execution time is more than 3 days in the past
+                    long threeDaysAgo = System.currentTimeMillis() - MAX_RESOLUTION_TIME_MILLIS;
+                    if (executionTime < threeDaysAgo) {
+                        newTask.setStatus(AppTask.STATUS_UNDONE);
+                    }
+
                     return taskRepository.createWithId(newTask)
                             .continueWith(createTask -> newTask.getId());
                 });
@@ -169,6 +175,15 @@ public class AppTaskService {
                     List<AppTask> finalTaskList = new ArrayList<>();
 
                     for (AppTask t : userTasks) {
+                        // Check if task is older than 3 days past execution time and still active - mark as undone
+                        long now = System.currentTimeMillis();
+                        long threeDaysAfterExecution = t.executionTime + MAX_RESOLUTION_TIME_MILLIS;
+                        if (t.isActive() && now > threeDaysAfterExecution) {
+                            t.setStatus(AppTask.STATUS_UNDONE);
+                            // Update the task in database
+                            taskRepository.update(t);
+                        }
+                        
                         if (t.isRecurring) {
                             // Generišemo sve instance u traženom opsegu
                             finalTaskList.addAll(taskGeneratorService.generateRecurringInstances(t, fromTime, toTime));
@@ -201,21 +216,48 @@ public class AppTaskService {
                             .collect(Collectors.toList());
 
                     for (AppTask t : userTasks) {
+                        // Check if task is older than 3 days past execution time and still active - mark as undone
+                        long threeDaysAfterExecution = t.executionTime + MAX_RESOLUTION_TIME_MILLIS;
+                        if (t.isActive() && now > threeDaysAfterExecution) {
+                            t.setStatus(AppTask.STATUS_UNDONE);
+                            // Update the task in database
+                            taskRepository.update(t);
+                        }
+                        
                         if (t.isRecurring) {
-                            // Generišemo samo BUDUĆE instance
-                            finalTaskList.addAll(taskGeneratorService.generateRecurringInstances(t, now, toTime));
+                            // Generišemo instance (including past ones that might be undone)
+                            finalTaskList.addAll(taskGeneratorService.generateRecurringInstances(t, now - TimeUnit.DAYS.toMillis(30), toTime));
                         } else {
-                            // Jednokratni zadaci: Samo trenutni i budući
-                            if (t.executionTime >= now) {
+                            // Jednokratni zadaci: Dodajemo aktivne i pauzirane zadatke
+                            if (t.isActive() || t.isPaused()) {
                                 finalTaskList.add(t);
                             }
                         }
                     }
 
-                    // 2. Filtriramo one koji su već završeni (done, canceled, missed)
-                    // (Iako bi generator trebao generisati samo aktivne, ovo je sigurnosna provera)
+                    // 2. Show active, paused, and canceled tasks (canceled only if execution time hasn't passed)
                     return finalTaskList.stream()
-                            .filter(AppTask::isActive)
+                            .filter(appTask -> {
+                                System.out.println("DEBUG: Filtering task - ID: " + appTask.id + ", Status: " + appTask.status + ", ExecutionTime: " + appTask.executionTime);
+                                
+                                // Always show active and paused tasks
+                                if (appTask.isActive() || appTask.isPaused()) {
+                                    System.out.println("DEBUG: Task is active or paused - SHOWING");
+                                    return true;
+                                }
+                                
+                                // Show canceled tasks only if execution time hasn't passed yet
+                                if (appTask.status.equals(AppTask.STATUS_CANCELED)) {
+                                    long currentTime = System.currentTimeMillis();
+                                    boolean shouldShow = appTask.executionTime >= currentTime;
+                                    System.out.println("DEBUG: Canceled task - CurrentTime: " + currentTime + ", ShouldShow: " + shouldShow);
+                                    return shouldShow;
+                                }
+                                
+                                // Don't show other statuses (done, missed, undone)
+                                System.out.println("DEBUG: Task has other status - HIDING");
+                                return false;
+                            })
                             .collect(Collectors.toList());
                 });
     }
@@ -225,7 +267,17 @@ public class AppTaskService {
     public Task<Void> deleteTask(String taskId) {
         String userId = getCurrentUserId();
 
-        return taskRepository.read(taskId)
+        // Check if this is a recurring task instance (has timestamp suffix)
+        final String originalTaskId;
+        if (taskId.contains("_") && taskId.length() > 20) {
+            // This is likely a generated instance ID, extract the original task ID
+            int lastUnderscoreIndex = taskId.lastIndexOf("_");
+            originalTaskId = taskId.substring(0, lastUnderscoreIndex);
+        } else {
+            originalTaskId = taskId;
+        }
+
+        return taskRepository.read(originalTaskId)
                 .continueWithTask(task -> {
                     AppTask appTask = task.getResult();
 
@@ -237,8 +289,48 @@ public class AppTaskService {
                         throw new RuntimeException("Cannot delete a finished task (done, missed, or canceled).");
                     }
 
-                    // Brisanje kompletne instance (što se tretira kao brisanje svih ponavljanja)
-                    return taskRepository.delete(taskId);
+                    if (appTask.isUndone()) {
+                        throw new RuntimeException("Cannot delete an undone task.");
+                    }
+
+                    // Check if task is more than 3 days past execution time
+                    long now = System.currentTimeMillis();
+                    
+                    // For recurring tasks, check the specific instance execution time
+                    // For non-recurring tasks, check the task's execution time
+                    long executionTimeToCheck;
+                    if (appTask.isRecurring && taskId.contains("_") && taskId.length() > 20) {
+                        // This is a recurring task instance, extract the execution time from the ID
+                        try {
+                            String[] parts = taskId.split("_");
+                            if (parts.length == 2) {
+                                executionTimeToCheck = Long.parseLong(parts[1]);
+                            } else {
+                                executionTimeToCheck = appTask.executionTime;
+                            }
+                        } catch (NumberFormatException e) {
+                            executionTimeToCheck = appTask.executionTime;
+                        }
+                    } else {
+                        // Non-recurring task or original recurring task
+                        executionTimeToCheck = appTask.executionTime;
+                    }
+                    
+                    long threeDaysAfterExecution = executionTimeToCheck + MAX_RESOLUTION_TIME_MILLIS;
+                    if (now > threeDaysAfterExecution) {
+                        throw new RuntimeException("Cannot delete tasks that are more than 3 days past their execution time.");
+                    }
+
+                    // Handle recurring tasks differently to preserve completed instances
+                    if (appTask.isRecurring) {
+                        // For recurring tasks, mark as canceled instead of deleting
+                        // This stops future instance generation but preserves completed instances
+                        appTask.setStatus(AppTask.STATUS_CANCELED);
+                        return taskRepository.update(appTask);
+                    } else {
+                        // For non-recurring tasks, delete the specific task
+                        return taskRepository.delete(originalTaskId);
+                    }
                 });
     }
 
@@ -246,25 +338,85 @@ public class AppTaskService {
             String taskId, String name, String description, long executionTime,
             String difficulty, String importance) {
 
-        String userId = getCurrentUserId();
+        System.out.println("DEBUG: AppTaskService.updateTask() started");
+        System.out.println("DEBUG: taskId: " + taskId);
+        System.out.println("DEBUG: name: " + name);
+        System.out.println("DEBUG: difficulty: " + difficulty);
+        System.out.println("DEBUG: importance: " + importance);
 
-        return taskRepository.read(taskId)
+        String userId = getCurrentUserId();
+        System.out.println("DEBUG: userId: " + userId);
+
+        // Check if this is a recurring task instance (has timestamp suffix)
+        final String originalTaskId;
+        if (taskId.contains("_") && taskId.length() > 20) {
+            // This is likely a generated instance ID, extract the original task ID
+            int lastUnderscoreIndex = taskId.lastIndexOf("_");
+            originalTaskId = taskId.substring(0, lastUnderscoreIndex);
+        } else {
+            originalTaskId = taskId;
+        }
+
+        System.out.println("DEBUG: originalTaskId: " + originalTaskId);
+
+        return taskRepository.read(originalTaskId)
                 .continueWithTask(task -> {
+                    System.out.println("DEBUG: Task read completed, success: " + task.isSuccessful());
                     AppTask appTask = task.getResult();
 
                     if (appTask == null || !userId.equals(appTask.getUserId())) {
+                        System.out.println("DEBUG: Task not found or permission denied");
                         throw new RuntimeException("Task not found or permission denied.");
                     }
 
                     if (appTask.isFinished()) {
+                        System.out.println("DEBUG: Task is finished");
                         throw new RuntimeException("Cannot modify a finished task (done, missed, or canceled).");
                     }
 
-                    // Izmena ponavljajućeg zadatka: Ako je executionTime u prošlosti, smatramo da korisnik menja buduća ponavljanja
+                    if (appTask.isUndone()) {
+                        System.out.println("DEBUG: Task is undone");
+                        throw new RuntimeException("Cannot modify an undone task.");
+                    }
 
+                    // Check if task is more than 3 days past execution time
+                    long now = System.currentTimeMillis();
+                    
+                    // For recurring tasks, check the specific instance execution time
+                    // For non-recurring tasks, check the task's execution time
+                    long executionTimeToCheck;
+                    if (appTask.isRecurring && taskId.contains("_") && taskId.length() > 20) {
+                        // This is a recurring task instance, extract the execution time from the ID
+                        try {
+                            String[] parts = taskId.split("_");
+                            if (parts.length == 2) {
+                                executionTimeToCheck = Long.parseLong(parts[1]);
+                            } else {
+                                executionTimeToCheck = appTask.executionTime;
+                            }
+                        } catch (NumberFormatException e) {
+                            executionTimeToCheck = appTask.executionTime;
+                        }
+                    } else {
+                        // Non-recurring task or original recurring task
+                        executionTimeToCheck = appTask.executionTime;
+                    }
+                    
+                    long threeDaysAfterExecution = executionTimeToCheck + MAX_RESOLUTION_TIME_MILLIS;
+                    if (now > threeDaysAfterExecution) {
+                        System.out.println("DEBUG: Task instance is too old (execution time: " + executionTimeToCheck + ")");
+                        throw new RuntimeException("Cannot modify tasks that are more than 3 days past their execution time.");
+                    }
+
+                    System.out.println("DEBUG: All validations passed, calculating XP");
+
+                    // For recurring tasks, updating any instance updates the entire recurring task
+                    // This means all future instances will have the new properties
                     int difficultyXp = getDifficultyXp(difficulty);
                     int importanceXp = getImportanceXp(importance);
                     int totalXp = difficultyXp + importanceXp;
+
+                    System.out.println("DEBUG: XP calculated - difficulty: " + difficultyXp + ", importance: " + importanceXp + ", total: " + totalXp);
 
                     appTask.name = name;
                     appTask.description = description;
@@ -277,6 +429,7 @@ public class AppTaskService {
                     appTask.totalXpValue = totalXp;
                     appTask.updatedAt = System.currentTimeMillis();
 
+                    System.out.println("DEBUG: Task updated, calling repository.update()");
                     return taskRepository.update(appTask);
                 });
     }
@@ -286,7 +439,17 @@ public class AppTaskService {
     public Task<Void> resolveTask(String taskId, String newStatus) {
         String userId = getCurrentUserId();
 
-        return taskRepository.read(taskId)
+        // Check if this is a recurring task instance (has timestamp suffix)
+        final String originalTaskId;
+        if (taskId.contains("_") && taskId.length() > 20) {
+            // This is likely a generated instance ID, extract the original task ID
+            int lastUnderscoreIndex = taskId.lastIndexOf("_");
+            originalTaskId = taskId.substring(0, lastUnderscoreIndex);
+        } else {
+            originalTaskId = taskId;
+        }
+
+        return taskRepository.read(originalTaskId)
                 .continueWithTask(task -> {
                     AppTask appTask = task.getResult();
 
@@ -298,6 +461,39 @@ public class AppTaskService {
                     // Provera 2: Samo aktivan zadatak može se rešiti/pauzirati
                     if (!appTask.isActive()) {
                         throw new RuntimeException("Only active tasks can be resolved/paused.");
+                    }
+
+                    // Provera 2.5: Undone zadaci se ne mogu menjati
+                    if (appTask.isUndone()) {
+                        throw new RuntimeException("Cannot modify an undone task.");
+                    }
+
+                    // Provera 2.6: Tasks that are more than 3 days past execution time cannot be modified
+                    long now = System.currentTimeMillis();
+                    
+                    // For recurring tasks, check the specific instance execution time
+                    // For non-recurring tasks, check the task's execution time
+                    long executionTimeToCheck;
+                    if (appTask.isRecurring && taskId.contains("_") && taskId.length() > 20) {
+                        // This is a recurring task instance, extract the execution time from the ID
+                        try {
+                            String[] parts = taskId.split("_");
+                            if (parts.length == 2) {
+                                executionTimeToCheck = Long.parseLong(parts[1]);
+                            } else {
+                                executionTimeToCheck = appTask.executionTime;
+                            }
+                        } catch (NumberFormatException e) {
+                            executionTimeToCheck = appTask.executionTime;
+                        }
+                    } else {
+                        // Non-recurring task or original recurring task
+                        executionTimeToCheck = appTask.executionTime;
+                    }
+                    
+                    long threeDaysAfterExecution = executionTimeToCheck + MAX_RESOLUTION_TIME_MILLIS;
+                    if (now > threeDaysAfterExecution) {
+                        throw new RuntimeException("Cannot modify tasks that are more than 3 days past their execution time.");
                     }
 
                     // Provera 3: Pauziranje
@@ -314,11 +510,11 @@ public class AppTaskService {
                     if (newStatus.equals(AppTask.STATUS_DONE) || newStatus.equals(AppTask.STATUS_CANCELED)) {
                         long threeDaysAgo = System.currentTimeMillis() - MAX_RESOLUTION_TIME_MILLIS;
                         if (appTask.executionTime < threeDaysAgo) {
-                            // Zadatak je previše star, već je trebao da pređe u "Missed"
-                            appTask.setStatus(AppTask.STATUS_MISSED);
+                            // Zadatak je previše star, već je trebao da pređe u "Undone"
+                            appTask.setStatus(AppTask.STATUS_UNDONE);
                             return taskRepository.update(appTask)
                                     .continueWith(t -> {
-                                        throw new RuntimeException("The task is too old and has been marked as missed.");
+                                        throw new RuntimeException("The task is too old and has been marked as undone.");
                                     });
                         }
                     }
@@ -333,11 +529,31 @@ public class AppTaskService {
                             // --- POZIV ZA SPECIJALNU MISIJU ---
                             return userRepository.read(appTask.userId).continueWithTask(userTask -> {
                                 User user = userTask.getResult();
+                                System.out.println("DEBUG: AppTaskService.resolveTask() - User: " + (user != null ? user.username : "null") + 
+                                        ", isInAlliance: " + (user != null ? user.isInAlliance() : "N/A"));
+                                
                                 if (user != null && user.isInAlliance()) {
                                     String actionType = getMissionTaskActionType(appTask.difficulty, appTask.importance);
+                                    System.out.println("DEBUG: AppTaskService.resolveTask() - Task difficulty: " + appTask.difficulty + 
+                                            ", importance: " + appTask.importance + ", actionType: " + actionType);
+                                    
                                     if (actionType != null) {
-                                        return missionService.updateMissionProgress(user.currentAllianceId, appTask.userId, actionType);
+                                        System.out.println("DEBUG: AppTaskService.resolveTask() - Calling updateMissionProgress with actionType: " + actionType);
+                                        return missionService.updateMissionProgress(user.currentAllianceId, appTask.userId, actionType)
+                                                .continueWith(missionUpdateTask -> {
+                                                    if (missionUpdateTask.isSuccessful() && missionUpdateTask.getResult()) {
+                                                        System.out.println("DEBUG: AppTaskService.resolveTask() - Mission progress updated successfully for task completion");
+                                                    } else {
+                                                        System.out.println("DEBUG: AppTaskService.resolveTask() - Failed to update mission progress for task completion: " + 
+                                                                (missionUpdateTask.getException() != null ? missionUpdateTask.getException().getMessage() : "Unknown error"));
+                                                    }
+                                                    return null;
+                                                });
+                                    } else {
+                                        System.out.println("DEBUG: AppTaskService.resolveTask() - Task does not contribute to mission (actionType is null)");
                                     }
+                                } else {
+                                    System.out.println("DEBUG: AppTaskService.resolveTask() - User not in alliance or user is null");
                                 }
                                 return Tasks.forResult(null);
                             }).continueWithTask(missionTask -> updateTask);
@@ -439,7 +655,7 @@ public class AppTaskService {
                             .collect(Collectors.toList());
 
                     for (AppTask t : missedTasks) {
-                        t.setStatus(AppTask.STATUS_MISSED);
+                        t.setStatus(AppTask.STATUS_UNDONE);
                         updateTasks.add(taskRepository.update(t));
                         updateTasks.add(missionService.setMissedTaskFlag(userId));
                     }
@@ -530,7 +746,8 @@ public class AppTaskService {
 
         // Set the display ID and status
         instance.id = displayId;
-        instance.status = (executionTime == originalTask.executionTime) ? originalTask.status : AppTask.STATUS_ACTIVE;
+        // Inherit status from original task for all instances
+        instance.status = originalTask.status;
         instance.totalXpValue = originalTask.totalXpValue;
 
         return instance;

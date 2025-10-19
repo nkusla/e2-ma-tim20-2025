@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.kulenina.questix.model.*;
 import com.kulenina.questix.repository.EquipmentRepository;
 import com.kulenina.questix.repository.UserRepository;
+import com.kulenina.questix.service.AllianceMissionService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +16,13 @@ public class EquipmentService {
     private final EquipmentRepository equipmentRepository;
     private final UserRepository userRepository;
     private final FirebaseAuth auth;
-
+    private final AllianceMissionService allianceMissionService;
 
     public EquipmentService() {
         this.equipmentRepository = new EquipmentRepository();
         this.userRepository = new UserRepository();
         this.auth = FirebaseAuth.getInstance();
+        this.allianceMissionService = new AllianceMissionService();
     }
 
     private String getCurrentUserId() {
@@ -99,7 +101,23 @@ public class EquipmentService {
                     return Tasks.whenAll(
                         equipmentRepository.update(existingClothing),
                         userRepository.update(user)
-                    ).continueWith(updateTask -> true);
+                    ).continueWithTask(updateTask -> {
+                        // Update alliance mission progress if user is in an active mission
+                        if (user.isInAlliance()) {
+                            return allianceMissionService.updateMissionProgress(user.currentAllianceId, userId, "PURCHASE")
+                                .continueWith(missionTask -> {
+                                    if (missionTask.isSuccessful() && missionTask.getResult()) {
+                                        System.out.println("Mission progress updated for clothing upgrade by user: " + userId);
+                                    } else {
+                                        System.out.println("Failed to update mission progress for clothing upgrade: " + 
+                                            (missionTask.getException() != null ? missionTask.getException().getMessage() : "Unknown error"));
+                                    }
+                                    return true; // Don't fail the purchase if mission update fails
+                                });
+                        }
+                        return Tasks.forResult(true);
+                    })
+                    .continueWith(finalTask -> true);
                 }
             }
 
@@ -115,7 +133,23 @@ public class EquipmentService {
 
             return equipmentRepository.create(equipment)
                 .continueWithTask(createTask -> userRepository.update(user))
-                .continueWith(updateTask -> true);
+                .continueWithTask(updateTask -> {
+                    // Update alliance mission progress if user is in an active mission
+                    if (user.isInAlliance()) {
+                        return allianceMissionService.updateMissionProgress(user.currentAllianceId, userId, "PURCHASE")
+                            .continueWith(missionTask -> {
+                                if (missionTask.isSuccessful() && missionTask.getResult()) {
+                                    System.out.println("Mission progress updated for purchase by user: " + userId);
+                                } else {
+                                    System.out.println("Failed to update mission progress for purchase: " + 
+                                        (missionTask.getException() != null ? missionTask.getException().getMessage() : "Unknown error"));
+                                }
+                                return true; // Don't fail the purchase if mission update fails
+                            });
+                    }
+                    return Tasks.forResult(true);
+                })
+                .continueWith(finalTask -> true);
         });
     }
 
@@ -217,7 +251,23 @@ public class EquipmentService {
             return Tasks.whenAll(
                 equipmentRepository.update(weapon),
                 userRepository.update(user)
-            ).continueWith(updateTask -> true);
+            ).continueWithTask(updateTask -> {
+                // Update alliance mission progress if user is in an active mission
+                if (user.isInAlliance()) {
+                    return allianceMissionService.updateMissionProgress(user.currentAllianceId, userId, "PURCHASE")
+                        .continueWith(missionTask -> {
+                            if (missionTask.isSuccessful() && missionTask.getResult()) {
+                                System.out.println("Mission progress updated for weapon upgrade by user: " + userId);
+                            } else {
+                                System.out.println("Failed to update mission progress for weapon upgrade: " + 
+                                    (missionTask.getException() != null ? missionTask.getException().getMessage() : "Unknown error"));
+                            }
+                            return true; // Don't fail the upgrade if mission update fails
+                        });
+                }
+                return Tasks.forResult(true);
+            })
+            .continueWith(finalTask -> true);
         });
     }
 

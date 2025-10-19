@@ -127,8 +127,17 @@ public class BossBattleService {
                         result.battleFinished = bossBattle.isBattleFinished();
                         result.bossDefeated = bossBattle.isDefeated();
                         if (attackHit && user.isInAlliance()) {
+                            // Update alliance mission progress and wait for completion
                             allianceMissionService.updateMissionProgress(
-                                    user.currentAllianceId, userId, "SUCCESSFUL_HIT");
+                                    user.currentAllianceId, userId, "SUCCESSFUL_HIT")
+                                    .addOnCompleteListener(missionTask -> {
+                                        if (missionTask.isSuccessful() && missionTask.getResult()) {
+                                            System.out.println("Mission progress updated for successful hit by user: " + userId);
+                                        } else {
+                                            System.out.println("Failed to update mission progress for successful hit: " + 
+                                                (missionTask.getException() != null ? missionTask.getException().getMessage() : "Unknown error"));
+                                        }
+                                    });
                         }
 
                         if (bossBattle.isDefeated()) {

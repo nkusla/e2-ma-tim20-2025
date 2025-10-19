@@ -30,6 +30,12 @@ public class TaskGeneratorService {
             return instances;
         }
 
+        // Don't generate instances for done/missed/undone recurring tasks
+        // But allow canceled tasks to generate instances (they can be shown if execution time hasn't passed)
+        if (originalTask.isFinished() && !originalTask.isPaused() && !originalTask.status.equals(AppTask.STATUS_CANCELED)) {
+            return instances;
+        }
+
         // 1. Definišemo granice generisanja
         // Krajnji datum je minimum od: definisanog endDate zadatka, traženog toTimestampa i MAX_DAYS_IN_FUTURE
         long effectiveEndTimestamp = Math.min(originalTask.endDate, toTimestamp);
@@ -98,8 +104,21 @@ public class TaskGeneratorService {
             instance.id = originalTask.id; // Zadržavamo ID za prvu instancu za rešavanje/izmenu
             instance.completedAt = originalTask.completedAt;
         } else {
-            // Buduće instance su uvek aktivne i dobijaju privremeni ID za prikaz (ne za bazu)
-            instance.status = AppTask.STATUS_ACTIVE;
+            // If the original task is paused, all generated instances should also be paused
+            if (originalTask.isPaused()) {
+                instance.status = AppTask.STATUS_PAUSED;
+            } else {
+                // Check if this instance is more than 3 days past execution time
+                long now = System.currentTimeMillis();
+                long threeDaysAfterExecution = newExecutionTime + (3 * 24 * 60 * 60 * 1000L);
+                if (now > threeDaysAfterExecution) {
+                    // Past instances older than 3 days after execution are marked as undone
+                    instance.status = AppTask.STATUS_UNDONE;
+                } else {
+                    // Future instances and recent past instances are active
+                    instance.status = AppTask.STATUS_ACTIVE;
+                }
+            }
             // Dajemo joj jedinstveni ID za prikaz: "ORIGINAL_ID_YYYYMMDDTHHMM"
             instance.id = originalTask.id + "_" + newExecutionTime;
         }

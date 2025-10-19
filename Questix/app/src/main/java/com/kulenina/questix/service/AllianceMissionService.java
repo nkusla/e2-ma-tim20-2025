@@ -56,7 +56,7 @@ public class AllianceMissionService {
         this.allianceRepository = new AllianceRepository();
         this.missionProgressRepository = new MissionProgressRepository();
         this.userRepository = new UserRepository();
-        //  this.equipmentService = new EquipmentService();
+        //  this.equipmentService = new EquipmentService();
         this.equipmentRepository = new EquipmentRepository();
     }
 
@@ -108,7 +108,7 @@ public class AllianceMissionService {
 
             // 1. Ažuriranje Alliance dokumenta (Batch update)
             batch.update(allianceRepository.getDocumentReference(allianceId),
-                    "missionActive", true,
+                    "isMissionActive", true,
                     "bossCurrentHp", totalBossHp,
                     "bossMaxHp", totalBossHp,
                     "missionStartedAt", startTime,
@@ -121,16 +121,25 @@ public class AllianceMissionService {
                 MissionProgress progress = new MissionProgress(allianceId, member.getId());
 
                 String progressId = allianceId + "_" + member.getId();
+                System.out.println("Creating MissionProgress document with ID: " + progressId + " for user: " + member.getId());
                 batch.set(missionProgressRepository.getDocumentReference(progressId), progress);
             }
 
             // 3. Izvršavanje svih operacija
-            return batch.commit();
+            System.out.println("Committing batch with " + members.size() + " MissionProgress documents");
+            return batch.commit()
+                .addOnSuccessListener(aVoid -> {
+                    System.out.println("Mission started successfully! MissionProgress documents should be created.");
+                })
+                .addOnFailureListener(e -> {
+                    System.out.println("Failed to start mission: " + e.getMessage());
+                });
         });
     }
 
     /**
      * OPŠTA METODA ZA AŽURIRANJE PROGRESA I HP BOSA
+     * KORISTI FIREBASE TRANSACTION za atomsko smanjenje HP-a Bosa, rešavajući problem sinhronizacije.
      * @param allianceId ID saveza
      * @param userId ID korisnika koji je izvršio akciju
      * @param actionType Tip akcije (npr. "PURCHASE", "HIT", "LIGHT_TASK", "HEAVY_TASK", "MESSAGE")
@@ -138,102 +147,101 @@ public class AllianceMissionService {
      */
     public Task<Boolean> updateMissionProgress(String allianceId, String userId, String actionType) {
         String progressId = allianceId + "_" + userId;
+        DocumentReference allianceRef = allianceRepository.getDocumentReference(allianceId);
+        DocumentReference progressRef = missionProgressRepository.getDocumentReference(progressId);
 
-        return Tasks.whenAllSuccess(
-                allianceRepository.read(allianceId),
-                missionProgressRepository.read(progressId)
-        ).continueWithTask(task -> {
-            List<Object> results = task.getResult();
-            Alliance alliance = (Alliance) results.get(0);
-            MissionProgress progress = (MissionProgress) results.get(1);
+        System.out.println("DEBUG: updateMissionProgress() called for allianceId: " + allianceId + ", userId: " + userId + ", actionType: " + actionType);
 
-            if (alliance == null || !alliance.isMissionActive() || progress == null) {
-                return Tasks.forResult(false);
+        // Vraća Task<Boolean> koji je rezultat transakcije
+        return db.runTransaction(transaction -> {
+            // 1. Čitanje dokumenata unutar transakcije
+            Alliance alliance = transaction.get(allianceRef).toObject(Alliance.class);
+            MissionProgress progress = transaction.get(progressRef).toObject(MissionProgress.class);
+
+            System.out.println("DEBUG: Transaction - alliance: " + (alliance != null ? "found" : "null") + 
+                    ", missionActive: " + (alliance != null ? alliance.isMissionActive() : "N/A") +
+                    ", progress: " + (progress != null ? "found" : "null"));
+
+            // Provera: Misija mora biti aktivna i Progress mora postojati
+            if (alliance == null || !alliance.isMissionActive() || progress == null || alliance.getBossCurrentHp() <= 0) {
+                System.out.println("DEBUG: Transaction failed validation - alliance: " + (alliance != null) + 
+                        ", missionActive: " + (alliance != null ? alliance.isMissionActive() : false) +
+                        ", progress: " + (progress != null) +
+                        ", bossHp: " + (alliance != null ? alliance.getBossCurrentHp() : "N/A"));
+                return false; // Nema promene
             }
 
             int hpChange = 0;
-            boolean progressUpdated = false;
 
-            // Transakcija za ažuriranje HP i Progresa
-            WriteBatch batch = db.batch();
-
-            // 1. Provera kvota i obračun HP za korisnika
+            // 2. Provera kvota i obračun HP za korisnika
             switch (actionType) {
                 case "PURCHASE":
                     if (progress.purchasesCount < 5) {
                         progress.purchasesCount++;
                         hpChange = HP_PURCHASE;
-                        progressUpdated = true;
                     }
                     break;
                 case "SUCCESSFUL_HIT":
                     if (progress.successfulHitsCount < 10) {
                         progress.successfulHitsCount++;
                         hpChange = HP_SUCCESSFUL_HIT;
-                        progressUpdated = true;
                     }
                     break;
-                case "LIGHT_TASK": // VL, L, N, V
-                    // Specifikacija: L+N se računa 2 puta. Ako je L+N, caller šalje "LIGHT_TASK_DOUBLE"
-                    // Ovde uvek samo povećavamo za 1, jer je po specifikaciji max 10 PUTA.
+                case "LIGHT_TASK": // VL, L, N, V (računa se kao 1 put)
                     if (progress.lightTasksCount < 10) {
                         progress.lightTasksCount++;
                         hpChange = HP_LIGHT_TASK;
-                        progressUpdated = true;
                     }
                     break;
-                case "LIGHT_TASK_DOUBLE": // LAK + NORMALAN
-                    // Dva puta se računa, max 10 puta ukupno
+                case "LIGHT_TASK_DOUBLE": // LAK + NORMALAN (računa se kao 2 puta)
                     if (progress.lightTasksCount <= 8) {
                         progress.lightTasksCount += 2;
                         hpChange = HP_LIGHT_TASK * 2;
-                        progressUpdated = true;
                     } else if (progress.lightTasksCount == 9) {
                         // Može da se poveća samo za 1
                         progress.lightTasksCount++;
                         hpChange = HP_LIGHT_TASK;
-                        progressUpdated = true;
                     }
                     break;
                 case "HEAVY_TASK": // T, ET, EV, S
                     if (progress.heavyTasksCount < 6) {
                         progress.heavyTasksCount++;
                         hpChange = HP_HEAVY_TASK;
-                        progressUpdated = true;
                     }
                     break;
                 case "MESSAGE":
                     String today = DATE_FORMAT.format(new Date());
-                    if (!progress.messageDays.contains(today)) {
-                        progress.messageDays.add(today);
+                    // Provera da li je kvota dana dostignuta (max 14 dana je limit misije)
+                    if (progress.getMessageDays().size() < 14 && !progress.getMessageDays().contains(today)) {
+                        // Pretpostavljamo da je messageDays List<String>
+                        progress.getMessageDays().add(today);
                         hpChange = HP_MESSAGE_DAY;
-                        progressUpdated = true;
                     }
                     break;
             }
 
+            // 3. Ažuriranje dokumenata
             if (hpChange > 0) {
-                // 2. Ažuriranje MissionProgress-a
+                System.out.println("DEBUG: Updating progress - hpChange: " + hpChange + 
+                        ", current totalHpContribution: " + progress.totalHpContribution);
+                
+                // Ažuriraj Progress
                 progress.totalHpContribution += hpChange;
-                batch.update(missionProgressRepository.getDocumentReference(progressId),
-                        "totalHpContribution", progress.totalHpContribution,
-                        "purchasesCount", progress.purchasesCount,
-                        "successfulHitsCount", progress.successfulHitsCount,
-                        "lightTasksCount", progress.lightTasksCount,
-                        "heavyTasksCount", progress.heavyTasksCount,
-                        "messageDays", progress.messageDays // Message days je set, updateuje se ceo
-                );
+                transaction.set(progressRef, progress); // Postavi ceo objekat sa ažuriranim brojačima
 
-                // 3. Ažuriranje HP bosa saveza (atomski)
+                // Ažuriraj Alliance HP (atomski unutar transakcije)
                 int newHp = Math.max(0, alliance.getBossCurrentHp() - hpChange);
-                batch.update(allianceRepository.getDocumentReference(allianceId),
-                        "bossCurrentHp", newHp
-                );
+                alliance.setBossCurrentHp(newHp);
+                transaction.update(allianceRef, "bossCurrentHp", newHp, "updatedAt", System.currentTimeMillis());
 
-                return batch.commit().continueWith(commitTask -> true);
+                System.out.println("DEBUG: Progress updated successfully - new totalHpContribution: " + progress.totalHpContribution + 
+                        ", new bossHp: " + newHp);
+                return true; // HP bosa umanjen
             }
 
-            return Tasks.forResult(false);
+            // Ako je kvota dostignuta ili nema promene
+            System.out.println("DEBUG: No HP change - quota reached or invalid action");
+            return false;
         });
     }
 
@@ -291,10 +299,6 @@ public class AllianceMissionService {
 
             // 1. Obračun bonusa za "Bez nerešenih zadataka" (samo ako vreme isteklo i bos živ)
             if (alliance.getBossCurrentHp() > 0 && currentTime >= missionEndTime) {
-                // Koristimo transakciju za HP ažuriranje bosa radi sigurnosti,
-                // iako ovde koristimo samo batch za update MissionProgressa.
-                // Idealno bi bilo ceo ovaj deo staviti u jednu transakciju.
-
                 // Pošto je ovo Batch, moramo ažurirati lokalni Alliance objekat pre ažuriranja batch-a
                 boolean allianceUpdated = false;
                 for (MissionProgress progress : allProgresses) {
@@ -326,13 +330,22 @@ public class AllianceMissionService {
 
             if (bossDefeated) {
                 // DODELA NAGRADA
-                return awardMissionRewards(alliance, allProgresses).continueWithTask(awardTask -> {
+                // Prvo izvršavamo sve batch operacije koje su se možda nagomilale (npr. bonus HP za Perfect Task)
+                return batch.commit().continueWithTask(commitTask ->
+                        // Zatim dodeljujemo nagrade, koje uključuju asinhrono ažuriranje opreme
+                        awardMissionRewards(alliance, allProgresses)
+                ).continueWithTask(awardTask -> {
                     // Resetovanje misije
-                    return resetMissionState(allianceId, batch);
+                    // Moramo kreirati NOVI batch jer je prethodni commit-ovan
+                    return resetMissionState(allianceId, db.batch());
                 });
             } else {
                 // MISIJA NEUSPEŠNA
-                return resetMissionState(allianceId, batch);
+                // Prvo izvršavamo sve batch operacije (npr. bonus HP za Perfect Task)
+                return batch.commit().continueWithTask(commitTask ->
+                        // Zatim resetujemo stanje
+                        resetMissionState(allianceId, db.batch())
+                );
             }
         });
     }
@@ -340,7 +353,7 @@ public class AllianceMissionService {
     private Task<Void> resetMissionState(String allianceId, WriteBatch batch) {
         // Resetovanje stanja misije u Savezu
         batch.update(allianceRepository.getDocumentReference(allianceId),
-                "missionActive", false,
+                "isMissionActive", false,
                 "bossCurrentHp", 0,
                 "bossMaxHp", 0,
                 "missionStartedAt", 0
@@ -393,13 +406,16 @@ public class AllianceMissionService {
                         // Odeća (proizvoljno, npr. ClothingType.GLOVES)
                         Clothing clothing = new Clothing(member.getId(), Clothing.ClothingType.GLOVES);
 
-                        // POZIV LOKALNE METODE registerEquipmentDrop
+                        // POZIV ASINHRONE METODE registerEquipmentDrop
                         equipmentTasks.add(registerEquipmentDrop(potion));
                         equipmentTasks.add(registerEquipmentDrop(clothing));
                     }
 
-                    // Prvo izvršavamo sve operacije na User i Alliance, pa onda opremu
-                    return batch.commit().continueWithTask(commitTask -> Tasks.whenAll(equipmentTasks));
+                    // Prvo izvršavamo sve operacije na User
+                    return batch.commit().continueWithTask(commitTask -> {
+                        // Nakon uspešnog commit-a, čekamo da se svi asinhroni zadaci za opremu završe
+                        return Tasks.whenAll(equipmentTasks);
+                    });
                 });
     }
 
@@ -435,20 +451,83 @@ public class AllianceMissionService {
         return allianceRepository.read(allianceId);
     }
 
+    public Task<MissionProgress> getUserProgressSafe(String allianceId, String userId) {
+        String progressId = allianceId + "_" + userId;
+        System.out.println("DEBUG: getUserProgressSafe() called for progressId: " + progressId);
+        
+        return missionProgressRepository.read(progressId)
+            .continueWith(task -> {
+                if (task.isSuccessful()) {
+                    MissionProgress progress = task.getResult();
+                    if (progress == null) {
+                        System.out.println("DEBUG: MissionProgress document not found for ID: " + progressId);
+                        return null;
+                    }
+                    System.out.println("DEBUG: Successfully loaded progress for user " + userId);
+                    return progress;
+                } else {
+                    System.out.println("DEBUG: Failed to read MissionProgress for " + progressId + ": " + 
+                            (task.getException() != null ? task.getException().getMessage() : "Unknown error"));
+                    return null;
+                }
+            });
+    }
+
     public Task<MissionProgress> getUserProgress(String allianceId, String userId) {
         String progressId = allianceId + "_" + userId;
-        return missionProgressRepository.read(progressId);
+        return missionProgressRepository.read(progressId)
+            .continueWith(task -> {
+                if (task.isSuccessful()) {
+                    MissionProgress progress = task.getResult();
+                    if (progress == null) {
+                        throw new RuntimeException("MissionProgress document not found for ID: " + progressId + ". This usually means the mission progress wasn't created when the mission started.");
+                    }
+                    return progress;
+                } else {
+                    throw new RuntimeException("Failed to read MissionProgress: " + task.getException().getMessage());
+                }
+            });
     }
 
     public Task<List<MissionProgress>> getAllianceProgresses(String allianceId) {
         return missionProgressRepository.getAllProgressesByAllianceId(allianceId);
     }
 
+    // DEBUG METHOD: Test creating and reading a MissionProgress document
+    public Task<Void> testMissionProgressCreation(String allianceId, String userId) {
+        String progressId = allianceId + "_" + userId;
+        MissionProgress testProgress = new MissionProgress(allianceId, userId);
+        
+        System.out.println("TEST: Creating MissionProgress with ID: " + progressId);
+        System.out.println("TEST: AllianceId: " + testProgress.allianceId + ", UserId: " + testProgress.userId);
+        
+        return missionProgressRepository.getDocumentReference(progressId)
+            .set(testProgress)
+            .continueWithTask(task -> {
+                if (task.isSuccessful()) {
+                    System.out.println("TEST: Document created successfully, now trying to read it back");
+                    return missionProgressRepository.read(progressId);
+                } else {
+                    throw new RuntimeException("Failed to create test document: " + task.getException().getMessage());
+                }
+            })
+            .continueWith(readTask -> {
+                if (readTask.isSuccessful()) {
+                    MissionProgress readProgress = readTask.getResult();
+                    if (readProgress != null) {
+                        System.out.println("TEST: Document read successfully! ID: " + readProgress.getId());
+                    } else {
+                        System.out.println("TEST: Document was created but returned null when reading");
+                    }
+                } else {
+                    System.out.println("TEST: Failed to read document: " + readTask.getException().getMessage());
+                }
+                return null;
+            });
+    }
+
     public Task<Boolean> registerEquipmentDrop(Equipment droppedEquipment) {
-        String userId = getCurrentUserId();
-        if (userId == null) {
-            return Tasks.forException(new RuntimeException("User not authenticated"));
-        }
+        String userId = droppedEquipment.getUserId();
 
         if (droppedEquipment == null) {
             return Tasks.forResult(true); // Nema opreme za dodelu
@@ -485,7 +564,7 @@ public class AllianceMissionService {
                             if (eq instanceof Potion) {
                                 Potion potion = (Potion) eq;
                                 // Napitak je unique, tako da ga uvek dodajemo kao novu instancu.
-                                // Međutim, ako je to Permanent Potion, treba ga spojiti. Pretpostavimo da je Potion.combineWith već implementiran za to.
+                                // Međutim, ako je to Permanent Potion, treba ga spojiti. Pretpostavljamo da je Potion.combineWith već implementiran za to.
                                 // Za potrebe ovog koda, pretpostavljamo da se Potioni spajaju (npr. povećava se kvantitet ili procenat).
                                 if (potion.getPotionType() == droppedPotion.getPotionType()) {
                                     existingEquipment = potion;
@@ -513,6 +592,167 @@ public class AllianceMissionService {
                         return equipmentRepository.create(droppedEquipment)
                                 .continueWith(createTask -> true);
                     }
+                });
+    }
+
+    /**
+     * Creates missing MissionProgress documents for all alliance members
+     * This is a fix for missions that were started before proper progress tracking was implemented
+     */
+    public Task<Void> createMissingMissionProgress(String allianceId) {
+        System.out.println("DEBUG: createMissingMissionProgress() called for allianceId: " + allianceId);
+        
+        return allianceRepository.getAllianceMembers(allianceId)
+                .continueWithTask(membersTask -> {
+                    System.out.println("DEBUG: getAllianceMembers task completed, success: " + membersTask.isSuccessful());
+                    
+                    if (!membersTask.isSuccessful()) {
+                        System.out.println("DEBUG: Failed to get alliance members: " + membersTask.getException().getMessage());
+                        return Tasks.forResult(null);
+                    }
+                    
+                    List<User> members = membersTask.getResult();
+                    System.out.println("DEBUG: Got members from task: " + (members != null ? members.size() : 0));
+                    
+                    if (members == null || members.isEmpty()) {
+                        System.out.println("DEBUG: No members found for alliance: " + allianceId);
+                        return Tasks.forResult(null);
+                    }
+
+                    System.out.println("DEBUG: Found " + members.size() + " members, checking for missing progress documents");
+                    
+                    // Log all member details
+                    for (User member : members) {
+                        System.out.println("DEBUG: Member - ID: " + member.getId() + ", Username: " + member.username);
+                    }
+
+                    // Check which members are missing progress documents
+                    List<Task<MissionProgress>> checkTasks = new ArrayList<>();
+                    for (User member : members) {
+                        System.out.println("DEBUG: Creating check task for member: " + member.username);
+                        checkTasks.add(getUserProgressSafe(allianceId, member.getId()));
+                    }
+
+                    System.out.println("DEBUG: Created " + checkTasks.size() + " check tasks, waiting for completion...");
+                    
+                    return Tasks.whenAllComplete(checkTasks)
+                            .continueWithTask(checkTask -> {
+                                System.out.println("DEBUG: All check tasks completed, success: " + checkTask.isSuccessful());
+                                
+                                if (!checkTask.isSuccessful()) {
+                                    System.out.println("DEBUG: Check tasks failed: " + checkTask.getException().getMessage());
+                                    return Tasks.forResult(null);
+                                }
+                                
+                                List<User> membersNeedingProgress = new ArrayList<>();
+                                
+                                for (int i = 0; i < checkTasks.size(); i++) {
+                                    Task<MissionProgress> task = checkTasks.get(i);
+                                    User member = members.get(i);
+                                    
+                                    System.out.println("DEBUG: Checking task " + i + " for member " + member.username + 
+                                            " - success: " + task.isSuccessful() + 
+                                            ", result: " + (task.getResult() != null ? "found" : "null"));
+                                    
+                                    if (!task.isSuccessful() || task.getResult() == null) {
+                                        membersNeedingProgress.add(member);
+                                        System.out.println("DEBUG: Member " + member.username + " needs MissionProgress document");
+                                    } else {
+                                        System.out.println("DEBUG: Member " + member.username + " already has MissionProgress document");
+                                    }
+                                }
+
+                                if (membersNeedingProgress.isEmpty()) {
+                                    System.out.println("DEBUG: All members already have MissionProgress documents");
+                                    return Tasks.forResult(null);
+                                }
+
+                                System.out.println("DEBUG: Creating MissionProgress documents for " + membersNeedingProgress.size() + " members");
+
+                                // Create missing MissionProgress documents
+                                WriteBatch batch = db.batch();
+                                for (User member : membersNeedingProgress) {
+                                    MissionProgress progress = new MissionProgress(allianceId, member.getId());
+                                    String progressId = allianceId + "_" + member.getId();
+                                    System.out.println("DEBUG: Creating MissionProgress document for " + member.username + " with ID: " + progressId);
+                                    batch.set(missionProgressRepository.getDocumentReference(progressId), progress);
+                                }
+
+                                System.out.println("DEBUG: Committing batch with " + membersNeedingProgress.size() + " documents...");
+                                
+                                return batch.commit()
+                                        .continueWith(commitTask -> {
+                                            System.out.println("DEBUG: Batch commit completed, success: " + commitTask.isSuccessful());
+                                            
+                                            if (commitTask.isSuccessful()) {
+                                                System.out.println("DEBUG: Successfully created " + membersNeedingProgress.size() + " MissionProgress documents");
+                                            } else {
+                                                System.out.println("DEBUG: Failed to create MissionProgress documents: " + 
+                                                        (commitTask.getException() != null ? commitTask.getException().getMessage() : "Unknown error"));
+                                                if (commitTask.getException() != null) {
+                                                    commitTask.getException().printStackTrace();
+                                                }
+                                            }
+                                            return null;
+                                        });
+                            });
+                });
+    }
+
+    /**
+     * Gets progress for all alliance members
+     */
+    public Task<List<MissionProgress>> getAllMembersProgress(String allianceId) {
+        System.out.println("DEBUG: AllianceMissionService.getAllMembersProgress() called for allianceId: " + allianceId);
+        
+        return allianceRepository.getAllianceMembers(allianceId)
+                .continueWithTask(membersTask -> {
+                    List<User> members = membersTask.getResult();
+                    System.out.println("DEBUG: AllianceMissionService got " + (members != null ? members.size() : 0) + " members from repository");
+                    
+                    if (members == null || members.isEmpty()) {
+                        System.out.println("DEBUG: No members found, returning empty list");
+                        return Tasks.forResult(new ArrayList<>());
+                    }
+
+                    // Create tasks to get progress for each member
+                    List<Task<MissionProgress>> progressTasks = new ArrayList<>();
+                    for (User member : members) {
+                        System.out.println("DEBUG: Creating progress task for member: " + member.username + " (ID: " + member.getId() + ")");
+                        progressTasks.add(getUserProgressSafe(allianceId, member.getId()));
+                    }
+
+                    System.out.println("DEBUG: Created " + progressTasks.size() + " progress tasks, waiting for completion...");
+                    
+                    // Wait for all progress tasks to complete
+                    return Tasks.whenAllComplete(progressTasks)
+                            .continueWith(allProgressTask -> {
+                                List<MissionProgress> allProgress = new ArrayList<>();
+                                
+                                System.out.println("DEBUG: Got " + progressTasks.size() + " task results");
+                                
+                                for (int i = 0; i < progressTasks.size(); i++) {
+                                    Task<MissionProgress> task = progressTasks.get(i);
+                                    User member = members.get(i);
+                                    
+                                    if (task.isSuccessful() && task.getResult() != null) {
+                                        MissionProgress progress = task.getResult();
+                                        allProgress.add(progress);
+                                        System.out.println("DEBUG: Added progress for user " + progress.userId + " with " + progress.totalHpContribution + " HP contribution");
+                                    } else {
+                                        System.out.println("DEBUG: Failed to get progress for user " + member.username + " (ID: " + member.getId() + "): " + 
+                                                (task.getException() != null ? task.getException().getMessage() : "Unknown error"));
+                                        
+                                        // Create a default progress entry for this member
+                                        MissionProgress defaultProgress = new MissionProgress(allianceId, member.getId());
+                                        allProgress.add(defaultProgress);
+                                        System.out.println("DEBUG: Created default progress for user " + member.username);
+                                    }
+                                }
+                                
+                                System.out.println("DEBUG: Returning " + allProgress.size() + " progress items");
+                                return allProgress;
+                            });
                 });
     }
 
