@@ -1,12 +1,11 @@
 package com.kulenina.questix.model;
 
 import com.google.firebase.firestore.Exclude;
-import com.google.firebase.firestore.ServerTimestamp;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MissionProgress implements IIdentifiable {
+public class MissionProgress implements IIdentifiable, Serializable {
 
     public String id; // missionId_userId
     public String allianceId;
@@ -19,17 +18,20 @@ public class MissionProgress implements IIdentifiable {
 
     public boolean hasMissedTask = false; // Bez nerešenih zadataka tokom misije - 10 HP
 
-    // Set datuma (kao string npr. "2025-10-21") za praćenje poslatih poruka (max 4 HP dnevno)
-    public Set<String> messageDays = new HashSet<>();
+    // List datuma (kao string npr. "2025-10-21") za praćenje poslatih poruka (max 4 HP dnevno)
+    public List<String> messageDays;
 
     public int totalHpContribution = 0; // Ukupno smanjenje HP bosa od strane ovog korisnika
 
-    @ServerTimestamp
-    public Date createdAt;
+    public long createdAt;
 
-    public MissionProgress() {}
+    public MissionProgress() {
+        this.messageDays = new ArrayList<>();
+        this.createdAt = System.currentTimeMillis();
+    }
 
     public MissionProgress(String allianceId, String userId) {
+        this();
         this.id = allianceId + "_" + userId;
         this.allianceId = allianceId;
         this.userId = userId;
@@ -42,6 +44,14 @@ public class MissionProgress implements IIdentifiable {
 
     @Exclude
     public int getMessageDaysCount() {
-        return messageDays.size();
+        return getMessageDays().size();
+    }
+    
+    @Exclude
+    public List<String> getMessageDays() {
+        if (messageDays == null) {
+            messageDays = new ArrayList<>();
+        }
+        return messageDays;
     }
 }

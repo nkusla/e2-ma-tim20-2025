@@ -37,6 +37,7 @@ public class AppTask implements IIdentifiable, Serializable {
     // --- Static Constants for Statuses and Units ---
     public static final String STATUS_ACTIVE = "active";
     public static final String STATUS_DONE = "done";
+    public static final String STATUS_UNDONE = "undone";
     public static final String STATUS_MISSED = "missed";
     public static final String STATUS_PAUSED = "paused";
     public static final String STATUS_CANCELED = "canceled";
@@ -92,16 +93,29 @@ public class AppTask implements IIdentifiable, Serializable {
     public void setStatus(String status) {
         this.status = status;
         this.updatedAt = System.currentTimeMillis();
-        if (status.equals(STATUS_DONE) || status.equals(STATUS_MISSED) || status.equals(STATUS_CANCELED)) {
+        if (status.equals(STATUS_DONE) || status.equals(STATUS_MISSED) || status.equals(STATUS_CANCELED) || status.equals(STATUS_UNDONE)) {
             this.completedAt = System.currentTimeMillis();
         }
     }
 
     public boolean isActive() {
-        return STATUS_ACTIVE.equals(status);
+        return STATUS_ACTIVE.equals(status) || STATUS_PAUSED.equals(status);
+    }
+
+    public boolean isPaused() {
+        return STATUS_PAUSED.equals(status);
+    }
+
+    public boolean isUndone() {
+        return STATUS_UNDONE.equals(status);
+    }
+
+    public boolean isDone() {
+        return STATUS_DONE.equals(status);
     }
 
     public boolean isFinished() {
-        return STATUS_DONE.equals(status) || STATUS_MISSED.equals(status) || STATUS_CANCELED.equals(status);
+        return STATUS_DONE.equals(status) || STATUS_MISSED.equals(status) || 
+               STATUS_CANCELED.equals(status) || STATUS_UNDONE.equals(status);
     }
 }
