@@ -114,7 +114,7 @@ public class AuthService {
 		}
 
 		// TODO: Remove this once email verification is implemented
-		// return user.isEmailVerified();
+		//return user.isEmailVerified();
 		return true;
 	}
 }
