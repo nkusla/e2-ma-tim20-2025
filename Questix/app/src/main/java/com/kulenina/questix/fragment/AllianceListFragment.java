@@ -19,19 +19,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.kulenina.questix.R;
+import com.kulenina.questix.activity.MainActivity;
 import com.kulenina.questix.databinding.FragmentAllianceListBinding;
 import com.kulenina.questix.adapter.AllianceMessageAdapter;
 import com.kulenina.questix.model.Alliance;
 import com.kulenina.questix.model.AllianceMessage;
+import com.kulenina.questix.service.AllianceMissionService;
 import com.kulenina.questix.service.AllianceService;
 import com.kulenina.questix.service.AuthService;
 import com.kulenina.questix.dialog.CreateAllianceDialog;
+import androidx.navigation.fragment.NavHostFragment; // Potrebno za navigaciju
 
 import java.util.List;
 
 public class AllianceListFragment extends Fragment implements CreateAllianceDialog.OnAllianceCreatedListener {
     private FragmentAllianceListBinding binding;
     private AllianceService allianceService;
+    private AllianceMissionService missionService;
     private AuthService authService;
     private String currentUserId;
     private Alliance currentAlliance;
@@ -55,6 +59,7 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         allianceService = new AllianceService();
         authService = new AuthService();
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        missionService = new AllianceMissionService();
 
         setupUI();
         setupMessaging();
@@ -66,6 +71,9 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         binding.buttonLeaveAlliance.setOnClickListener(v -> leaveAlliance());
         binding.buttonDisbandAlliance.setOnClickListener(v -> disbandAlliance());
 
+        binding.buttonStartMission.setOnClickListener(v -> startMission());
+        binding.buttonViewMission.setOnClickListener(v -> viewMissionDetails());
+        // Initialize UI state - show loading by default
         showLoadingState();
     }
 
@@ -108,10 +116,28 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         if (currentAlliance != null) {
             binding.textViewAllianceName.setText(currentAlliance.name);
             binding.textViewMemberCount.setText("Members: " + currentAlliance.getMemberCount());
-            binding.textViewMissionStatus.setText(currentAlliance.isMissionActive ? "Mission Active" : "No Active Mission");
 
-            binding.buttonLeaveAlliance.setVisibility(currentAlliance.canLeave(currentUserId) ? View.VISIBLE : View.GONE);
-            binding.buttonDisbandAlliance.setVisibility(currentAlliance.canDisband(currentUserId) ? View.VISIBLE : View.GONE);
+            boolean isLeader = currentAlliance.isLeader(currentUserId);
+
+            if (currentAlliance.isMissionActive()) {
+                // Misija je aktivna
+                binding.textViewMissionStatus.setText(R.string.mission_status_active); // Pretpostavljamo da imate string resurs
+                binding.buttonStartMission.setVisibility(View.GONE);
+                binding.buttonViewMission.setVisibility(View.VISIBLE);
+
+                // Onemogući napuštanje/raspuštanje
+                binding.buttonLeaveAlliance.setVisibility(View.GONE);
+                binding.buttonDisbandAlliance.setVisibility(View.GONE);
+            } else {
+                // Nema aktivne misije
+                binding.textViewMissionStatus.setText(R.string.mission_status_inactive);
+                binding.buttonStartMission.setVisibility(isLeader ? View.VISIBLE : View.GONE);
+                binding.buttonViewMission.setVisibility(View.GONE);
+
+                // Omogući napuštanje/raspuštanje po pravilu
+                binding.buttonLeaveAlliance.setVisibility(currentAlliance.canLeave(currentUserId) ? View.VISIBLE : View.GONE);
+                binding.buttonDisbandAlliance.setVisibility(currentAlliance.canDisband(currentUserId) ? View.VISIBLE : View.GONE);
+            }
 
             binding.layoutAllianceInfo.setVisibility(View.VISIBLE);
             binding.layoutAllianceChat.setVisibility(View.VISIBLE);
@@ -211,5 +237,72 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
                 Toast.makeText(getContext(), "Error sending message: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 messageEditText.setText(messageText);
             });
+    }
+
+    // U AllianceListFragment.java
+
+private void startMission() {
+    if (currentAlliance == null || !currentAlliance.isLeader(currentUserId)) {
+        Toast.makeText(getContext(), "Only the leader can start a mission.", Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    System.out.println("DEBUG: AllianceListFragment.startMission() called for alliance: " + currentAlliance.id);
+    System.out.println("DEBUG: Current user is leader: " + currentAlliance.isLeader(currentUserId));
+    System.out.println("DEBUG: Mission currently active: " + currentAlliance.isMissionActive());
+
+    missionService.startMission(currentAlliance.id)
+            .addOnSuccessListener(aVoid -> {
+                System.out.println("DEBUG: Mission started successfully!");
+                Toast.makeText(getContext(), "Special Mission started successfully! Refreshing status...", Toast.LENGTH_LONG).show();
+                
+                
+                allianceService.getUserAlliance(currentUserId)
+                    .addOnSuccessListener(updatedAlliance -> {
+                        currentAlliance = updatedAlliance;
+                        
+                        if (currentAlliance.isMissionActive()) {
+                            Toast.makeText(getContext(), "UI successfully updated to Mission Active.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Error: Mission is still reported as inactive after start. Check Firebase console.", Toast.LENGTH_LONG).show();
+                        }
+                        
+                        updateAllianceUI();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to refresh alliance data after mission start: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+
+            })
+            .addOnFailureListener(e -> {
+                System.out.println("DEBUG: Failed to start mission: " + e.getMessage());
+                if (e.getCause() != null) {
+                    System.out.println("DEBUG: Cause: " + e.getCause().getMessage());
+                }
+                Toast.makeText(getContext(), "Error starting mission: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            });
+}
+
+    private void viewMissionDetails() {
+        if (currentAlliance == null || !currentAlliance.isMissionActive()) {
+            Toast.makeText(getContext(), "No active mission to view.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Kreirajte Bundle za prenos ID-a
+        Bundle bundle = new Bundle();
+        bundle.putString("allianceId", currentAlliance.getId());
+
+        // Kreirajte instancu ciljnog fragmenta
+        AllianceMissionFragment missionFragment = new AllianceMissionFragment();
+        missionFragment.setArguments(bundle);
+
+        // KORISTITE PUBLIC METODU IZ GLAVNE AKTIVNOSTI ZA ZAMENU FRAGMENTA SA BACK STACK-OM
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).replaceFragmentWithBackStack(missionFragment);
+        } else {
+            // Fallback (ako se fragment učitava van MainActivity, što ne bi trebalo)
+            Toast.makeText(getContext(), "Error: Could not navigate. Host Activity not found.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

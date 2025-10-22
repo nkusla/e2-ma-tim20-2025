@@ -21,6 +21,7 @@ public class AllianceService {
     private final AllianceMessageRepository messageRepository;
     private final UserRepository userRepository;
     private final NotificationSenderService notificationService;
+    private final AllianceMissionService allianceMissionService;
 
     public AllianceService() {
         this.db = FirebaseFirestore.getInstance();
@@ -28,6 +29,7 @@ public class AllianceService {
         this.messageRepository = new AllianceMessageRepository();
         this.userRepository = new UserRepository();
         this.notificationService = new NotificationSenderService();
+        this.allianceMissionService = new AllianceMissionService();
     }
 
     public Task<String> createAlliance(String name, String leaderId) {
@@ -272,7 +274,12 @@ public class AllianceService {
                 sender.username, messageText);
 
             return messageRepository.createWithId(message)
-                .continueWith(createTask -> messageId);
+                    .continueWithTask(createTask -> {
+                        return allianceMissionService.updateMissionProgress(
+                                allianceId, senderId, "MESSAGE"
+                        );
+                    })
+                    .continueWith(missionTask -> messageId);
         });
     }
 
@@ -286,5 +293,9 @@ public class AllianceService {
 
                 return messageRepository.getMessagesByAllianceId(allianceId);
             });
+    }
+
+    public Task<Void> startSpecialMission(String allianceId, String leaderId) {
+        return allianceMissionService.startMission(allianceId);
     }
 }

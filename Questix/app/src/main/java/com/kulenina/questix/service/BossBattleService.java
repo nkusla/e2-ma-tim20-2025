@@ -17,6 +17,8 @@ public class BossBattleService {
     private final FirebaseAuth auth;
     private final Random random;
 
+    private final AllianceMissionService allianceMissionService;
+
     public BossBattleService() {
         this.userRepository = new UserRepository();
         this.bossBattleRepository = new BossBattleRepository();
@@ -24,6 +26,7 @@ public class BossBattleService {
         this.levelProgressionService = new LevelProgressionService();
         this.auth = FirebaseAuth.getInstance();
         this.random = new Random();
+        this.allianceMissionService = new AllianceMissionService();
     }
 
     private String getCurrentUserId() {
@@ -123,6 +126,19 @@ public class BossBattleService {
                         result.attacksRemaining = bossBattle.getAttacksRemaining();
                         result.battleFinished = bossBattle.isBattleFinished();
                         result.bossDefeated = bossBattle.isDefeated();
+                        if (attackHit && user.isInAlliance()) {
+                            // Update alliance mission progress and wait for completion
+                            allianceMissionService.updateMissionProgress(
+                                    user.currentAllianceId, userId, "SUCCESSFUL_HIT")
+                                    .addOnCompleteListener(missionTask -> {
+                                        if (missionTask.isSuccessful() && missionTask.getResult()) {
+                                            System.out.println("Mission progress updated for successful hit by user: " + userId);
+                                        } else {
+                                            System.out.println("Failed to update mission progress for successful hit: " + 
+                                                (missionTask.getException() != null ? missionTask.getException().getMessage() : "Unknown error"));
+                                        }
+                                    });
+                        }
 
                         if (bossBattle.isDefeated()) {
                             result.coinsReward = bossBattle.getCoinsReward();

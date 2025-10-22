@@ -44,7 +44,9 @@ public class UserStatisticsFragment extends Fragment {
     private FragmentUserStatisticsBinding binding;
     private UserStatisticsService statisticsService;
 
-    public UserStatisticsFragment() {}
+    public UserStatisticsFragment() {
+        // Required empty public constructor
+    }
 
     public static UserStatisticsFragment newInstance() {
         return new UserStatisticsFragment();
@@ -157,6 +159,7 @@ public class UserStatisticsFragment extends Fragment {
     }
 
     private void displayStatistics(StatisticsData stats) {
+        // Display text statistics
         binding.tvActiveDays.setText(getString(R.string.consecutive_days, stats.activeDaysCount));
         binding.tvCompletedCount.setText(String.valueOf(stats.totalCompletedTasks));
         binding.tvMissedCount.setText(String.valueOf(stats.totalMissedTasks));
@@ -169,7 +172,8 @@ public class UserStatisticsFragment extends Fragment {
         binding.tvLongestStreak.setText(getString(R.string.days_in_row, stats.longestSuccessStreak));
         binding.tvStartedMissions.setText(String.valueOf(stats.startedSpecialMissions));
         binding.tvCompletedMissions.setText(String.valueOf(stats.completedSpecialMissions));
-        
+
+        // Setup charts with data
         setupPieChartData(stats);
         setupBarChartData(stats.completedTasksByCategory);
         setupDifficultyLineChart(stats.averageDifficultyData);

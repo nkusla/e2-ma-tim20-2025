@@ -147,12 +147,39 @@
 						android:text="No Active Mission"
 						android:textSize="14sp"
 						android:layout_marginBottom="16dp" />
+					<com.google.android.material.button.MaterialButton
+						android:id="@+id/button_start_mission"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="Start Special Mission"
+						android:layout_marginBottom="8dp"
+						android:visibility="gone"
+						app:icon="@drawable/ic_sword"
+						app:iconGravity="textStart"
+						app:iconPadding="8dp"
+						app:iconTint="@android:color/white"
+						app:cornerRadius="8dp" />
+
+					<com.google.android.material.button.MaterialButton
+						android:id="@+id/button_view_mission"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="View Active Mission"
+						android:layout_marginBottom="8dp"
+						android:visibility="gone"
+						style="@style/Widget.Material3.Button.OutlinedButton"
+						app:icon="@drawable/ic_eye"
+						app:iconGravity="textStart"
+						app:iconPadding="8dp"
+						app:iconTint="?attr/colorPrimary"
+						app:cornerRadius="8dp" />
 
 					<LinearLayout
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:orientation="horizontal"
-						android:gravity="center">
+						android:gravity="center"
+						android:layout_marginTop="8dp">
 
 
 						<com.google.android.material.button.MaterialButton

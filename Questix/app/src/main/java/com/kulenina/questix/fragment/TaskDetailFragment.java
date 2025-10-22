@@ -164,8 +164,28 @@ public class TaskDetailFragment extends Fragment {
         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
     }
 
+    /**
+     * Extracts Difficulty/Importance string from array (e.g., "Very Easy (1 XP)" -> "Very Easy")
+     */
     private String getSelectedText(String uiText) {
-        return uiText.split(" \\(")[0];
+        System.out.println("DEBUG: getSelectedText() called with: '" + uiText + "'");
+        
+        if (uiText == null || uiText.isEmpty()) {
+            System.out.println("DEBUG: UI text is null or empty");
+            throw new IllegalArgumentException("UI text is null or empty");
+        }
+        
+        String[] parts = uiText.split(" \\(");
+        System.out.println("DEBUG: Split result: " + java.util.Arrays.toString(parts));
+        
+        if (parts.length == 0) {
+            System.out.println("DEBUG: Invalid UI text format");
+            throw new IllegalArgumentException("Invalid UI text format: " + uiText);
+        }
+        
+        String result = parts[0].trim();
+        System.out.println("DEBUG: Extracted '" + result + "' from '" + uiText + "'");
+        return result;
     }
 
     private void setupButtons() {
@@ -175,49 +195,129 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void handleUpdate() {
-        if (currentTask == null || currentTask.isFinished()) return;
+        try {
+            System.out.println("DEBUG: handleUpdate() started");
+            
+            if (currentTask == null) {
+                Toast.makeText(requireContext(), "No task selected.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        String name = binding.etTaskName.getText().toString().trim();
-        String description = binding.etTaskDescription.getText().toString();
+            if (currentTask.isFinished()) {
+                Toast.makeText(requireContext(), "Cannot update finished tasks.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        if (name.isEmpty()) {
-            binding.etTaskName.setError("Task name is required.");
-            return;
+            if (currentTask.isUndone()) {
+                Toast.makeText(requireContext(), "Cannot update undone tasks.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            System.out.println("DEBUG: Task validation passed");
+
+            String name = binding.etTaskName.getText().toString().trim();
+            String description = binding.etTaskDescription.getText().toString();
+
+            if (name.isEmpty()) {
+                binding.etTaskName.setError("Task name is required.");
+                return;
+            }
+
+            System.out.println("DEBUG: Name validation passed: '" + name + "'");
+
+            // Get spinner values with null checks
+            Object difficultyObj = binding.spinnerDifficulty.getSelectedItem();
+            Object importanceObj = binding.spinnerImportance.getSelectedItem();
+            
+            System.out.println("DEBUG: Difficulty object: " + difficultyObj);
+            System.out.println("DEBUG: Importance object: " + importanceObj);
+            
+            if (difficultyObj == null || importanceObj == null) {
+                Toast.makeText(requireContext(), "Please select difficulty and importance.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            String difficulty = getSelectedText(difficultyObj.toString());
+            String importance = getSelectedText(importanceObj.toString());
+            long newExecutionTime = executionCalendar.getTimeInMillis();
+
+            // Debug logging
+            System.out.println("DEBUG: Difficulty: '" + difficulty + "', Importance: '" + importance + "'");
+            System.out.println("DEBUG: Execution time: " + newExecutionTime);
+            System.out.println("DEBUG: Task ID: " + currentTask.id);
+
+            // Pozivamo servis za izmenu
+            System.out.println("DEBUG: Calling appTaskViewModel.updateTask()");
+            appTaskViewModel.updateTask(
+                            currentTask.id, name, description, newExecutionTime,
+                            difficulty, importance)
+                    .addOnCompleteListener(task -> {
+                        System.out.println("DEBUG: updateTask completed, success: " + task.isSuccessful());
+                        if (task.isSuccessful()) {
+                            Toast.makeText(requireContext(), "Task updated successfully.", Toast.LENGTH_SHORT).show();
+                            NavHostFragment.findNavController(this).popBackStack();
+                        } else {
+                            String errorMsg = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                            System.out.println("DEBUG: Update failed with error: " + errorMsg);
+                            Toast.makeText(requireContext(), "Error updating task: " + errorMsg, Toast.LENGTH_LONG).show();
+                        }
+                    });
+        } catch (Exception e) {
+            System.out.println("DEBUG: Exception in handleUpdate: " + e.getMessage());
+            e.printStackTrace();
+            Toast.makeText(requireContext(), "Error preparing update: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
-
-        String difficulty = getSelectedText(binding.spinnerDifficulty.getSelectedItem().toString());
-        String importance = getSelectedText(binding.spinnerImportance.getSelectedItem().toString());
-        long newExecutionTime = executionCalendar.getTimeInMillis();
-
-        appTaskViewModel.updateTask(
-                        currentTask.id, name, description, newExecutionTime,
-                        difficulty, importance)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(requireContext(), "Task updated successfully.", Toast.LENGTH_SHORT).show();
-                        NavHostFragment.findNavController(this).popBackStack();
-                    } else {
-                        Toast.makeText(requireContext(), "Error updating task: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
     }
 
     private void handleDelete() {
-        if (currentTask == null || currentTask.isFinished()) return;
+        if (currentTask == null) {
+            Toast.makeText(requireContext(), "No task selected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        if (currentTask.isFinished()) {
+            Toast.makeText(requireContext(), "Cannot delete finished tasks.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (currentTask.isUndone()) {
+            Toast.makeText(requireContext(), "Cannot delete undone tasks.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // TODO: Add confirmation dialog here
         appTaskViewModel.deleteTask(currentTask.id)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(requireContext(), "Task deleted successfully.", Toast.LENGTH_SHORT).show();
                         NavHostFragment.findNavController(this).popBackStack();
                     } else {
-                        Toast.makeText(requireContext(), "Error deleting task: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        String errorMsg = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                        Toast.makeText(requireContext(), "Error deleting task: " + errorMsg, Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
     private void handlePauseResume() {
-        if (currentTask == null || !currentTask.isRecurring) return;
+        if (currentTask == null) {
+            Toast.makeText(requireContext(), "No task selected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!currentTask.isRecurring) {
+            Toast.makeText(requireContext(), "Only recurring tasks can be paused/resumed.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (currentTask.isFinished()) {
+            Toast.makeText(requireContext(), "Cannot pause/resume finished tasks.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (currentTask.isUndone()) {
+            Toast.makeText(requireContext(), "Cannot pause/resume undone tasks.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         String newStatus = currentTask.status.equals(AppTask.STATUS_PAUSED) ? AppTask.STATUS_ACTIVE : AppTask.STATUS_PAUSED;
 
@@ -225,9 +325,11 @@ public class TaskDetailFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(requireContext(), "Task status changed to: " + newStatus, Toast.LENGTH_SHORT).show();
+                        // Pošto se status menja, ponovo učitavamo detalje da bismo osvežili UI
                         appTaskViewModel.loadTaskDetails(currentTask.id);
                     } else {
-                        Toast.makeText(requireContext(), "Error changing status: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        String errorMsg = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                        Toast.makeText(requireContext(), "Error changing status: " + errorMsg, Toast.LENGTH_LONG).show();
                     }
                 });
     }

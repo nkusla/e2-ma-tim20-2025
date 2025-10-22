@@ -9,13 +9,21 @@ public class Alliance implements IIdentifiable, Serializable {
     public String name;
     public String leaderId; // Creator's user ID
     public List<String> memberIds; // All member user IDs (including leader)
-    public boolean isMissionActive; // Whether a mission is currently running
+    public boolean isMissionActive = false; // Whether a mission is currently running
+
+    public int bossCurrentHp = 0;
+    public int bossMaxHp = 0;
+    public long missionStartedAt = 0;
+
     public long createdAt;
     public long updatedAt;
 
     public Alliance() {
         this.memberIds = new ArrayList<>();
         this.isMissionActive = false;
+        this.bossCurrentHp = 0;
+        this.bossMaxHp = 0;
+        this.missionStartedAt = 0;
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
     }
@@ -76,5 +84,42 @@ public class Alliance implements IIdentifiable, Serializable {
     public void setMissionActive(boolean missionActive) {
         this.isMissionActive = missionActive;
         this.updatedAt = System.currentTimeMillis();
+    }
+
+    public int getBossCurrentHp() {
+        return bossCurrentHp;
+    }
+
+    public void setBossCurrentHp(int bossCurrentHp) {
+        this.bossCurrentHp = bossCurrentHp;
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    public int getBossMaxHp() {
+        return bossMaxHp;
+    }
+
+    public void setBossMaxHp(int bossMaxHp) {
+        this.bossMaxHp = bossMaxHp;
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    public long getMissionStartedAt() {
+        return missionStartedAt;
+    }
+    public void setMissionStartedAt(long missionStartedAt) {
+        this.missionStartedAt = missionStartedAt;
+        this.updatedAt = System.currentTimeMillis();
+    }
+    public boolean isMissionActive() {
+        return isMissionActive;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setLeaderId(String leaderId) {
+        this.leaderId = leaderId;
     }
 }

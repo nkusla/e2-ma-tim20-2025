@@ -18,6 +18,7 @@ public class User implements IIdentifiable, Serializable {
 	public String currentAllianceId;
 	public List<String> allianceInvitations;
 	public String fcmToken;
+	public Integer badgesCount = 0;
 
 	public User() {
 		this.level = 0;
@@ -27,9 +28,10 @@ public class User implements IIdentifiable, Serializable {
 		this.bossLevel = 1;
 		this.friends = new ArrayList<>();
 		this.allianceInvitations = new ArrayList<>();
+		this.badgesCount = 0;
 	}
 
-	public User(String id, String avatar, String username, String email, Integer level, Integer powerPoints, Integer xp, Integer coins) {
+	public User(String id, String avatar, String username, String email, Integer level, Integer powerPoints, Integer xp, Integer coins, Integer badgesCount) {
 		this.id = id;
 		this.avatar = avatar;
 		this.username = username;
@@ -41,6 +43,7 @@ public class User implements IIdentifiable, Serializable {
 		this.bossLevel = 1;
 		this.friends = new ArrayList<>();
 		this.allianceInvitations = new ArrayList<>();
+		this.badgesCount = badgesCount;
 	}
 
 	@Override

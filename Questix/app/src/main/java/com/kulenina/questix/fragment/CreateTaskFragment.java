@@ -66,6 +66,7 @@ public class CreateTaskFragment extends Fragment {
     private void setupCategorySpinner() {
         categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
             if (categories != null && !categories.isEmpty()) {
+                // Kreiranje adaptera
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(
                         requireContext(),
                         android.R.layout.simple_spinner_item,
@@ -74,6 +75,7 @@ public class CreateTaskFragment extends Fragment {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 binding.spinnerCategory.setAdapter(adapter);
 
+                // DODAVANJE LISTENER-A za odabir kategorije
                 binding.spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -84,12 +86,15 @@ public class CreateTaskFragment extends Fragment {
 
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
+                        // Ne radi ništa
                     }
                 });
 
+                // Podrazumevani odabir prve kategorije
                 selectedCategoryId = categories.get(0).getId();
             } else {
-                selectedCategoryId = null;
+                // Ako nema kategorija, prikaži poruku i postavi ID na null
+                selectedCategoryId = null; // Ovde MORA da se postavi na null
             }
         });
         categoryViewModel.loadCategories();
@@ -175,12 +180,14 @@ public class CreateTaskFragment extends Fragment {
                             isRecurring, executionTime, repetitionInterval,
                             repetitionUnit, startDate, endDate, description)
                     .addOnCompleteListener(task -> {
+                        // Proverava da li je fragment još uvek aktivan
                         if (!isAdded() || getContext() == null) {
-                            return;
+                            return; // Fragment je uništen, ne radi ništa
                         }
 
                         if (task.isSuccessful()) {
                             Toast.makeText(requireContext(), "Task created successfully!", Toast.LENGTH_SHORT).show();
+                            // Resetuj formu za kreiranje novog zadatka
                             resetForm();
                         } else {
                             String errorMessage = "Unknown error";
@@ -252,27 +259,37 @@ public class CreateTaskFragment extends Fragment {
         binding.spinnerImportance.setAdapter(importanceAdapter);
     }
 
+    /**
+     * Resetuje formu nakon uspešnog kreiranja zadatka
+     */
     private void resetForm() {
+        // Očisti text polja
         binding.etTaskName.setText("");
         binding.etTaskDescription.setText("");
         binding.etRepetitionInterval.setText("");
 
+        // Resetuj checkbox
         binding.cbIsRecurring.setChecked(false);
         binding.layoutRecurringDetails.setVisibility(View.GONE);
 
+        // Resetuj spinere na default vrednosti
         binding.spinnerDifficulty.setSelection(0);
         binding.spinnerImportance.setSelection(0);
         binding.spinnerRepetitionUnit.setSelection(0);
 
+        // Resetuj kategoriju na prvu (ako postoji)
         binding.spinnerCategory.setSelection(0);
 
+        // Resetuj datume na trenutno vreme
         executionCalendar = Calendar.getInstance();
         startCalendar = (Calendar) executionCalendar.clone();
         endCalendar = Calendar.getInstance();
         endCalendar.add(Calendar.MONTH, 1);
 
+        // Ažuriraj dugmad sa novim vremenima
         updateDateTimeButtons();
 
+        // Očisti greške
         binding.etTaskName.setError(null);
         binding.etRepetitionInterval.setError(null);
     }

@@ -80,9 +80,11 @@ public class ShopFragment extends Fragment implements ShopAdapter.OnShopItemClic
         if (currentUser != null && binding != null) {
             binding.textViewCoins.setText(String.valueOf(currentUser.coins));
 
+            // Display boss level instead of user level
             int bossLevel = currentUser.bossLevel != null ? currentUser.bossLevel : 1;
             binding.textViewLevel.setText("Boss Level: " + bossLevel);
 
+            // Update shop adapter with current boss level for dynamic pricing
             shopAdapter.setBossLevel(bossLevel);
         }
     }

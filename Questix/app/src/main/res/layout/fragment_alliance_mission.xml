@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <!-- Ovde možete dodati podatke, ali za sad koristimo direktno View bindovanje -->
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:background="#1A1A2E"
+        tools:context=".fragment.AllianceMissionFragment">
+
+        <!-- Naslov Misije -->
+        <TextView
+            android:id="@+id/textViewMissionTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Special Boss Mission"
+            android:textColor="#E94560"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp" />
+
+        <!-- Tajmer -->
+        <TextView
+            android:id="@+id/textViewTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time Left: 23:59:59"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/textViewMissionTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Time Left: 00:00:00" />
+
+        <!-- Boss HP Prikaz -->
+        <TextView
+            android:id="@+id/textViewBossHpLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Boss Health"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@id/textViewTimer"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/textViewBossHp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="#E94560"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/textViewBossHpLabel"
+            app:layout_constraintTop_toTopOf="@id/textViewBossHpLabel"
+            tools:text="1000 / 10000 HP (10%)" />
+
+        <ProgressBar
+            android:id="@+id/progressBarBossHp"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:progressTint="#FFD700"
+            android:progressBackgroundTint="#44446A"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewBossHp"
+            android:max="100"
+            android:progress="10" />
+
+        <!-- Prikaz Dnevnog Doprinosa Članova (može biti RecyclerView) -->
+        <TextView
+            android:id="@+id/textViewMemberContributions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Your Daily Contribution: 0/500 DMG"
+            android:textColor="#A0A0FF"
+            android:textSize="16sp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@id/progressBarBossHp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Section Header for All Members -->
+        <TextView
+            android:id="@+id/textViewMembersHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Alliance Members Progress"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/textViewMemberContributions"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- RecyclerView for Members Progress -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewMembersProgress"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            app:layout_constraintTop_toBottomOf="@id/textViewMembersHeader"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:listitem="@layout/item_member_progress" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

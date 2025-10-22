@@ -45,7 +45,7 @@
                 android:textColor="@color/colorTextPrimary"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toEndOf="@id/category_color_indicator"
-                app:layout_constraintEnd_toStartOf="@id/btn_complete"
+                app:layout_constraintEnd_toStartOf="@id/layout_action_buttons"
                 tools:text="Dovrši projekat Questix" />
 
             <TextView
@@ -57,7 +57,7 @@
                 android:textColor="@color/colorTextSecondary"
                 app:layout_constraintTop_toBottomOf="@id/tv_task_name"
                 app:layout_constraintStart_toStartOf="@id/tv_task_name"
-                app:layout_constraintEnd_toStartOf="@id/btn_complete"
+                app:layout_constraintEnd_toStartOf="@id/layout_action_buttons"
                 tools:text="25. Okt. 2025. - 10:00" />
 
             <TextView
@@ -69,20 +69,60 @@
                 android:textColor="@color/colorTextSecondary"
                 app:layout_constraintTop_toBottomOf="@id/tv_execution_time"
                 app:layout_constraintStart_toStartOf="@id/tv_task_name"
-                app:layout_constraintEnd_toStartOf="@id/btn_complete"
+                app:layout_constraintEnd_toStartOf="@id/layout_action_buttons"
                 tools:text="Dnevno ponavljanje | 10 XP" />
 
-            <ImageButton
-                android:id="@+id/btn_complete"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Završi Zadatak"
-                android:src="@drawable/ic_check"
-                app:tint="@color/colorSuccess"
+            <LinearLayout
+                android:id="@+id/layout_action_buttons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageButton
+                    android:id="@+id/btn_complete"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Završi Zadatak"
+                    android:src="@drawable/ic_check"
+                    app:tint="@color/colorSuccess" />
+
+                <ImageButton
+                    android:id="@+id/btn_cancel"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Otkaži Zadatak"
+                    android:src="@drawable/ic_close"
+                    app:tint="@color/colorError" />
+
+                <ImageButton
+                    android:id="@+id/btn_pause"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Pauziraj Zadatak"
+                    android:src="@drawable/ic_lock"
+                    android:visibility="gone"
+                    app:tint="@color/colorWarning" />
+
+                <ImageButton
+                    android:id="@+id/btn_resume"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Nastavi Zadatak"
+                    android:src="@drawable/ic_check"
+                    android:visibility="gone"
+                    app:tint="@color/colorSuccess" />
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

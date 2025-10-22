@@ -49,4 +49,13 @@
     <string name="no_completed_tasks">No completed tasks yet</string>
     <string name="no_xp_data">No XP data available</string>
     <string name="statistics_load_error">Failed to load statistics: %s</string>
+    <string name="mission_status_inactive">Mission Inactive</string>
+    <string name="mission_time_finished">Time Left: Mission Ended</string>
+    <string name="mission_boss_defeated">BOSS DEFEATED!</string>
+    <string name="mission_title_active">Special Alliance Mission</string>
+    <string name="mission_no_progress">Your contribution loading...</string>
+    <string name="mission_progress_load_error">Error loading your contribution.</string>
+    <string name="mission_member_contribution">Your Total Contribution: %d HP</string>
+    <string name="mission_status_active">Active Mission</string>
+    <string name="mission_status_inactive_list">No Active Mission</string>
 </resources>

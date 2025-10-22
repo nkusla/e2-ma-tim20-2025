@@ -28,9 +28,7 @@
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary_text_color"
-                android:gravity="start|center_vertical"
-                android:drawableStart="@drawable/ic_statistics"
-                android:drawablePadding="12dp"
+                android:gravity="center"
                 android:layout_marginBottom="24dp" />
 
             <!-- Active Days Card -->

@@ -130,6 +130,54 @@ public class CalendarFragment extends Fragment implements TaskListAdapter.TaskAc
     }
 
     @Override
+    public void onTaskCancel(String taskId) {
+        // Implementiramo logiku otkazivanja zadatka
+        appTaskViewModel.cancelTask(taskId)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(requireContext(), "Zadatak otkazan!", Toast.LENGTH_SHORT).show();
+                        // Ponovo učitavamo zadatke za trenutno odabrani datum
+                        long selectedDate = binding.calendarView.getDate();
+                        loadTasksForSelectedDate(selectedDate);
+                    } else {
+                        Toast.makeText(requireContext(), "Greška: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    @Override
+    public void onTaskPause(String taskId) {
+        // Implementiramo logiku pauziranja ponavljajućeg zadatka
+        appTaskViewModel.pauseTask(taskId)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(requireContext(), "Ponavljajući zadatak pauziran!", Toast.LENGTH_SHORT).show();
+                        // Ponovo učitavamo zadatke za trenutno odabrani datum
+                        long selectedDate = binding.calendarView.getDate();
+                        loadTasksForSelectedDate(selectedDate);
+                    } else {
+                        Toast.makeText(requireContext(), "Greška: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    @Override
+    public void onTaskResume(String taskId) {
+        // Implementiramo logiku nastavljanja ponavljajućeg zadatka
+        appTaskViewModel.resumeTask(taskId)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(requireContext(), "Ponavljajući zadatak nastavljen!", Toast.LENGTH_SHORT).show();
+                        // Ponovo učitavamo zadatke za trenutno odabrani datum
+                        long selectedDate = binding.calendarView.getDate();
+                        loadTasksForSelectedDate(selectedDate);
+                    } else {
+                        Toast.makeText(requireContext(), "Greška: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    @Override
     public void onTaskClick(String taskId) {
         TaskDetailFragment fragment = TaskDetailFragment.newInstance(taskId);
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();

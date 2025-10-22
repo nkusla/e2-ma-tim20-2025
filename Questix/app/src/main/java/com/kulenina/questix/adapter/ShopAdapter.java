@@ -19,7 +19,7 @@ import java.util.List;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder> {
     private List<Equipment> shopItems = new ArrayList<>();
-    private int bossLevel = 1;
+    private int bossLevel = 1; // Default boss level
     private OnShopItemClickListener listener;
 
     public interface OnShopItemClickListener {
@@ -37,7 +37,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
 
     public void setBossLevel(int bossLevel) {
         this.bossLevel = bossLevel;
-        notifyDataSetChanged();
+        notifyDataSetChanged(); // Refresh prices when boss level changes
     }
 
     @NonNull

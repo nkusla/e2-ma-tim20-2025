@@ -45,6 +45,7 @@ public class BossBattleFragment extends Fragment {
     private User currentUser;
     private List<Equipment> activeEquipment;
 
+    // Shake detection
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private ShakeDetector shakeDetector;
@@ -85,6 +86,7 @@ public class BossBattleFragment extends Fragment {
             accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             shakeDetector = new ShakeDetector();
             shakeDetector.setOnShakeListener(count -> {
+                // Trigger attack on shake
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         performAttack();
@@ -333,6 +335,7 @@ public class BossBattleFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Register shake detector
         if (sensorManager != null && accelerometer != null && shakeDetector != null) {
             sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI);
         }
@@ -341,6 +344,7 @@ public class BossBattleFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        // Unregister shake detector to save battery
         if (sensorManager != null && shakeDetector != null) {
             sensorManager.unregisterListener(shakeDetector);
         }
@@ -349,6 +353,7 @@ public class BossBattleFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Clean up sensor resources
         if (sensorManager != null && shakeDetector != null) {
             sensorManager.unregisterListener(shakeDetector);
         }
