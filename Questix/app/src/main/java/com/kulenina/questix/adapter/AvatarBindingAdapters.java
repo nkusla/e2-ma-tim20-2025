@@ -18,7 +18,6 @@ public class AvatarBindingAdapters {
         if (resourceId != 0) {
             imageView.setImageResource(resourceId);
         } else {
-            // Fallback to default avatar
             int defaultResourceId = imageView.getContext().getResources().getIdentifier(
                 "avatar_1", "drawable", imageView.getContext().getPackageName()
             );

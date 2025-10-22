@@ -123,7 +123,6 @@ public class UserViewModel extends BaseObservable {
         if (user == null || user.level == null) return "200";
 
         int currentLevel = user.level;
-        // Get total cumulative XP needed to reach next level
         return String.valueOf(levelProgressionService.getXpRequiredForLevel(currentLevel + 1));
     }
 
@@ -141,7 +140,6 @@ public class UserViewModel extends BaseObservable {
 
     public void setUser(User user) {
         this.user = user;
-        // Notify all user-related properties changed
         notifyPropertyChanged(com.kulenina.questix.BR.email);
         notifyPropertyChanged(com.kulenina.questix.BR.username);
         notifyPropertyChanged(com.kulenina.questix.BR.level);

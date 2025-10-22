@@ -62,7 +62,6 @@ public class EquipmentDisplayAdapter extends RecyclerView.Adapter<EquipmentDispl
             textViewEffect.setText(equipment.getEffectDescription());
             textViewType.setText(equipment.getType().name());
 
-            // Set appropriate icon and type background color
             switch (equipment.getType()) {
                 case POTION:
                     imageViewIcon.setImageResource(R.drawable.ic_potion);

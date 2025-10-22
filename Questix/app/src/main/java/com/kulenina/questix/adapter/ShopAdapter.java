@@ -86,7 +86,6 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
             int price = equipment.getPrice(basePrice);
             textViewPrice.setText(String.valueOf(price));
 
-            // Set type-specific styling and icon
             switch (equipment.getType()) {
                 case POTION:
                     imageViewIcon.setImageResource(R.drawable.ic_potion);

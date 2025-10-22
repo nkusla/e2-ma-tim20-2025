@@ -44,14 +44,12 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //navController = Navigation.findNavController(view);
         appTaskViewModel = new ViewModelProvider(requireActivity()).get(AppTaskViewModel.class);
 
         setupRecyclerView();
         setupObservers();
         setupFilterTabs();
 
-        // Početno učitavanje zadataka
         appTaskViewModel.loadTasksForList();
         
         // Proveri i označi stare zadatke kao "undone"
@@ -161,12 +159,6 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
             applyFilter();
         });
 
-        // Observator za status učitavanja (ako je implementiran u VM)
-        // appTaskViewModel.getLoadingStatus().observe(getViewLifecycleOwner(), isLoading -> {
-        //     binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        // });
-
-        // Observator za greške
         appTaskViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
                 Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_LONG).show();
@@ -176,8 +168,6 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
     }
 
 
-
-    // --- TaskActionListener Implementacija ---
 
     @Override
     public void onTaskComplete(String taskId) {
@@ -239,7 +229,6 @@ public class TaskListFragment extends Fragment implements TaskListAdapter.TaskAc
 
     @Override
     public void onTaskClick(String taskId) {
-        // Otvaranje detalja zadatka preko MainActivity
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).showTaskDetail(taskId);
         } else {

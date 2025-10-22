@@ -1,7 +1,6 @@
 package com.kulenina.questix.dialog;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -126,7 +125,6 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
                     textViewNoFriends.setVisibility(View.VISIBLE);
                     textViewNoFriends.setText("You don't have any friends to invite");
                 } else {
-                    // Convert friends to UserViewModels
                     friendViewModels.clear();
                     for (User friend : friends) {
                         UserViewModel userViewModel = new UserViewModel();
@@ -170,14 +168,11 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
         buttonCreate.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
 
-        // Create alliance
         allianceService.createAlliance(allianceName, currentUserId)
             .addOnSuccessListener(allianceId -> {
-                // Send invitations to selected friends
                 if (!selectedFriendIds.isEmpty()) {
                     sendInvitationsToFriends(allianceId, allianceName);
                 } else {
-                    // No friends selected, just show success
                     progressBar.setVisibility(View.GONE);
                     buttonCreate.setEnabled(true);
                     if (listener != null) {
@@ -203,7 +198,6 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
                 .addOnSuccessListener(invitationId -> {
                     completedInvitations[0]++;
                     if (completedInvitations[0] == totalInvitations) {
-                        // All invitations sent
                         progressBar.setVisibility(View.GONE);
                         buttonCreate.setEnabled(true);
                         if (listener != null) {
@@ -215,7 +209,6 @@ public class CreateAllianceDialog extends DialogFragment implements FriendSelect
                 .addOnFailureListener(e -> {
                     completedInvitations[0]++;
                     if (completedInvitations[0] == totalInvitations) {
-                        // All invitations processed (some may have failed)
                         progressBar.setVisibility(View.GONE);
                         buttonCreate.setEnabled(true);
                         if (listener != null) {

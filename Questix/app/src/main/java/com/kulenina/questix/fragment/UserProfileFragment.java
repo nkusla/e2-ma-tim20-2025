@@ -49,13 +49,11 @@ public class UserProfileFragment extends Fragment {
 
         setupRecyclerView();
 
-        // Initialize UI state - show loading by default
         showLoadingState();
 
         if (getArguments() != null) {
             String userId = getArguments().getString("userId");
             if (userId != null) {
-                // Check if this is the current user's own profile
                 String currentUserId = authService.getCurrentUser().getUid();
                 userViewModel.setIsOwnProfile(currentUserId.equals(userId));
 
@@ -104,7 +102,6 @@ public class UserProfileFragment extends Fragment {
                 equipmentAdapter.setEquipmentList(activeEquipment);
             })
             .addOnFailureListener(e -> {
-                // Silently handle equipment loading failure - not critical for profile display
                 userViewModel.setActiveEquipment(new java.util.ArrayList<>());
                 equipmentAdapter.setEquipmentList(new java.util.ArrayList<>());
             });
@@ -121,14 +118,12 @@ public class UserProfileFragment extends Fragment {
     private void setupFriendButton(String profileUserId) {
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Don't show friend button for own profile
         if (currentUserId.equals(profileUserId)) {
             return;
         }
 
         FriendshipService friendshipService = new FriendshipService();
 
-        // Check if already friends
         friendshipService.areFriends(currentUserId, profileUserId)
             .addOnSuccessListener(areFriends -> {
                 Button friendButton = getView().findViewById(R.id.buttonAddFriend);
@@ -152,7 +147,7 @@ public class UserProfileFragment extends Fragment {
         friendshipService.addFriend(currentUserId, friendId)
             .addOnSuccessListener(aVoid -> {
                 Toast.makeText(getContext(), "Friend added!", Toast.LENGTH_SHORT).show();
-                setupFriendButton(friendId); // Refresh button
+                setupFriendButton(friendId);
             })
             .addOnFailureListener(e -> {
                 Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -166,7 +161,7 @@ public class UserProfileFragment extends Fragment {
         friendshipService.removeFriend(currentUserId, friendId)
             .addOnSuccessListener(aVoid -> {
                 Toast.makeText(getContext(), "Friend removed!", Toast.LENGTH_SHORT).show();
-                setupFriendButton(friendId); // Refresh button
+                setupFriendButton(friendId);
             })
             .addOnFailureListener(e -> {
                 Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();

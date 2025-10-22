@@ -193,7 +193,7 @@ public class BossBattleFragment extends Fragment {
     }
 
     private void showHitAnimation() {
-        binding.ivHitAnimation.setBackground(new ColorDrawable(Color.argb(180, 255, 0, 0))); // Semi-transparent red
+        binding.ivHitAnimation.setBackground(new ColorDrawable(Color.argb(180, 255, 0, 0)));
         binding.ivHitAnimation.setVisibility(View.VISIBLE);
 
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(binding.ivBoss, "scaleX", 1.0f, 0.9f, 1.1f, 1.0f);
@@ -319,7 +319,6 @@ public class BossBattleFragment extends Fragment {
     }
 
     private void continueBattle() {
-        // Always get current boss battle (which resets the battle state)
         bossBattleService.getCurrentBossBattle()
             .addOnSuccessListener(bossBattle -> {
                 currentBossBattle = bossBattle;

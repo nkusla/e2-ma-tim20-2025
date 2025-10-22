@@ -2,7 +2,6 @@ package com.kulenina.questix.adapter;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -66,17 +65,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
             binding.tvTaskName.setText(task.name);
             binding.tvExecutionTime.setText(dateFormat.format(task.executionTime));
 
-            // Prikaz XP i Ponavljanja
             String recurrenceInfo = task.isRecurring ?
                     String.format("(%d %s)", task.repetitionInterval, task.repetitionUnit) : "Non-recurring";
             String xpInfo = String.format("%s | %d XP", recurrenceInfo, task.totalXpValue);
             binding.tvRecurrenceXp.setText(xpInfo);
 
-            // Boja Kategorije
             try {
                 binding.categoryColorIndicator.setBackgroundColor(Color.parseColor(task.colorHex));
             } catch (IllegalArgumentException | NullPointerException e) {
-                // Ako je boja neispravna, koristi se podrazumevana
                 binding.categoryColorIndicator.setBackgroundColor(itemView.getContext().getResources().getColor(R.color.colorAccent));
             }
 

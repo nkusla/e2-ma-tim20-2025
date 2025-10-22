@@ -43,7 +43,6 @@ public class TaskDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Dohvatanje taskId iz argumenata
         if (getArguments() != null) {
             taskId = getArguments().getString("taskId");
         }
@@ -58,19 +57,16 @@ public class TaskDetailFragment extends Fragment {
         appTaskViewModel = new ViewModelProvider(requireActivity()).get(AppTaskViewModel.class);
         categoryViewModel = new ViewModelProvider(requireActivity()).get(CategoryViewModel.class);
 
-        // Inicijalizacija kalendara
         executionCalendar = Calendar.getInstance();
 
         setupObservers();
         setupDateTimePickers();
         setupButtons();
 
-        // Učitavanje zadatka
         appTaskViewModel.loadTaskDetails(taskId);
     }
 
     private void setupObservers() {
-        // Observator za detalje zadatka
         appTaskViewModel.getTaskDetails().observe(getViewLifecycleOwner(), task -> {
             if (task != null) {
                 currentTask = task;
@@ -81,10 +77,6 @@ public class TaskDetailFragment extends Fragment {
             }
         });
 
-        // Observator za kategoriju (Potrebno za prikaz imena kategorije)
-        // Moved to populateUI method to avoid null pointer exception
-
-        // Observator za greške
         appTaskViewModel.getErrorLiveData().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
                 Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_LONG).show();
@@ -98,15 +90,12 @@ public class TaskDetailFragment extends Fragment {
         binding.etTaskDescription.setText(task.description);
         binding.tvTaskStatus.setText("Status: " + task.status);
 
-        // Inicijalizacija kalendara sa vremenom izvršenja
         executionCalendar.setTimeInMillis(task.executionTime);
         updateDateTimeButtons();
 
-        // Postavljanje spinera na trenutne vrednosti
         setSpinnerSelection(binding.spinnerDifficulty, R.array.task_difficulties, task.difficulty);
         setSpinnerSelection(binding.spinnerImportance, R.array.task_importance, task.importance);
 
-        // Observator za kategoriju (moved here to avoid null pointer)
         if (task.categoryId != null) {
             categoryViewModel.getCategoryById(task.categoryId).observe(getViewLifecycleOwner(), category -> {
                 if (category != null) {
@@ -115,16 +104,13 @@ public class TaskDetailFragment extends Fragment {
             });
         }
 
-        // Ažuriranje dugmeta Pauza/Nastavak
         if (task.isFinished()) {
-            // Zabranjujemo izmene i akcije za završen/propušten zadatak
             binding.btnUpdateTask.setEnabled(false);
             binding.btnPauseResume.setVisibility(View.GONE);
-            binding.btnDeleteTask.setVisibility(View.GONE); // Ne može se brisati završen
+            binding.btnDeleteTask.setVisibility(View.GONE);
             binding.etTaskName.setEnabled(false);
             binding.etTaskDescription.setEnabled(false);
         } else if (task.isRecurring) {
-            // Ponavljajući zadaci mogu se pauzirati/nastaviti
             binding.btnPauseResume.setVisibility(View.VISIBLE);
             if (task.status.equals(AppTask.STATUS_PAUSED)) {
                 binding.btnPauseResume.setText("Resume");
@@ -138,14 +124,11 @@ public class TaskDetailFragment extends Fragment {
         }
     }
 
-    // --- Pomoćne metode za UI ---
-
     private void setSpinnerSelection(android.widget.Spinner spinner, int arrayId, String targetValue) {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 requireContext(), arrayId, android.R.layout.simple_spinner_item);
 
         for (int i = 0; i < adapter.getCount(); i++) {
-            // Upoređujemo samo prvi deo stringa (npr. "Very Easy" iz "Very Easy (1 XP)")
             String spinnerItem = adapter.getItem(i).toString().split(" \\(")[0];
             if (spinnerItem.equals(targetValue)) {
                 spinner.setSelection(i);
@@ -204,8 +187,6 @@ public class TaskDetailFragment extends Fragment {
         System.out.println("DEBUG: Extracted '" + result + "' from '" + uiText + "'");
         return result;
     }
-
-    // --- Logika Dugmadi (Izmena, Brisanje, Pauza/Nastavak) ---
 
     private void setupButtons() {
         binding.btnUpdateTask.setOnClickListener(v -> handleUpdate());

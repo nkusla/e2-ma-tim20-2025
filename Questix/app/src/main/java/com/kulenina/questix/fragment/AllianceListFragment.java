@@ -82,11 +82,9 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
         messagesRecyclerView = binding.recyclerViewMessages;
         messageEditText = binding.editTextMessage;
 
-        // Setup RecyclerView
         messagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         messagesRecyclerView.setAdapter(messageAdapter);
 
-        // Setup send button
         binding.buttonSendMessage.setOnClickListener(v -> sendMessage());
     }
 
@@ -113,7 +111,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
     }
 
     private void updateAllianceUI() {
-        // Hide loading state
         binding.layoutLoading.setVisibility(View.GONE);
 
         if (currentAlliance != null) {
@@ -146,7 +143,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
             binding.layoutAllianceChat.setVisibility(View.VISIBLE);
             binding.layoutNoAlliance.setVisibility(View.GONE);
 
-            // Load alliance messages
             loadAllianceMessages();
         } else {
             binding.layoutAllianceInfo.setVisibility(View.GONE);
@@ -190,7 +186,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
 
     @Override
     public void onAllianceCreated(String allianceId) {
-        // Refresh the alliance data
         loadUserAlliance();
     }
 
@@ -201,7 +196,6 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
                 .addOnSuccessListener(messages -> {
                     messageAdapter.updateMessages(messages);
                     if (!messages.isEmpty()) {
-                        // Scroll to bottom to show latest messages
                         messagesRecyclerView.scrollToPosition(messages.size() - 1);
                     }
                 })
@@ -233,17 +227,14 @@ public class AllianceListFragment extends Fragment implements CreateAllianceDial
             return;
         }
 
-        // Clear the input immediately
         messageEditText.setText("");
 
         allianceService.sendMessage(currentAlliance.id, currentUserId, messageText)
             .addOnSuccessListener(messageId -> {
-                // Reload messages to show the new message
                 loadAllianceMessages();
             })
             .addOnFailureListener(e -> {
                 Toast.makeText(getContext(), "Error sending message: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                // Restore the message text if sending failed
                 messageEditText.setText(messageText);
             });
     }
